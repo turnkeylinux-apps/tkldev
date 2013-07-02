@@ -1,0 +1,17 @@
+turnkey-tkldev-12.1 (1) turnkey; urgency=low
+
+  * Initial public release of TKLDev.
+
+  * TKLDev related:
+
+    - Full usage and development documentation.
+    - Includes TurnKey developed components: fab, deck and friends.
+    - Turnkey development directory structure with preconfigured CDPATH.
+    - Integrated caching proxy for fast and iterative development.
+    - Webmin and shellinabox included but disabled by default.
+
+  * Note: Please refer to turnkey-core's changelog for changes common to all
+    appliances. Here we only describe changes specific to this appliance.
+
+ -- Alon Swartz <alon@turnkeylinux.org>  Tue, 02 Jul 2013 18:56:00 +0300
+
