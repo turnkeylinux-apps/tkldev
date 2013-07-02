@@ -2,12 +2,21 @@
 
 FAB_PATH=/turnkey/fab
 
+# create directory structure
 mkdir -p $FAB_PATH/bootstraps
 mkdir -p $FAB_PATH/products
 
+# environmental variables and bash tweaks
 mkdir -p /root/.bashrc.d
+
 cat >/root/.bashrc.d/fab<<EOF
 export FAB_PATH=$FAB_PATH
 EOF
 chmod +x /root/.bashrc.d/fab
+
+cat >/root/.bashrc.d/turnkey-paths<<EOF
+CDPATH=.:$FAB_PATH:/turnkey:$FAB_PATH/products
+export _CDPATH=\$CDPATH
+EOF
+chmod +x /root/.bashrc.d/turnkey-paths
 
