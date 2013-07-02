@@ -8,4 +8,5 @@ build-essential
 gnupg
 genisoimage
 squashfs-tools
+polipo
 
