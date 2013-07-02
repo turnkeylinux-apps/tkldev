@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+FAB_PATH=/turnkey/fab
+
+mkdir -p $FAB_PATH/bootstraps
+mkdir -p $FAB_PATH/products
+
+mkdir -p /root/.bashrc.d
+cat >/root/.bashrc.d/fab<<EOF
+export FAB_PATH=$FAB_PATH
+EOF
+chmod +x /root/.bashrc.d/fab
+
