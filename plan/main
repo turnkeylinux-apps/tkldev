@@ -9,4 +9,5 @@ gnupg
 genisoimage
 squashfs-tools
 polipo
+sysv-rc-conf
 
