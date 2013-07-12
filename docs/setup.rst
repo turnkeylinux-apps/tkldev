@@ -5,9 +5,9 @@ layout overview
 ---------------
 
 Before getting started, it's useful to understand the file-system layout
-of TKLDev, the most relevant for now is the ``/turnkey`` root folder::
+of TKLDev, the most relevant for now is the ``/turnkey/fab`` folder::
 
-    /turnkey/
+    /turnkey/fab/
         bootstraps/
         cdroots/
         common/
