@@ -20,9 +20,9 @@ Note that absolute paths are used in the documentation, even though
 ``CDPATH`` is pre-configured and supports tab completion, providing
 quick and easy navigation, for example::
 
-    cd core             # changes to /turnkey/products/core
-    cd products/core    # changes to /turnkey/products/core
-    cd common           # changed to /turnkey/common
+    cd core             # changes to /turnkey/fab/products/core
+    cd products/core    # changes to /turnkey/fab/products/core
+    cd common           # changes to /turnkey/fab/common
 
 bootstrap
 ---------
