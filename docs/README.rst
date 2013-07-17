@@ -12,10 +12,6 @@ Documentation
 * `Setup`_
 * `Development`_
 
-
-.. _TKLDev: http://www.turnkeylinux.org/tkldev/
-.. _TurnKey Linux: http://www.turnkeylinux.org/
-.. _source: https://github.com/turnkeylinux-apps/
 .. _Installation: installation.rst
 .. _Setup: setup.rst
 .. _Development: development/README.rst

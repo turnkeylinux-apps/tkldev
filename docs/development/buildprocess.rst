@@ -1,90 +1,101 @@
 Build process high-level overview
 =================================
 
-You should recall that the last phase of `Setup`_ was to build TurnKey
-Core using the command ``make``, which generated ``product.iso``. Let's
-describe what actually happened and introduce some terminology.
+The last phase described in `Setup`_ built TurnKey Core::
+    
+    cd core
+    make
 
-bootstrap
----------
+This generated ``product.iso`` in roughly 6 stages:
 
-One of the first things that happen in the build process, is the
+1) seed root filesystem from bootstrap
+--------------------------------------
+
+One of the first things that happens in the build process, is the
 creation of a ``deck`` based on ``bootstrap``.
 
-* A ``deck`` is a virtual filesystem branch derived from a directory or
-  another deck.
+The ``bootstrap`` is the minimal root filesystem in which packages can
+be installed.
 
-* The ``bootstrap`` was already introduced in `Setup`_, which is
-  basically the minimal root filesystem in which packages can be
-  installed.
+A ``deck`` is a copy-on-write branch of a directory or another deck
+created with the ``deck`` tool.
 
-root.build
-----------
+Decking a directory (or another deck) works like copying it to a new
+location where you can apply arbitrary changes, except that it works
+faster because there is no copying involved. See the ``deck``
+documentation for full details.
 
-Next, a new ``deck`` called ``root.build`` is created from the bootstrap
-deck.
+2) install plan into root.build
+-------------------------------
 
-* The ``root.build`` is the chroot'able root filesystem of the product,
-  built by installing the resolved packages from the ``plan``.
+``root.build`` is branched off from ``bootstrap`` and into it the plan
+is installed via the package manager.
 
-* A ``plan`` defines a set of packages to be installed in the product,
-  which may include other plans, such as those in ``common``.
+The plan is a list of packages which may include references to other
+plans containing additional packages, such as those in the ``common``
+repository (e.g. /turnkey/fab/common/plans/turnkey/lamp).
 
-* ``common``, also introduced in `Setup`_, includes common plans,
-  overlays, conf scripts and more adhering to the DRY principle.
+3) apply conf scripts and overlay files to root.patched
+-------------------------------------------------------
 
-root.patched
-------------
+``root.patched`` is branched off from ``root.build`` and on to it
+overlays and conf scripts are applied in the following order:
 
-The ``root.patched`` deck is then created from the root.build deck.
+A) common ``overlays`` and ``conf`` scripts 
+B) product specific ``overlays`` and ``conf`` scripts.
 
-* The ``root.patched`` is the chroot'able root filesystem of the
-  product, built by applying common ``overlays`` and ``confs``, and
-  finally the product specific ``overlays`` and ``confs``.
+An ``overlay``: a directory containing files to be overlaid on top of
+``root.patched``. For example youroverlay/etc/hostname will be copied into
+root.pathced/etc/hostname.
 
-* An ``overlay`` is a directory containing files to be overlayed in
-  ``root.patched``.
+A ``conf`` script: any executable script in ``conf.d`` of the product
+source code, or a specified script or directory in common.
 
-* A ``conf`` is any executable script in ``conf.d`` of the product
-  source code, or a specified script or directory in common.
+The scripts are executed in alpha-numeric ordering based on the
+filename, so if you need to control the order, you can prepend an
+integer (e.g., conf.d/10myscript). This is used in complex products,
+such as `GitLab`_.
 
-  The scripts are executed in alpha-numeric ordering based on the
-  filename, so if you have to control the order, you can prepend an
-  integer (e.g., conf.d/10myscript). This is used in complex products,
-  such as `GitLab`_.
+Each script is copied into a temporary directory in ``root.patched``
+and executed while chrooted into ``root.patched``. After execution the
+temporary directory is deleted.
 
-  Each script is copied into a temporary directory in ``root.patched``
-  and executed while chrooted into ``root.patched``. After execution the
-  temporary directory is deleted.
+4) squash root.tmp overlay - sandbox for manual changes
+-------------------------------------------------------
 
-root.tmp
---------
+``root.tmp`` is branched off from the ``root.patched`` deck.
 
-Next, a new ``deck`` called ``root.tmp`` is created from the
-root.patched deck.
+This step isn't strictly a necessary part of the build process. It only
+really exists to make life easier for the appliance developer.
 
-* The ``root.tmp`` is a chroot'able root filesystem of the product, used
-  as a sandbox to accelerate the development cycle by providing a
-  mechanism for testing manual changes to the root filesystem.
+``root.tmp`` is just like ``root.patched`` except it is designed to hold
+temporary, manual modifications to the root filesystem.  It serves as a
+sandbox that can be used to accelerate the development cycle by making
+it easy to test proposed changes to the root filesystem quickly, without
+changing product source code and without having to wait for the build
+process to resquash the ``root.patched`` root filesystem.
 
-  Instead of re- ``squashing`` the root filesystem from scratch, root.tmp's
-  overlay is squashed separetly - ie. rebuilding a product to test a
-  change to the root filesystem only takes a few seconds.
+The way it works is that is that the build process squashes root.tmp's
+overlay separately. This only takes a few seconds. It then copies the
+archived filesystem overlay into the cdroot, where it will be used to
+apply the changes to the root filesystem during boot.
 
-cdroot
-------
+5) package the components into the cdroot template
+--------------------------------------------------
 
-Now that the root filesystem is ready, the ``cdroot`` (introduced in
-`Setup`_) is created, including the initrd, kernel, ``squashed`` root
-filesystem, the bootsplash and a few other files to facilite the boot
-process.
+Now that the root filesystem is ready, the final ``cdroot`` can be
+created.
 
-product.iso
------------
+The cdroot is a directory which includes all the files required to make
+the appliance's CD ISO image bootable including the bootloader,
+bootsplash configuration, kernel, initramfs, squashed ``root.patched``
+filesystem and the ``root.tmp`` overlay if it exists.
 
-The final product used by the end-user. The product is generated from
-the prepared ``cdroot``.
+6) generate product.iso
+-----------------------
 
+The final product.iso file is generated from the ``cdroot`` by the
+genisoimage tool.
 
 .. _Setup: ../setup.rst
 .. _GitLab: https://github.com/turnkeylinux-apps/gitlab/tree/master/conf.d/

@@ -62,7 +62,7 @@ Perform change
 
 So now we are ready to make our changes. It's recommended to read the
 release notes of new versions to see if there are any other changes that
-might need to be made. For argument sake, lets say there aren't.
+might need to be made. For arguments sake, lets say there aren't.
 
 We get the new versions download URL as well as the md5sum, and update
 ``conf.d/downloads``.
@@ -71,8 +71,9 @@ Test
 ''''
 
 And we're done, not so hard. Lets perform a build for testing, but
-instead of building the ISO, we'll specify ``CHROOT_ONLY=y`` which
-excludes boot-related packages and stops at target ``root.tmp``::
+instead of building the ISO, we'll take a quick shortcut and specify
+``CHROOT_ONLY=y``. This excludes boot-related packages and stops the
+build at the ``root.tmp`` stage::
 
     make CHROOT_ONLY=y
 
@@ -87,29 +88,41 @@ Once the ``CHROOT_ONLY`` build is successful, lets test it::
     /etc/init.d/apache2 start
     /usr/lib/inithooks/firstboot.d/20regen-projectpier-secrets
 
-    # on host system, browse to http://tkldev
+    # on host system, browse to http://ip-of-tkldev-vm
     # verify there are no issues
 
     /etc/init.d/apache2 stop
     /etc/init.d/mysql stop
     exit
 
-Testing complete, perform cleanup::
+Testing complete? Let's perform a cleanup::
 
     deck -D build/root.tmp
     make clean
 
-If we were performing a large change, or changes that impact the boot
-process directly or indirectly (e.g., inithooks), it's recommended to
-perform a full build and test the ISO in a VM.
+Cautionary note: not all changes can be tested reliably (or at all)
+inside chroot using the CHROOT_ONLY shortcut. For large changes or
+changes that may effect the boot process (e.g., inithooks) it is
+recommended not to use CHROOT_ONLY. Instead, perform a full build and
+test the ISO in a VM.
 
 Commit
 ''''''
 
-Now we commit our changes to the repository::
+Now we commit our example change to the repository::
 
-    git-add conf.d/downloads
-    git-commit -m "Upgraded projectpier to version XX.YY"
+    $ git-status
+    # On branch master
+    # Changed but not updated:
+    #   (use "git add <file>..." to update what will be committed)
+    #   (use "git checkout -- <file>..." to discard changes in working directory)
+    #
+    #	modified:   conf.d/downloads
+    #
+    no changes added to commit (use "git add" and/or "git commit -a")
+
+    $ git-add conf.d/downloads
+    $ git-commit -m "Upgraded projectpier to version XX.YY"
 
 Push changes to GitHub and submit a Pull Request
 ------------------------------------------------
@@ -134,7 +147,6 @@ problem with your change, they won't want to merge until fixed.
 The good news is that whenever you commit and push more changes to that
 branch of your code, they will be included in that original pull request
 until it is closed.
-
 
 .. _TurnKey ProjectPier: https://github.com/turnkeylinux-apps/projectpier/
 .. _Git Flow: https://github.com/turnkeylinux/tracker/blob/master/GITFLOW.rst

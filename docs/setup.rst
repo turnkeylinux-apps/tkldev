@@ -1,36 +1,60 @@
-Download requirements
-=====================
+CDPATH
+======
 
-layout overview
----------------
-
-Before getting started, it's useful to understand the file-system layout
-of TKLDev, the most relevant for now is the ``/turnkey/fab`` folder::
-
-    /turnkey/fab/
-        bootstraps/
-        cdroots/
-        common/
-        products/
-            core/
-            wordpress/
-            ...
-
-Note that absolute paths are used in the documentation, even though
-``CDPATH`` is pre-configured and supports tab completion, providing
-quick and easy navigation, for example::
+While absolute paths are used in the documentation, the ``CDPATH``
+environment variable is pre-configured to provide quick and easy
+navigation through the filesystem::
 
     cd core             # changes to /turnkey/fab/products/core
     cd products/core    # changes to /turnkey/fab/products/core
     cd common           # changes to /turnkey/fab/common
 
-bootstrap
----------
+Note that CDPATH supports tab auto-completion.
 
-All appliances (ie. products) are built by layering on top of a
-bootstrap. Bootstraps are release and architecture specific, so here we
-download the bootstrap suitable for the TKLDev deployment, verify it,
-and proceed to unpack it::
+Prerequisites
+=============
+
+tkldev is the mother of all TurnKey appliances. It is the appliance that
+creates all other appliances, including new versions of itself.
+
+By convention, the source code for an appliance is placed within tkldev
+in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
+/turnkey/fab/products/wordpress, etc.).
+
+Though you can build any TurnKey appliance from source code within
+tkldev, we recommend first trying to build TurnKey Core as it is the
+simplest and easiest to understand of all TurnKey appliances.
+
+But before you build your first appliance, you will need to download 3
+prerequisite build dependencies and place them into their appropriate
+paths within the tkldev filesystem::
+
+1) /turnkey/fab/bootstraps: contains minimal bootstrap filesystems
+2) /turnkey/fab/cdroots: contains the cdroot template for the built ISO
+3) /turnkey/fab/common: contains source code shared amongst all TurnKey
+   appliances.
+
+1) bootstrap
+------------
+
+An appliance filesystem is first initialized as a copy of ``bootstrap``,
+which is an archived filesystem containing the bare minimum essential
+operating system components required to run the package manager and
+install additional packages.
+
+Bootstraps are specific to a specific OS release and architecture. This
+means there are 32-bit and 64-bit versions of bootstrap for each major
+operating system release.
+
+TurnKey's bootstrap is similar to the bootstrap filesystem created by
+Debian's debootstrap tool, except it is slightly smaller and more
+efficient. Other then that there is nothing TurnKey specific about it so
+you can roll your own if you don't want to use the bootstrap tarballs
+TurnKey provides for convenience.
+
+The easiest way to get started is to download a suitable bootstrap
+archive for your version of TKLDev, verify it, and proceed to unpack
+it to /turnkey/fab/bootstraps::
 
     ARCH=$(dpkg --print-architecture)
     CODENAME=$(lsb_release -s -c)
@@ -46,25 +70,34 @@ and proceed to unpack it::
     mkdir $CODENAME
     tar -zxf bootstrap-$CODENAME-$ARCH.tar.gz -C $CODENAME
 
-cdroots
--------
+2) cdroot
+---------
 
-Without going into too much detail, when an ISO is booted it displays a
-bootsplash prompting the user to select whether to install to harddisk
-or run in live non-persistent mode. The bootsplash configuration, files
-which facilitate the boot process (initrd, kernel), and root filesystem
-are stored in the ``cdroot``::
+When an ISO is booted it displays a bootsplash prompting the user to
+select whether to install to harddisk or run in live non-persistent
+mode. The bootsplash configuration, files which facilitate the boot
+process (initrd, kernel), and root filesystem are stored in the
+``cdroot``::
 
     cd /turnkey/fab
     git-clone https://github.com/turnkeylinux/cdroots.git
 
-common
-------
+3) common
+---------
 
-Again, without going into too much detail, each appliance (usually) has
-a product specific plan, conf scripts and overlay. Common provides the
-common code and configuration files used by multiple appliances adhering
-to the DRY (Don't repeat yourself) principle::
+While each TurnKey appliance has a product specific plan, conf scripts
+and overlay it also shares a common base of functionality with other
+appliances.
+
+For example, all appliances share the common ``TurnKey Core``
+functionality, all LAMP stack based appliances have a LAMP stack in
+common, and so forth.
+
+The common repository provides the common code and configuration files
+used by multiple appliances. This prevents wasteful and ineffecient
+repetition of build instructions that would otherwise have to be
+repeated for each appliance, in accordance with the DRY (Don't repeat
+yourself) principle::
 
     cd /turnkey/fab
     git-clone https://github.com/turnkeylinux/common.git
@@ -87,7 +120,6 @@ Finally, perform cleanup::
 
     deck -D build/root.tmp
     make clean
-
 
 .. _TurnKey Core: http://www.turnkeylinux.org/core/
 
