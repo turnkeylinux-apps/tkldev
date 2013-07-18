@@ -2,10 +2,10 @@ TKLDev - Appliance Development Toolchain and Build System
 =========================================================
 
 TKLDev is the mother of all TurnKey appliances. It's used to give birth
-to all other appliances, including new versions of itself. It
-includes a self-contained appliance development toolchain and build
-system that can be used by appliance hackers to fabricate any existing
-or new TurnKey appliance from `source`_.
+to all other appliances, including new versions of itself. It includes a
+self-contained appliance development toolchain and build system that can
+be used by appliance hackers to fabricate any existing or new TurnKey
+appliance from `source`_.
 
 Read the `blog post`_ announcing TKLDev for the background story and
 overview.
@@ -13,7 +13,8 @@ overview.
 This appliance includes all the standard features in `TurnKey Core`_,
 and on top of that:
 
-- Includes TurnKey appliance development build toolchain: fab_, deck_ and friends.
+- Includes TurnKey appliance development build toolchain: `fab`_,
+  `deck`_ and friends.
 - Turnkey development directory structure with preconfigured CDPATH.
 - Integrated caching proxy for fast and iterative development.
 - Full usage and development `documentation`_.

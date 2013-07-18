@@ -19,5 +19,5 @@ Recommended Git Flow and configuration
 
 
 .. _Git Flow and guidelines: https://github.com/turnkeylinux/tracker/blob/master/GITFLOW.rst
-.. _TKLdev: https://github.com/turnkeylinux-apps/tkldev/
+.. _TKLDev: https://github.com/turnkeylinux-apps/tkldev/
 

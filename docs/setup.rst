@@ -19,19 +19,20 @@ in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
 /turnkey/fab/products/wordpress, etc.).
 
 Though you can build any TurnKey appliance from source code within
-tkldev, we recommend first trying to build TurnKey Core as it is the
+TKLDev, we recommend first trying to build TurnKey Core as it is the
 simplest and easiest to understand of all TurnKey appliances.
 
 But before you build your first appliance, you will need to download 3
 prerequisite build dependencies and place them into their appropriate
-paths within the tkldev filesystem::
+paths within the TKLDev filesystem:
 
-1) /turnkey/fab/bootstraps: contains minimal bootstrap filesystems
-2) /turnkey/fab/cdroots: contains the cdroot template for the built ISO
-3) /turnkey/fab/common: contains source code shared amongst all TurnKey
-   appliances.
+1. ``/turnkey/fab/bootstraps``: contains minimal bootstrap filesystems.
+2. ``/turnkey/fab/cdroots``: contains the cdroot template for the built
+   ISO.
+3. ``/turnkey/fab/common``: contains source code shared amongst all
+   TurnKey appliances.
 
-1) bootstrap
+1. bootstrap
 ------------
 
 An appliance filesystem is first initialized as a copy of ``bootstrap``,
@@ -50,8 +51,8 @@ you can roll your own if you don't want to use the bootstrap tarballs
 TurnKey provides for convenience.
 
 The easiest way to get started is to download a suitable bootstrap
-archive for your version of TKLDev, verify it, and proceed to unpack
-it to /turnkey/fab/bootstraps::
+archive for your version of TKLDev, verify it, and proceed to unpack it
+to /turnkey/fab/bootstraps::
 
     ARCH=$(dpkg --print-architecture)
     CODENAME=$(lsb_release -s -c)
@@ -67,7 +68,7 @@ it to /turnkey/fab/bootstraps::
     mkdir $CODENAME
     tar -zxf bootstrap-$CODENAME-$ARCH.tar.gz -C $CODENAME
 
-2) cdroot
+2. cdroot
 ---------
 
 When an ISO is booted it displays a bootsplash prompting the user to
@@ -79,7 +80,7 @@ process (initrd, kernel), and root filesystem are stored in the
     cd /turnkey/fab
     git-clone https://github.com/turnkeylinux/cdroots.git
 
-3) common
+3. common
 ---------
 
 While each TurnKey appliance has a product specific plan, conf scripts
