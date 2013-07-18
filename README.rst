@@ -1,5 +1,5 @@
-TKLDev - TurnKey appliance development infrastructure
-=====================================================
+TKLDev - TurnKey appliance fabricator
+=====================================
 
 TKLDev is a self-contained fabrication appliance that can be used by
 appliance hackers to build any TurnKey Linux appliance from `source`_,
