@@ -14,9 +14,6 @@ Note that CDPATH supports tab auto-completion.
 Prerequisites
 =============
 
-tkldev is the mother of all TurnKey appliances. It is the appliance that
-creates all other appliances, including new versions of itself.
-
 By convention, the source code for an appliance is placed within tkldev
 in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
 /turnkey/fab/products/wordpress, etc.).
