@@ -109,8 +109,8 @@ Core`_ - The common base for all appliances::
     cd /turnkey/fab/products
     git-clone https://github.com/turnkeylinux-apps/core.git
 
-If you're behind a web proxy, then you'll need to set the `parentProxy`
-in `/etc/polipo/config` and restart the `polipo` service.
+If you're behind a web proxy, then you'll need to set the ``parentProxy``
+in ``/etc/polipo/config`` and restart the ``polipo`` service.
 
 Finally, perform the build::
 
