@@ -7,14 +7,15 @@ Recommended Git Flow and configuration
   so you can track any changes made to the development documentation, as
   well as improvements to the appliance.
 
-* And finally, tell git who you are by editing ``~/.bashrc.d/git``::
+* Tell git who you are by editing ``~/.bashrc.d/git``::
 
     export GIT_AUTHOR_NAME="Your Name"
     export GIT_AUTHOR_EMAIL="your@email.com"
     export GIT_COMMITTER_NAME=$GIT_AUTHOR_NAME
     export GIT_COMMITTER_EMAIL=$GIT_AUTHOR_EMAIL
 
-* Source that file as changes will only take effect at login
+* And finally source that file as changes will only take effect at
+  login::
 
     . ~/.bashrc.d/git 
 
