@@ -112,7 +112,7 @@ Commit
 Now we commit our example change to the repository::
 
     $ git-status
-    # On branch master
+    # On branch upgrade-to-vXX.YY
     # Changed but not updated:
     #   (use "git add <file>..." to update what will be committed)
     #   (use "git checkout -- <file>..." to discard changes in working directory)
