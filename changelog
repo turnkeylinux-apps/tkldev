@@ -2,15 +2,16 @@ turnkey-tkldev-13.0 (1) turnkey; urgency=low
 
   * Related bugfixes and tweaks:
 
-    - deck: improved deck.is_dirty logic (bugfix).
-    - fab: removed release specific mksquashfs binaries.
-    - fab: support MKSQUASHFS override if set in environment.
-    - common: use release codename from build system instead of hardcoding.
+    - Deck: improved deck.is_dirty logic (bugfix).
+    - Fab: removed release specific mksquashfs binaries.
+    - Fab: support MKSQUASHFS override if set in environment.
+    - Common: use release codename from build system instead of hardcoding.
+    - Bugfixed and improved documentation.
 
   * Note: Please refer to turnkey-core's changelog for changes common to all
     appliances. Here we only describe changes specific to this appliance.
 
- -- Alon Swartz <alon@turnkeylinux.org>  Mon, 29 Jul 2013 12:23:55 +0300
+ -- Alon Swartz <alon@turnkeylinux.org>  Fri, 11 Oct 2013 11:43:49 +0300
 
 turnkey-tkldev-12.1 (1) turnkey; urgency=low
 
