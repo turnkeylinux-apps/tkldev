@@ -12,7 +12,7 @@ If you can handle that you're ready to roll.
 
 "Simple things should be simple. Hard things should be possible."
 
-    -- Alan Kay
+ -- Alan Kay
 
 Developing new Linux distributions with TKLDev is easy. It has to be. We
 use it to develop and maintain the 100+ ready-to-use apps in the TurnKey
@@ -55,13 +55,31 @@ lines of "code"::
 The hard part usually isn't getting the integration details into TKLDev
 but testing that they work properly.
 
+Is TKLDev limited to building TurnKey related systems?
+------------------------------------------------------
+
+Nope. You can build any type of Debian based distribution you want. No
+strings attached. If you don't want to, you don't have to include common
+TurnKey functionality or any of the custom TurnKey components.
+
+Sadly, we've gotten into the nasty habit of prepending TKL - the TurnKey
+Linux initials - to all the TurnKey related stuff we develop but don't
+let that fool you. Under the hood TKLDev is general purpose.
+
+Of course we'll be delighted if you end up using TKLDev to help us
+improve TurnKey but everyone is more than welcome to use it for other
+things as well.
+
+Getting started
+---------------
+
 Advanced Linux users can probably skip the documentation and just take a
 look at a few examples from the TurnKey library source code:
 https://github.com/turnkeylinux-apps
 
 If you find yourself confused, take a step back and read through the
 rest of the documentation first to get an overview of how things works,
-understand development best practices, etc.
+learn more about development best practices, etc.
 
 Hopefully, we've made this stuff easy enough to use so nearly anyone
 with the inclination can jump in and make cool stuff happen. 
