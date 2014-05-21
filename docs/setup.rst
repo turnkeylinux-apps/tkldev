@@ -104,10 +104,16 @@ Building your first appliance (TurnKey Core)
 ============================================
 
 Now that everything is in place, clone the source code of `TurnKey
-Core`_ - The common base for all appliances, and perform the build::
+Core`_ - The common base for all appliances::
 
     cd /turnkey/fab/products
     git-clone https://github.com/turnkeylinux-apps/core.git
+
+If you're behind a web proxy, then you'll need to set ``parentProxy``
+in ``/etc/polipo/config`` and restart the ``polipo`` service.
+
+Next, perform the build::
+
     cd core
     make
 
