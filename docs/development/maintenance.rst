@@ -95,6 +95,9 @@ Once the ``CHROOT_ONLY`` build is successful, lets test it::
     /etc/init.d/mysql stop
     exit
 
+Note: If testing via the Hub you will need to adjust the Firewall rules 
+to open any relevant ports (e.g. 80 for http, etc).
+
 Testing complete? Let's perform a cleanup::
 
     deck -D build/root.tmp
