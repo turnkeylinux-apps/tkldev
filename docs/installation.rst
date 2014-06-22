@@ -11,7 +11,7 @@ benefit of providing you with a network connection that is probably much
 faster than the one you have locally, shortening download times for
 packages and other components.
 
-TKLDev doesn't support cross-architecture builds. That means building an
+TKLDev doesn't support cross-architecture builds (yet). That means building an
 amd64 type appliance image requires an amd64 build of TKLDev. 
 
 Connect via SSH
