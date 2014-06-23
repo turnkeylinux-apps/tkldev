@@ -1,18 +1,5 @@
-CDPATH
-======
-
-While absolute paths are used in the documentation, the ``CDPATH``
-environment variable is pre-configured to provide quick and easy
-navigation through the filesystem::
-
-    cd core             # changes to /turnkey/fab/products/core
-    cd products/core    # changes to /turnkey/fab/products/core
-    cd common           # changes to /turnkey/fab/common
-
-Note that CDPATH supports tab auto-completion.
-
-Prerequisites
-=============
+Filesystem layout
+=================
 
 By convention, the source code for an appliance is placed within tkldev
 in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
@@ -119,11 +106,6 @@ Next, perform the build::
 
 The above will create ``build/product.iso`` which you should copy to
 your host system for testing in a VM.
-
-Finally, perform cleanup::
-
-    deck -D build/root.tmp
-    make clean
 
 .. _TurnKey Core: http://www.turnkeylinux.org/core/
 
