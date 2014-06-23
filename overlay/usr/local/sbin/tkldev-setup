@@ -1,0 +1,46 @@
+#!/bin/bash
+
+mkdir -p /turnkey/fab/bootstraps
+CODENAME=$(lsb_release -s -c)
+
+if [ ! -d /turnkey/fab/bootstraps/$CODENAME ]; then
+    echo "Downloading $CODENAME bootstrap from Sourceforge to /turnkey/fab/bootstraps"
+    set -x
+
+    ARCH=$(dpkg --print-architecture)
+    SOURCEFORGE="http://downloads.sourceforge.net/project/turnkeylinux"
+
+    cd /turnkey/fab/bootstraps
+    wget $SOURCEFORGE/bootstrap/bootstrap-$CODENAME-$ARCH.tar.gz
+    wget $SOURCEFORGE/bootstrap/bootstrap-$CODENAME-$ARCH.tar.gz.sig
+
+    gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 0xA16EB94D
+    gpg --verify bootstrap-$CODENAME-$ARCH.tar.gz.sig
+
+    mkdir $CODENAME
+    tar -zxf bootstrap-$CODENAME-$ARCH.tar.gz -C $CODENAME
+
+    set +x
+fi
+
+if [ ! -d /turnkey/fab/cdroots ]; then
+    echo "Cloning cdroots repo from GitHub"
+
+    set -x
+
+    cd /turnkey/fab
+    git-clone https://github.com/turnkeylinux/cdroots.git
+
+    set +x
+fi
+
+if [ ! -d /turnkey/fab/common ]; then
+    echo "Cloning common repo from GitHub"
+
+    set -x
+
+    cd /turnkey/fab
+    git-clone https://github.com/turnkeylinux/common.git
+
+    set +x
+fi
