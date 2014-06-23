@@ -14,21 +14,6 @@ packages and other components.
 TKLDev doesn't support cross-architecture builds (yet). That means building an
 amd64 type appliance image requires an amd64 build of TKLDev. 
 
-Connect via SSH
-===============
-
-Shellinabox (as well as Webmin) is installed but disabled by default so
-as not to conflict with appliance builds. You should connect via an SSH
-client.
-
-To streamline connectivity, it's recommended to update your local
-``/etc/hosts`` to include ``APPLIANCE_IP tkldev`` and setup SSH
-public-key authentication::
-
-    ssh-copy-id root@tkldev
-    ssh root@tkldev
-
-
 .. _TurnKey Hub: https://hub.turnkeylinux.org/
 .. _download: http://www.turnkeylinux.org/tkldev/
 
