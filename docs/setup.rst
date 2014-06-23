@@ -38,9 +38,26 @@ amd64 type appliance image requires an amd64 build of TKLDev.
 B. Setup the build dependencies
 ===============================
 
-Before you build your first appliance, you will need to setup 3 build
-dependencies and place them into their appropriate paths within the
-TKLDev filesystem:
+In the next version of TKLDev, this step happens automatically the first
+time TKLDev boots. 
+
+If it doesn't (e.g., we didn't have a working Internet connection)
+you'll be able to trigger it by running this command inside TKLDev as
+root::
+
+    tkldev-setup
+
+But you're not using the next version of TKLDev (yet), so you'll want to
+download the new tkldev-setup from GitHub::
+
+    cd /usr/local/sbin
+    wget https://raw.githubusercontent.com/turnkeylinux-apps/tkldev/master/overlay/usr/local/sbin/tkldev-setup
+    chmod +x tkldev-setup
+
+    ./tkldev-setup
+
+The build dependencies: what are they?
+--------------------------------------
 
 1. **bootstrap** in ``/turnkey/fab/bootstraps``: contains minimal bootstrap filesystems.
 
@@ -51,7 +68,7 @@ TKLDev filesystem:
    TurnKey appliances.
 
 1. bootstrap
-------------
+''''''''''''
 
 An appliance filesystem is first initialized as a copy of ``bootstrap``,
 which is an archived filesystem containing the bare minimum essential
@@ -68,9 +85,7 @@ efficient. Other then that there is nothing TurnKey specific about it so
 you can roll your own if you don't want to use the bootstrap tarballs
 TurnKey provides for convenience.
 
-The easiest way to get started is to download a suitable bootstrap
-archive for your version of TKLDev, verify it, and proceed to unpack it
-to /turnkey/fab/bootstraps::
+Manual setup::
 
     ARCH=$(dpkg --print-architecture)
     CODENAME=$(lsb_release -s -c)
@@ -87,19 +102,21 @@ to /turnkey/fab/bootstraps::
     tar -zxf bootstrap-$CODENAME-$ARCH.tar.gz -C $CODENAME
 
 2. cdroot
----------
+'''''''''
 
 When an ISO is booted it displays a bootsplash prompting the user to
 select whether to install to harddisk or run in live non-persistent
 mode. The bootsplash configuration, files which facilitate the boot
 process (initrd, kernel), and root filesystem are stored in the
-``cdroot``::
+``cdroot``.
+
+Manual setup::
 
     cd /turnkey/fab
     git-clone https://github.com/turnkeylinux/cdroots.git
 
 3. common
----------
+'''''''''
 
 While each TurnKey appliance has a product specific plan, conf scripts
 and overlay it also shares a common base of functionality with other
@@ -113,7 +130,9 @@ The common repository provides the common code and configuration files
 used by multiple appliances. This prevents wasteful and ineffecient
 repetition of build instructions that would otherwise have to be
 repeated for each appliance, in accordance with the DRY (Don't repeat
-yourself) principle::
+yourself) principle.
+
+Manual setup::
 
     cd /turnkey/fab
     git-clone https://github.com/turnkeylinux/common.git
@@ -145,4 +164,3 @@ The above will create ``build/product.iso`` which you should copy to
 your host system for testing in a VM.
 
 .. _TurnKey Core: http://www.turnkeylinux.org/core/
-
