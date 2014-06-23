@@ -94,11 +94,9 @@ the integration details in ways you couldn't do otherwise.
 Documentation
 -------------
 
-* `Installation`_
 * `Setup`_
 * `Development`_
 
-.. _Installation: installation.rst
 .. _Setup: setup.rst
 .. _Development: development/README.rst
 

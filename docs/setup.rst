@@ -1,22 +1,53 @@
-Filesystem layout
-=================
+Overview
+========
 
-By convention, the source code for an appliance is placed within tkldev
-in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
-/turnkey/fab/products/wordpress, etc.).
+By the end of this setup guide you should be able to build a TurnKey
+Core ISO from source. If you can do that, then you've setup TKLDev
+correctly.
 
-Though you can build any TurnKey appliance from source code within
-TKLDev, we recommend first trying to build TurnKey Core as it is the
-simplest and easiest to understand of all TurnKey appliances.
+Of course you can build any TurnKey appliance from source code within
+TKLDev, not just TurnKey Core. We recommend first trying to build
+TurnKey Core as it is the simplest and easiest to understand of all
+TurnKey appliances.
 
-But before you build your first appliance, you will need to download 3
-prerequisite build dependencies and place them into their appropriate
-paths within the TKLDev filesystem:
+We'll setup TKLDev and build TurnKey Core in 3 steps:
 
-1. ``/turnkey/fab/bootstraps``: contains minimal bootstrap filesystems.
-2. ``/turnkey/fab/cdroots``: contains the cdroot template for the built
+A. Deploy TKLDev
+B. Setup the build dependencies
+C. Clone Core from GitHub and run "make"
+
+A. Deploy TKLDev
+================
+
+Like any other TurnKey appliance, TKLDev is available for `download`_ in
+multiple build formats from the TurnKey Linux website. 
+
+An even easier way to get an instance of TKLDev up and running is to
+deploy it on the Amazon EC2 cloud using the `TurnKey Hub`_. Besides
+being easy, doing appliance development on Amazon EC2 has the additional
+benefit of providing you with a network connection that is probably much
+faster than the one you have locally, shortening download times for
+packages and other components.
+
+TKLDev doesn't support cross-architecture builds (yet). That means building an
+amd64 type appliance image requires an amd64 build of TKLDev. 
+
+.. _TurnKey Hub: https://hub.turnkeylinux.org/
+.. _download: http://www.turnkeylinux.org/tkldev/
+
+B. Setup the build dependencies
+===============================
+
+Before you build your first appliance, you will need to setup 3 build
+dependencies and place them into their appropriate paths within the
+TKLDev filesystem:
+
+1. **bootstrap** in ``/turnkey/fab/bootstraps``: contains minimal bootstrap filesystems.
+
+2. **cdroots** in ``/turnkey/fab/cdroots``: contains the cdroot template for the built
    ISO.
-3. ``/turnkey/fab/common``: contains source code shared amongst all
+
+3. **common** in ``/turnkey/fab/common``: contains source code shared amongst all
    TurnKey appliances.
 
 1. bootstrap
@@ -87,17 +118,23 @@ yourself) principle::
     cd /turnkey/fab
     git-clone https://github.com/turnkeylinux/common.git
 
-Building your first appliance (TurnKey Core)
-============================================
+C. Clone Core from GitHub and run "make"
+========================================
 
-Now that everything is in place, clone the source code of `TurnKey
-Core`_ - The common base for all appliances::
+You're about to use TKLDev to build your first appliance.
+
+By convention, the source code for an appliance is placed within tkldev
+in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
+/turnkey/fab/products/wordpress, etc.).
+
+Clone the source code of `TurnKey Core`_ from GitHub::
 
     cd /turnkey/fab/products
     git-clone https://github.com/turnkeylinux-apps/core.git
 
-If you're behind a web proxy, then you'll need to set ``parentProxy``
-in ``/etc/polipo/config`` and restart the ``polipo`` service.
+Note that if you're behind a web proxy, then you need to set
+``parentProxy`` in ``/etc/polipo/config`` and restart the ``polipo``
+service.
 
 Next, perform the build::
 
