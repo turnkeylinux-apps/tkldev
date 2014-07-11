@@ -6,7 +6,7 @@ The last phase described in `Setup`_ built TurnKey Core::
     cd core
     make
 
-This generated ``product.iso`` in roughly 6 stages:
+This generated ``product.iso`` in the following 6 copy-on-write stages...
 
 1. seed root filesystem from bootstrap
 --------------------------------------
