@@ -5,10 +5,9 @@ By the end of this setup guide you should be able to build a TurnKey
 Core ISO from source. If you can do that, then you've setup TKLDev
 correctly.
 
-Of course you can build any TurnKey appliance from source code within
-TKLDev, not just TurnKey Core. We recommend first trying to build
-TurnKey Core as it is the simplest and easiest to understand of all
-TurnKey appliances.
+Of course you can build any TurnKey system from source code within
+TKLDev, not just TurnKey Core. We recommend starting with TurnKey Core
+because its the simplest TurnKey system.
 
 We'll setup TKLDev and build TurnKey Core in 3 steps:
 
@@ -19,18 +18,18 @@ C. Clone Core from GitHub and run "make"
 A. Deploy TKLDev
 ================
 
-Like any other TurnKey appliance, TKLDev is available for `download`_ in
+Like any other TurnKey system, TKLDev is available for `download`_ in
 multiple build formats from the TurnKey Linux website. 
 
 An even easier way to get an instance of TKLDev up and running is to
 deploy it on the Amazon EC2 cloud using the `TurnKey Hub`_. Besides
-being easy, doing appliance development on Amazon EC2 has the additional
-benefit of providing you with a network connection that is probably much
-faster than the one you have locally, shortening download times for
+being easy, developing your Linux distribution on Amazon EC2 has the
+additional benefit of providing you with a network connection that is
+much faster than the one you have locally, shortening download times for
 packages and other components.
 
-TKLDev doesn't support cross-architecture builds (yet). That means building an
-amd64 type appliance image requires an amd64 build of TKLDev. 
+TKLDev doesn't support cross-architecture builds (yet). That means
+building an amd64 type image requires an amd64 build of TKLDev. 
 
 .. _TurnKey Hub: https://hub.turnkeylinux.org/
 .. _download: http://www.turnkeylinux.org/tkldev/
@@ -65,15 +64,15 @@ The build dependencies: what are they?
    ISO.
 
 3. **common** in ``/turnkey/fab/common``: contains source code shared amongst all
-   TurnKey appliances.
+   TurnKey systems.
 
 1. bootstrap
 ''''''''''''
 
-An appliance filesystem is first initialized as a copy of ``bootstrap``,
-which is an archived filesystem containing the bare minimum essential
-operating system components required to run the package manager and
-install additional packages.
+Your Linux distribution's filesystem is first initialized as a copy of
+``bootstrap``, which is an archived filesystem containing the bare
+minimum essential operating system components required to run the
+package manager and install additional packages.
 
 Bootstraps are specific to a specific OS release and architecture. This
 means there are 32-bit and 64-bit versions of bootstrap for each major
@@ -118,19 +117,17 @@ Manual setup::
 3. common
 '''''''''
 
-While each TurnKey appliance has a product specific plan, conf scripts
-and overlay it also shares a common base of functionality with other
-appliances.
+Each system has its own unique package plans, conf scripts and overlay,
+but can also inherit from a common pool of configurations that live in
+the "common" repository.
 
-For example, all appliances share the common ``TurnKey Core``
-functionality, all LAMP stack based appliances have a LAMP stack in
-common, and so forth.
+This prevents wasteful and ineffecient repetition of build instructions
+that would otherwise have to be repeated for each system (I.e., AKA the
+DRY - Don't repeat yourself - principle).
 
-The common repository provides the common code and configuration files
-used by multiple appliances. This prevents wasteful and ineffecient
-repetition of build instructions that would otherwise have to be
-repeated for each appliance, in accordance with the DRY (Don't repeat
-yourself) principle.
+For example, all current TurnKey apps share the common ``TurnKey Core``
+functionality, all LAMP stack based apps have a LAMP stack in common,
+and so forth.
 
 Manual setup::
 
@@ -140,7 +137,8 @@ Manual setup::
 C. Clone Core from GitHub and run "make"
 ========================================
 
-You're about to use TKLDev to build your first appliance.
+You're about to use TKLDev to build your first TurnKey Linux
+distribution.
 
 By convention, the source code for an appliance is placed within tkldev
 in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
