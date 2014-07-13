@@ -73,7 +73,7 @@ Test
 And we're done, not so hard. Lets perform a build for testing, but
 instead of building the ISO, we'll take a quick shortcut and specify
 ``CHROOT_ONLY=y``. This excludes boot-related packages and stops the
-build at the ``root.tmp`` stage::
+build at the ``root.sandbox`` stage::
 
     make CHROOT_ONLY=y
 
@@ -83,7 +83,7 @@ where it left off, and re-make the target that caused the issue.
 
 Once the ``CHROOT_ONLY`` build is successful, lets test it::
 
-    fab-chroot build/root.tmp
+    fab-chroot build/root.sandbox
     /etc/init.d/mysql start
     /etc/init.d/apache2 start
     /usr/lib/inithooks/firstboot.d/20regen-projectpier-secrets
@@ -100,7 +100,7 @@ to open any relevant ports (e.g. 80 for http, etc).
 
 Testing complete? Let's perform a cleanup::
 
-    deck -D build/root.tmp
+    deck -D build/root.sandbox
     make clean
 
 Cautionary note: not all changes can be tested reliably (or at all)

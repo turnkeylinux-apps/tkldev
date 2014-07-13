@@ -100,11 +100,11 @@ start with the ``Makefile``, ``plan`` and finally ``conf.d and
 overlay``.
 
 It's usually easier to comment out code in conf.d scripts, rename the
-overlay to something temporary, and build the ``root.tmp`` for manual
+overlay to something temporary, and build the ``root.sandbox`` for manual
 integration and testing::
 
     make CHROOT_ONLY=y
-    fab-chroot build/root.tmp
+    fab-chroot build/root.sandbox
     
     # start required services
     
@@ -117,7 +117,7 @@ integration and testing::
 
 Then, test your code::
 
-    deck -D build/root.tmp
+    deck -D build/root.sandbox
     deck -D build/root.patched
     make CHROOT_ONLY=y
 
@@ -251,9 +251,9 @@ Testing
 
 We're almost done. Appliances should be thoroughly tested. During the
 development process you most likely performed lots of testing in the
-``root.tmp`` chroot. It's now time to perform a clean build::
+``root.sandbox`` chroot. It's now time to perform a clean build::
 
-    deck -D build/root.tmp
+    deck -D build/root.sandbox
     make clean
     make
 

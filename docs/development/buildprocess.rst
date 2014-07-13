@@ -60,22 +60,22 @@ Each script is copied into a temporary directory in ``root.patched`` and
 executed while chrooted into ``root.patched``. After execution the
 temporary directory is deleted.
 
-4. squash root.tmp overlay - sandbox for manual changes
--------------------------------------------------------
+4. squash root.sandbox overlay - sandbox for manual prototyping
+---------------------------------------------------------------
 
-``root.tmp`` is branched off from the ``root.patched`` deck.
+``root.sandbox`` is branched off from the ``root.patched`` deck.
 
 This step isn't strictly a necessary part of the build process. It only
 really exists to make life easier for the appliance developer.
 
-``root.tmp`` is just like ``root.patched`` except it is designed to hold
+``root.sandbox`` is just like ``root.patched`` except it is designed to hold
 temporary, manual modifications to the root filesystem. It serves as a
 sandbox that can be used to accelerate the development cycle by making
 it easy to test proposed changes to the root filesystem quickly, without
 changing product source code and without having to wait for the build
 process to resquash the ``root.patched`` root filesystem.
 
-The way it works is that the build process squashes root.tmp's overlay
+The way it works is that the build process squashes root.sandbox's overlay
 separately. This only takes a few seconds. It then copies the archived
 filesystem overlay into the cdroot, where it will be used to apply the
 changes to the root filesystem during boot.
@@ -89,7 +89,7 @@ created.
 The cdroot is a directory which includes all the files required to make
 the appliance's CD ISO image bootable including the bootloader,
 bootsplash configuration, kernel, initramfs, squashed ``root.patched``
-filesystem and the ``root.tmp`` overlay if it exists.
+filesystem and the ``root.sandbox`` overlay if it exists.
 
 6. generate product.iso
 -----------------------
