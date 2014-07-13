@@ -1,14 +1,14 @@
-Importing a new appliance into turnkeylinux-apps
-================================================
+Importing a new app into turnkeylinux-apps
+==========================================
 
-Below describes the process used by the core devs to import a `new`_
-appliance into turnkeylinux-apps, and faciliate collaboration with the
-upstream developer/maintainer.
+Below we describe the current process used to import a `new`_ app into
+turnkeylinux-apps. The idea is to faciliate easy collaboration with the
+original integration developer/maintainer.
 
 Fork
 ----
 
-* Fork appliance into turnkeylinux-apps.
+* Fork repository into turnkeylinux-apps.
 * Update title and website.
 * Change repository name (if required).
 * Disable unneeded GitHub repo features (wiki, issues, etc.)

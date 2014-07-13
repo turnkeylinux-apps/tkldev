@@ -8,9 +8,9 @@ successful build of `TurnKey Core`_.
 After that you're ready to dive in:
 
 * `System image build process and terminology`_
-* `Appliance source code walkthrough`_
-* `Improving and maintaining an appliance`_
-* `Developing a new appliance`_
+* `Source code walkthrough`_
+* `Improving and maintaining an integration`_
+* `Developing a new integration`_
 
 Notes on how we use Git:
 
@@ -21,7 +21,7 @@ Notes on how we use Git:
 .. _TurnKey Core: https://github.com/turnkeylinux-apps/core/
 .. _Git Configuration and Workflow: git.rst
 .. _System image build process and terminology: buildprocess.rst
-.. _Appliance source code walkthrough: walkthrough.rst
-.. _Improving and maintaining an appliance: maintenance.rst
-.. _Developing a new appliance: new.rst
+.. _Source code walkthrough: walkthrough.rst
+.. _Improving and maintaining an integration: maintenance.rst
+.. _Developing a new TurnKey app: new.rst
 

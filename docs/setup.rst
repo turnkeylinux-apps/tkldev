@@ -140,8 +140,8 @@ C. Clone Core from GitHub and run "make"
 You're about to use TKLDev to build your first TurnKey Linux
 distribution.
 
-By convention, the source code for an appliance is placed within tkldev
-in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
+By convention, the source code for TurnKey integrations is placed within
+tkldev in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
 /turnkey/fab/products/wordpress, etc.).
 
 Clone the source code of `TurnKey Core`_ from GitHub::
@@ -158,7 +158,9 @@ Next, perform the build::
     cd core
     make
 
-The above will create ``build/product.iso`` which you should copy to
-your host system for testing in a VM.
+The build should take about 3-5 minutes.
+
+The above will create ``build/product.iso`` which you can image to a USB
+drive, burn on a CD or copy to your host system for testing in a VM.
 
 .. _TurnKey Core: http://www.turnkeylinux.org/core/

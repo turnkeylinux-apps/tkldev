@@ -12,8 +12,8 @@ Makefile
     include $(FAB_PATH)/common/mk/turnkey.mk
 
 As you can see, the `Makefile`_ includes `mk/turnkey.mk`_, which defines
-variables and the `build process`_ for TurnKey appliances. It inturn
-includes `fab/share/product.mk`_ which is the main Makefile.
+variables and the `build process`_ for TurnKey apps. `mk/turnkey.mk` in
+turn includes `fab/share/product.mk`_ which is the main Makefile.
 
 The ``fab's product.mk`` is designed to be configurable and extendable.
 
@@ -51,9 +51,10 @@ changelog, readme and images
 The `changelog`_ describes changes for each release, and the version
 specified is used in the product release package.
 
-The `readme`_ and `images`_ (logo and screenshots) are used to generate
-the appliance page on the TurnKey Linux website.
-
+The `readme`_ and `.art`_ (logo and screenshots) are used to
+automatically generate the website page on the TurnKey Linux website. In
+the future it will be used to automatically generate listings for
+"unofficial" integrations developed by the community.
 
 .. _TurnKey Core: https://github.com/turnkeylinux-apps/core/
 .. _common: https://github.com/turnkeylinux/common/
@@ -66,5 +67,5 @@ the appliance page on the TurnKey Linux website.
 .. _conf/turnkey.d: https://github.com/turnkeylinux/common/tree/master/conf/turnkey.d
 .. _changelog: https://github.com/turnkeylinux-apps/core/blob/master/changelog
 .. _readme: https://github.com/turnkeylinux-apps/core/blob/master/README.rst
-.. _images: https://github.com/turnkeylinux-apps/core/tree/master/images
+.. _.art: https://github.com/turnkeylinux-apps/core/tree/master/.art
 

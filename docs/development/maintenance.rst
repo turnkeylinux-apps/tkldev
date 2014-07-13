@@ -1,20 +1,18 @@
-Improving and maintaining an appliance
-======================================
+Improving and maintaining a TurnKey app
+=======================================
 
-Lets say you find a bug in an appliance, want to add more functionality,
-upgrade the version of upstream software, or make any other change, then
-this guide should help you do that and get your changes included in the
-official TurnKey appliance and earn some street cred.
+Lets say you want to fix a bug, add functionality, upgrade the version
+of upstream software, or make any other change. This guide should help
+you do that and get your changes included in the official TurnKey app.
 
-For example, say a new version of ``projectpier`` has been released, so
-lets update `TurnKey ProjectPier`_.
+For example, say a new version of ``projectpier`` has been released, and
+we want to update `TurnKey ProjectPier`_.
 
 Fork and clone the source
 -------------------------
 
 As described in the TurnKey `Git Flow`_, GitHub is used to facilitate
-collaboration, so the first thing to do is fork the appliance source
-code:
+collaboration, so the first thing to do is fork the source code:
 
 * Log into GitHub, and browse to https://github.com/turnkeylinux-apps/projectpier/
 * Click the ``fork`` button.

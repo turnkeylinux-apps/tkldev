@@ -1,23 +1,23 @@
-Developing a new TurnKey appliance
-==================================
+Developing a new TurnKey app
+============================
 
-Before developing an appliance from scratch, it's recommended to read
-over the source code of a few `existing appliances`_. You should also be
-familiar with `appliance maintenance`_.
+Before attempting to develop a new integration from scratch, it's
+recommended to read over the source code of a few `existing apps`_.
+Bonus points if you are already familiar with the `maintenance`_
+process.
 
-If you're looking for new appliance ideas, take a look at `Appliance
-candidates`_ on the `Wiki`_ for inspiration.
+If you're looking for ideas, take a look at `candidates`_ on the `Wiki`_
+for inspiration. Note that your integration doesn't have to be a
+server-type app. It can be any Linux distribution (e.g., a desktop
+system)
 
-Requirements
-------------
+Requirements for official inclusion in TurnKey GNU/Linux
+--------------------------------------------------------
 
-* Open source.
-* No proprietry software, binaries, database dumps, etc.
-* Compliance with the recommended `Git Flow`_.
-* Compliance with the `Debian Policy`_ and `Filesystem Hierarchy Standard (FHS)`_.
-* Completely automated build.
-* Fully tested (chroot, live, installed).
-* Changelog, readme and images.
+* Free open source software
+* No proprietary software, binaries, database dumps, etc.
+* Completely automated build. 
+* Following recommended practices in `Debian Policy`_ and `Filesystem Hierarchy Standard (FHS)`_.
 
 High level steps
 ----------------
@@ -25,15 +25,14 @@ High level steps
 Update the Tracker Wiki
 '''''''''''''''''''''''
 
-The `Wiki`_ is used to track appliance candidates as well as a
-whiteboard. To faciliate the open development model, it's recommended
-that you:
+The `Wiki`_ is used to track candidates as well as a whiteboard. To
+faciliate the open development model, it's recommended that you:
 
-* Create a whiteboard for the appliance you are about to develop.
+* Create a whiteboard page for the integration you're develloping.
 * Create a candidate, and link it to the whiteboard.
-* At a minimum, the whiteboard should include the state of development
-  and updated periodically. Additionally, it's a wonderful place to keep
-  ideas, development notes and resources related to the appliance.
+* Ideally, the whiteboard page is updated periodically with the state of
+  development. It's also a good place to keep ideas, development notes
+  and related resources.
 
 Read upstream installation documentation, take notes
 ''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -51,33 +50,33 @@ Thing to look out for:
 * Are components only available upstream? If so, what are the download
   URLs? Are releases signed and verifiable via GPG? If so, this
   information will most likely be added to ``conf.d/downloads``.
-* Does the appliance require accessible public ports that aren't
-  pre-configured in the base appliance? If so, they should be defined in
+* Does the system require accessible public ports that aren't
+  pre-configured in Core? If so, they should be defined in
   the ``Makefile`` and ``overlay/etc/confconsole/services.txt``.
 * Can installation be performed via command line?
 
-Decide on appliance name
-''''''''''''''''''''''''
+Decide on a name
+''''''''''''''''
 
-The appliance name will be used as the repository name, as well as the
-appliance hostname, so it should be descriptive yet short.
+The name will be used as the repository name, as well as the hostname,
+so it should be descriptive yet short.
 
 Preferably the name of the main component should be used, such as
 ``wordpress`` (lower case). In other cases, be creative, such as
 ``asp-net-apache``.
 
-Identify closest existing appliance
+Identify closest existing integration
 '''''''''''''''''''''''''''''''''''
 
 By reading the installation documentation you should be familiar with
 the required dependencies or base stack, such as `LAMP Stack`_,
-`Tomcat-Apache`_, etc. Although the base appliance would be a great
-starting point, usually there is another appliance whose code could be
-adapted for the new appliance instead of writing it from scratch.
+`Tomcat-Apache`_, etc. Although Core will work as a starting point, look
+around if there is another TurnKey app whose code can be more easily
+adapted to do what you want.
 
-For example, when developing a new LAMP stack based appliance, it might
-be better to base off of a `Bugzilla`_ (Debian package available) or
-`Vanilla`_ (upstream software only).
+For example, when developing a new LAMP stack based integration, it
+might be better to base off of a `Bugzilla`_ (Debian package available)
+or `Vanilla`_ (upstream software only).
 
 Sometimes its just easier to start from scratch, in which case the best
 candidate is `TurnKey Core`_.
@@ -85,11 +84,11 @@ candidate is `TurnKey Core`_.
 Clone and start hacking
 '''''''''''''''''''''''
 
-Next up, clone the appliance identified above and reinitialize the git
-repository::
+Next up, clone the integration repository you want to fork off of and
+reinitialize the git repository to reset the history::
 
     cd /turnkey/fab/products
-    git-clone https://github.com/turnkeylinux-apps/APPLIANCE.git NEW_NAME
+    git-clone https://github.com/turnkeylinux-apps/core.git NEW_NAME
     
     cd NEW_NAME
     rm -rf .git
@@ -126,14 +125,14 @@ Rince and repeat as needed.
 Completely automated build
 ''''''''''''''''''''''''''
 
-It is required that appliance builds are non-interactive, and completely
+It is required that builds are non-interactive, and completely
 automated. The most common issues you might run into are Debian packages
 that require preseeding, and web-based installers.
 
 Debian package pre-seeding
 ``````````````````````````
 
-For example, the `Drupal6`_ appliance uses the Debian drupal6 package,
+For example, TurnKey `Drupal6`_ uses the Debian drupal6 package,
 but the database setup cannot be completed during the build. In this
 case, we preseed the package and reconfigure it in the conf::
 
@@ -175,9 +174,9 @@ well as a security mechanism. You should already be familiar with some
 of the inithooks that run on firstboot, such as the regeneration of SSL
 certificates, SSH keys, setting the root and database passwords, etc.
 
-Most appliances also include application specific inithooks, such as
-regenerating secrets, setting the administrative users email address,
-password and domain.
+Many integrations also include application specific inithooks, that do
+things such as regenerating secrets, setting the admin user's email
+address, password, etc.
 
 Note that when the email and/or domain are not required, inithooks are
 not required nor recommended. For example, some applications require a
@@ -216,17 +215,15 @@ handle service state. For example:
 Bonus: Welcome post / tklweb-cp
 '''''''''''''''''''''''''''''''
 
-To improve the user experience of an appliance, either a welcome page/post is
-injected into the database (e.g., `MediaWiki conf`_) or a TurnKey Web Control
-panel (e.g., `DomainController tklweb-cp`_) is created.
+To improve the user experience a welcome page/post is injected into the
+database (e.g., `MediaWiki conf`_) or a TurnKey Web Control panel (e.g.,
+`DomainController tklweb-cp`_) is created.
 
 Bonus: TKLBAM profile overrides
 '''''''''''''''''''''''''''''''
 
-Each appliance has a `TurnKey Backup and Migration`_ profile, which
-describes what should be backed up, and what shouldn't. If you are
-intimiate enough with the appliance, you should recommend overrides to
-be included in the profile.
+Each TurnKey app has a `TurnKey Backup and Migration`_ profile, which
+describes what should be backed up, and what shouldn't. 
 
 For example, to keep bloat out of `Drupal7`_, backup sessions, cache and
 search tables are excluded::
@@ -249,9 +246,10 @@ The same can be done for `directory paths`_.
 Testing
 -------
 
-We're almost done. Appliances should be thoroughly tested. During the
-development process you most likely performed lots of testing in the
-``root.sandbox`` chroot. It's now time to perform a clean build::
+We're almost done. To avoid nasty surprises integrations should be well
+tested. During the development process you most likely performed lots of
+testing in the ``root.sandbox`` chroot. It's now time to perform a clean
+build::
 
     deck -D build/root.sandbox
     make clean
@@ -259,21 +257,27 @@ development process you most likely performed lots of testing in the
 
 And test ``build/product.iso`` in a VM (both live and installed).
 
-Changelog, readme and images
-----------------------------
+Packaging: changelog, readme and artwork
+----------------------------------------
 
-The appliance is done, congrats!! There are a few things needed to
-finalize the appliance though:
+Your new Linux distribution is done, congrats! TurnKey apps follow a
+packaging convention with the idea of making automatic maintenance of
+integration showcases eventually automatic.
 
-* **changelog**: You can use the changelog from the cloned appliance as
-  a base, and extend it as needed. Keep in mind that it must comply with
-  the `Debian Policy`_.
+Components:
+
+* **changelog**: You can use the changelog from the integration you
+  started out from (e.g., Core) as a base, and extend it as needed. The
+  format is the same as for Debian packages. The Debian devscripts
+  package includes a helper to make the changelog easier to edit::
+  
+    dch -i
 
 * **README.rst**: The readme should include an opening overview
-  paragraph and any other information that a user of the appliance
-  should know. It must be formatted in `reStructuredText`_.
+  paragraph and any other information that you think users should know.
+  Like this document, it's formatted in `reStructuredText`_.
 
-* **images**: The images directory should include a logo and
+* **.art**: This directory should include a logo and
   screenshots. Templates and guidelines are available in `TurnKey
   Artwork`_.
 
@@ -285,20 +289,15 @@ Linux library:
 
 * If you haven't already, register a new repository on GitHub and push
   your branch.
+
 * If you haven't already, update the whiteboard on the `Wiki`_ you
   created earlier.
-* Create a new issue on the `Issue Tracker`_ with a title resembling
-  *New appliance: APPLIANCE NAME* and include a link to your repository
-  and wiki page in the description. One of the core developers will take
-  it from there.
-* Rejoice! Together we are creating a party of superb open source
-  software so powerful it will repeal the oppressive laws of
-  thermodynamics, and provide our children with a better tomorrow!
 
+* Create a new issue on the `Issue Tracker`_ with a #new-appliance tag.
 
-.. _existing appliances: https://github.com/turnkeylinux-apps/
-.. _appliance maintenance: maintenance.rst
-.. _Appliance candidates: https://github.com/turnkeylinux/tracker/wiki/Candidates
+.. _existing apps: https://github.com/turnkeylinux-apps/
+.. _maintenance: maintenance.rst
+.. _candidates: https://github.com/turnkeylinux/tracker/wiki/Candidates
 .. _wiki: https://github.com/turnkeylinux/tracker/wiki
 .. _Git Flow: https://github.com/turnkeylinux/tracker/blob/master/GITFLOW.rst
 .. _Debian Policy: http://www.debian.org/doc/debian-policy/
@@ -321,5 +320,5 @@ Linux library:
 .. _directory paths: http://www.turnkeylinux.org/faq/backup-and-migration-tklbam#t601n2382
 .. _reStructuredText: http://docutils.sourceforge.net/docs/user/rst/quickref.html
 .. _TurnKey Artwork: https://github.com/turnkeylinux/artwork/
-.. _Issue Tracker: https://github.com/turnkeylinux/tracker/issues
+.. _Issue Tracker: https://github.com/turnkeylinux/tracker/issues?labels=new-appliance
 

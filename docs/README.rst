@@ -1,8 +1,8 @@
 Overview
 --------
 
-With TKLDev, building an appliance from scratch is as easy as grabbing
-the source and running make::
+With TKLDev, building a TurnKey system image from scratch is as easy as
+grabbing the source and running make::
 
     root@tkldev ~$ cd core
     /turnkey/fab/products/turnkey/core
@@ -20,7 +20,7 @@ library so we've gone to great lengths to make common tasks (e.g.,
 installing packages, configuration files) as simple as possible.
 
 The code footprint for most apps is very small. For example, our minimal
-base appliance, TurnKey Core is just 4 lines of TKLDev "code"::
+base system, TurnKey Core is just 4 lines of TKLDev "code"::
 
     root@tkldev ~$ cd /turnkey/fab/products
     /turnkey/fab/products
