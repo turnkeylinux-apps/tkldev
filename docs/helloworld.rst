@@ -8,8 +8,9 @@ changes to the root filesystem.
 This makes it easier to test changes without having to edit source code
 and then rebuild from scratch.
 
-root.sandbox is implemented as a copy-on-write filesystem overlay inside
-the product.iso.
+root.sandbox is implemented as a copy-on-write filesystem that branches
+off from root.patched. If you dirty the sandbox by making changes inside
+it, then your changes get saved to a separate overlay in product.iso.
 
 Note that before we start playing in the sandbox the overlay does not
 exist::
@@ -168,7 +169,7 @@ First, we throw away the sandbox::
     deck -D build/root.sandbox
 
 Note that before we implement this, we don't get a hello world when we
-chroot in root.patched::
+chroot into root.patched::
 
     root@tkldev products/core# fab-chroot build/root.patched/
     root@tkldev /#  exit
@@ -185,6 +186,7 @@ Implement hello world change::
 
 Rebuild:: 
 
+    root@tkldev products/core# make clean
     root@tkldev products/core# make
 
 Now we do get "hello world"::
@@ -196,9 +198,11 @@ Now we do get "hello world"::
 Hacking root.patched without rebuilding from scratch
 ----------------------------------------------------
 
-Note that changing the package plan requires rebuilding root.build,
-which can take a few minutes because we need to reinstall all the
-packages on top of the bootstrap.
+Note that changing the package installation plan like we did above
+(I.e., by adding hello) requires us to "make clean" first.
+
+That can take a few minutes because we need to reinstall all the
+packages into the root.build target.
 
 However, we can save time and skip this step if we don't need to change
 the package plan. This is the case if we're only making changes to

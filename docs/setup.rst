@@ -37,8 +37,8 @@ building an amd64 type image requires an amd64 build of TKLDev.
 B. Setup the build dependencies
 ===============================
 
-In the next version of TKLDev, this step happens automatically the first
-time TKLDev boots. 
+In the next version of TKLDev, you can skip this step because it happens
+automatically on first boot.
 
 If it doesn't (e.g., we didn't have a working Internet connection)
 you'll be able to trigger it by running this command inside TKLDev as
