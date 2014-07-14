@@ -13,7 +13,7 @@ If you can handle that you're ready to roll.
 How hard is this?
 -----------------
 
-"Simple things should be simple. Hard things should be possible."
+ "Simple things should be simple. Hard things should be possible."
 
  -- Alan Kay
 
