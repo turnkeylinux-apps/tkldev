@@ -3,8 +3,7 @@ Development
 
 Before getting started with development, you should have already
 followed the `Setup`_ guide, resulting in a successful build of `TurnKey
-Core`_. Following along the `Hello world`_ examples should also be
-helpful.
+Core`_. Following along the `Hello world`_ examples should also help.
 
 After that you're ready to dive in:
 
@@ -15,7 +14,7 @@ After that you're ready to dive in:
 
 Notes on how we use Git:
 
-* `Git Configuration and Workflow`_
+* `Git Configuration and Workflow <git.rst>`_
 
 .. _Setup: ../setup.rst
 .. _TurnKey Core: https://github.com/turnkeylinux-apps/core/
