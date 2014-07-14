@@ -88,7 +88,7 @@ If you're going to integrate a Linux system you're going to have to do
 that anyway and test it, so why not to do it in a way that is well
 documented and repeatable as opposed to an error prone manual process.
 Your future self will appreciate it and so will everyone else that wants
-to build on your work.
+to benefit from and build on your work.
 
 Is TKLDev limited to building TurnKey related systems?
 ------------------------------------------------------
@@ -136,9 +136,9 @@ the integration details in ways you couldn't do otherwise.
 Documentation
 -------------
 
-1) `Setup`_: setup TKLDev and build your first image.
-2) `Hello world`_: say hello to TKLDev by making your first change.
-3) `Development`_: understand TKLDev in greater detail.
+1) `Setup`_: build your first image.
+2) `Hello world`_: say hello by making your first change.
+3) `Development`_: understand how stuff works in greater detail.
 4) `Tips and tricks`_: reference collection of tips and tricks.
 
 .. _common: https://github.com/turnkeylinux/common

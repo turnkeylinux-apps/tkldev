@@ -166,7 +166,7 @@ drive, burn on a CD or copy to your host system for testing in a VM.
 What next?
 ==========
 
-* `Hello world`_: say hello to TKLDev by making your first change.
+* `Hello world`_: say hello by making your first change.
 
 .. _Hello world: helloworld.rst
 .. _TurnKey Core: http://www.turnkeylinux.org/core/

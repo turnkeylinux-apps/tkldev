@@ -412,7 +412,7 @@ this example)::
 What next?
 ==========
 
-* `Development`_: understand TKLDev in greater detail.
+* `Development`_: understand how stuff works in greater detail.
 
 .. _Development: development/README.rst
 
