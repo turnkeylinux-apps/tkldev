@@ -41,7 +41,7 @@ To make testing easier any changes you make in the sandbox will
 (temporarily) show up in the next ISO image build. If you want to keep
 these changes you'll need to update the source though.
 
-For a more detailed example see `Hello world`_.
+For a more detailed example see `Hello world <helloworld.rst>`_.
 
 Quick re-patch: how to reapply root.patched configurations
 ==========================================================
@@ -51,7 +51,6 @@ without changing the package installation plan then we can update
 root.patched quickly without having to wait for TKLDev to reinstall all
 packages::
 
-::
     root@tkldev products/core# rm build/stamps/root.patched 
     root@tkldev products/core# make root.patched
 
