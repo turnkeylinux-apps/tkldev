@@ -1,33 +1,3 @@
-This page contains a list of tips and trick for getting more stuff done
-faster.
-
-Jumping around the filesystem with CDPATH
-=========================================
-
-While absolute paths are used in the documentation, the ``CDPATH``
-environment variable is pre-configured to provide quick and easy
-navigation through the filesystem::
-
-    cd core             # changes to /turnkey/fab/products/core
-    cd products/core    # changes to /turnkey/fab/products/core
-    cd common           # changes to /turnkey/fab/common
-
-Note that CDPATH supports tab auto-completion.
-
-Logging in via SSH without a password
-=====================================
-
-To streamline connectivity, it's recommended to update your local
-``/etc/hosts`` to include ``APPLIANCE_IP tkldev`` and setup SSH
-public-key authentication::
-
-    ssh-copy-id root@tkldev
-    ssh root@tkldev
-
-Shellinabox (as well as Webmin) is installed but disabled by default so
-as not to conflict with builds that may use it. You should connect via
-an SSH client.
-
 Playing in the sandbox
 ======================
 
@@ -153,8 +123,8 @@ made to the copy-on-write sandbox::
 How the sandbox works: a peak under the hood
 --------------------------------------------
 
-Now that we've "dirtied" the sandbox and rebuilt the product.iso the
-overlay filesystem exists::
+Now that we've "dirtied" the sandbox and rebuilt the product.iso, the
+overlay does exist::
 
     root@tkldev products/core# ls -la build/cdroot/casper/*sandbox*
     -rw-r--r-- 1 root root 3297280 Jul 13 11:09 build/cdroot/casper/20sandbox.squashfs
@@ -248,8 +218,10 @@ And we'll rebuild root.patched::
     root@tkldev products/core# make root.patched
     make: Nothing to be done for `root.patched'.
 
-Woops. That didn't work! We forgot to tell "make" to rebuild the
-root.patched target::
+Woops. That didn't work because we forgot to tell "make" it needed to
+rebuild the already existing root.patched target. 
+
+We do that by removing the rooot.patched "build stamp"::
 
     root@tkldev products/core# rm build/stamps/root.patched 
 
@@ -342,7 +314,7 @@ instead of hello world::
     root@tkldev /# exit
 
 We can test the integration by chrooting into root.patched, or we can
-continue with the build and test the product.iso image.
+continue with the build and test the product.iso image (e.g., in a VM)
 
 The default make target is product.iso so if we run make with no 
 target it will just continue from where it left off (root.patched in
@@ -436,4 +408,11 @@ this example)::
     real	0m51.614s
     user	1m30.394s
     sys	0m4.080s
+
+What next?
+==========
+
+* `Development`_: understand TKLDev in greater detail.
+
+.. _Development: development/README.rst
 

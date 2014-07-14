@@ -3,25 +3,21 @@ Development
 
 Before getting started with development, you should have already
 followed the `Setup`_ guide, resulting in a successful build of `TurnKey
-Core`_.
+Core`_. Following along the `Hello world`_ examples should also be
+helpful.
 
 After that you're ready to dive in:
 
-* `System image build process and terminology`_
-* `Source code walkthrough`_
-* `Improving and maintaining an integration`_
-* `Developing a new integration`_
+* `Understanding the build process / terminology <buildprocess.rst>`_
+* `Walking through example source code <walkthrough.rst>`_
+* `Improving and maintaining an integration <maintenance.rst>`_
+* `Developing a new integration <new.rst>`_
 
 Notes on how we use Git:
 
 * `Git Configuration and Workflow`_
 
-.. _Installation: ../installation.rst
 .. _Setup: ../setup.rst
 .. _TurnKey Core: https://github.com/turnkeylinux-apps/core/
-.. _Git Configuration and Workflow: git.rst
-.. _System image build process and terminology: buildprocess.rst
-.. _Source code walkthrough: walkthrough.rst
-.. _Improving and maintaining an integration: maintenance.rst
-.. _Developing a new TurnKey app: new.rst
+.. _Hello world: ../helloworld.rst
 

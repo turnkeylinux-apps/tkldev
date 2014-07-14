@@ -82,7 +82,7 @@ lines of "code"::
      147 total
 
 The hard part usually isn't using TKLDev but getting the integration
-details right (e.g., what combination of packages and configurations). 
+details right (e.g., combining packages and configurations). 
 
 If you're going to integrate a Linux system you're going to have to do
 that anyway and test it, so why not to do it in a way that is well
@@ -111,6 +111,7 @@ things as well.
 Getting started
 ---------------
 
+
 Advanced Linux users can probably skip the documentation and just take a
 look at a few examples from the TurnKey library source code:
 https://github.com/turnkeylinux-apps
@@ -135,11 +136,14 @@ the integration details in ways you couldn't do otherwise.
 Documentation
 -------------
 
-* `Setup`_
-* `Development`_
+1) `Setup`_: setup TKLDev and build your first image.
+2) `Hello world`_: say hello to TKLDev by making your first change.
+3) `Development`_: understand TKLDev in greater detail.
+4) `Tips and tricks`_: reference collection of tips and tricks.
 
 .. _common: https://github.com/turnkeylinux/common
 .. _Setup: setup.rst
+.. _Hello world: helloworld.rst
+.. _Tips and tricks: tips.rst
 .. _Development: development/README.rst
-.. _Tips and Tricks: development/tips.rst
 

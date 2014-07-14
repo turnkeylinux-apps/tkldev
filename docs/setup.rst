@@ -7,12 +7,12 @@ correctly.
 
 Of course you can build any TurnKey system from source code within
 TKLDev, not just TurnKey Core. We recommend starting with TurnKey Core
-because its the simplest TurnKey system.
+because it's a simple example.
 
 We'll setup TKLDev and build TurnKey Core in 3 steps:
 
 A. Deploy TKLDev
-B. Setup the build dependencies
+B. Setup the build dependencies automatically or by hand
 C. Clone Core from GitHub and run "make"
 
 A. Deploy TKLDev
@@ -81,8 +81,8 @@ operating system release.
 TurnKey's bootstrap is similar to the bootstrap filesystem created by
 Debian's debootstrap tool, except it is slightly smaller and more
 efficient. Other then that there is nothing TurnKey specific about it so
-you can roll your own if you don't want to use the bootstrap tarballs
-TurnKey provides for convenience.
+you can roll your own (e.g., with Debian's debootstrap) if you prefer
+not to use the bootstrap tarballs TurnKey provides for convenience.
 
 Manual setup::
 
@@ -163,4 +163,10 @@ The build should take about 3-5 minutes.
 The above will create ``build/product.iso`` which you can image to a USB
 drive, burn on a CD or copy to your host system for testing in a VM.
 
+What next?
+==========
+
+* `Hello world`_: say hello to TKLDev by making your first change.
+
+.. _Hello world: helloworld.rst
 .. _TurnKey Core: http://www.turnkeylinux.org/core/
