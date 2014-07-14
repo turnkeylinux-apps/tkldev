@@ -2,8 +2,8 @@ Development
 ===========
 
 Before getting started with development, you should have already
-followed the `Installation`_ and `Setup`_ guides, resulting in a
-successful build of `TurnKey Core`_.
+followed the `Setup`_ guide, resulting in a successful build of `TurnKey
+Core`_.
 
 After that you're ready to dive in:
 
