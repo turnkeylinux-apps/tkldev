@@ -111,35 +111,21 @@ things as well.
 Getting started
 ---------------
 
-
-Advanced Linux users can probably skip the documentation and just take a
-look at a few examples from the TurnKey library source code:
-https://github.com/turnkeylinux-apps
-
-That together with a peak at the `Tips and Tricks`_ page will get you a
-long way.
-
-If you find yourself confused, take a step back and read through the
-rest of the documentation first to get an overview of how things works,
-learn more about development best practices, etc.
-
-Hopefully, we've made this stuff easy enough to use so nearly anyone
-with the inclination can jump in and make cool stuff happen. 
-
-All the hard, really technical bits are automated so you don't need a
-lot of Linux experience to work with TKLDev. The same amount of
-experience you'd need to install and configure a regular Debian
-installation will take you a long way. The difference is that with
-TKLDev you can mass reproduce the results and collaborate with others on
-the integration details in ways you couldn't do otherwise.
-
-Documentation
--------------
+It's recommended to read through documentation in the following order:
 
 1) `Setup`_: build your first image.
 2) `Hello world`_: say hello by making your first change.
 3) `Development`_: understand how stuff works in greater detail.
 4) `Tips and tricks`_: reference collection of tips and tricks.
+
+More advanced Linux users may be able to fast forward through most of it
+and learn the most by examining a few real-life examples from the
+TurnKey library: https://github.com/turnkeylinux-apps
+
+If you find yourself confused, take a step back and read through the
+rest of the documentation first to get an overview of how things works,
+learn more about development best practices, etc. We've made this easy
+enough so anyone that wants to can jump in and make cool stuff happen. 
 
 .. _common: https://github.com/turnkeylinux/common
 .. _Setup: setup.rst
