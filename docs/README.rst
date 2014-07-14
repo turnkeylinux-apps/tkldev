@@ -26,15 +26,15 @@ development cycle and automates away most of the drudge work.
 The source code to the existing library of 100+ TurnKey images provides
 a rich source of working examples you can borrow from.
 
-TKLDev isn't TurnKey specific because you can build any Debian based
-Linux distribution with it. We do use it a lot for TurnKey though so
-we've been continually refining it to scratch our own itches and make
-common tasks (e.g., installing packages, configuration files) as simple
-and easy as possible.
+TKLDev isn't TurnKey specific. You can build any Debian based Linux
+distribution with it. We do use it a lot for TurnKey though so we've
+been continually refining it to scratch our own itches and make common
+tasks (e.g., installing packages, configuration files) as simple and
+easy as possible.
 
-The code footprint for most integrations is small, especially if it
-inherits common base functionality. For example, TurnKey Core is just 6
-lines of TKLDev "code"::
+The code footprint for most integrations is small, because most of the
+basic functionality is inherited from the `common`_ repository. For
+example, TurnKey Core is just 6 lines of TKLDev "code"::
 
     root@tkldev ~$ cd /turnkey/fab/products
     /turnkey/fab/products
@@ -48,6 +48,8 @@ lines of TKLDev "code"::
       2 core/conf.d/main
       6 total
 
+The code for Core doesn't do much beyond inheriting from the common base::
+
     root@tkldev fab/products# cat core/Makefile 
     WEBMIN_FW_TCP_INCOMING = 22 12320 12321
 
@@ -59,7 +61,6 @@ lines of TKLDev "code"::
     root@tkldev fab/products# cat core/conf.d/main 
     #!/bin/sh -ex
     echo "do nothing - core requires no post-package configuration commands"
-
 
 TurnKey LAMP stack, which is slightly more complicated is still just 147
 lines of "code"::
@@ -80,11 +81,14 @@ lines of "code"::
        5 lamp/Makefile
      147 total
 
-The hard part usually isn't getting the integration details into TKLDev
-but testing that they work properly. But... if you're going to integrate
-a Linux system you're going to have to do that anyway, so why not to do
-it in a way that is well documented and repeatable as opposed to an
-error prone manual process.
+The hard part usually isn't using TKLDev but getting the integration
+details right (e.g., what combination of packages and configurations). 
+
+If you're going to integrate a Linux system you're going to have to do
+that anyway and test it, so why not to do it in a way that is well
+documented and repeatable as opposed to an error prone manual process.
+Your future self will appreciate it and so will everyone else that wants
+to build on your work.
 
 Is TKLDev limited to building TurnKey related systems?
 ------------------------------------------------------
@@ -111,8 +115,8 @@ Advanced Linux users can probably skip the documentation and just take a
 look at a few examples from the TurnKey library source code:
 https://github.com/turnkeylinux-apps
 
-That together with a peak at `Tips an Tricks`_ page will get you a long
-way.
+That together with a peak at the `Tips and Tricks`_ page will get you a
+long way.
 
 If you find yourself confused, take a step back and read through the
 rest of the documentation first to get an overview of how things works,
@@ -134,6 +138,7 @@ Documentation
 * `Setup`_
 * `Development`_
 
+.. _common: https://github.com/turnkeylinux/common
 .. _Setup: setup.rst
 .. _Development: development/README.rst
 .. _Tips and Tricks: development/tips.rst
