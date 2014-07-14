@@ -14,9 +14,8 @@ system)
 Requirements for official inclusion in TurnKey GNU/Linux
 --------------------------------------------------------
 
-* Free open source software
-* No proprietary software, binaries, database dumps, etc.
-* Completely automated build. 
+* Contains free open source software.
+* A completely automated build. No interactive steps.
 * Following recommended practices in `Debian Policy`_ and `Filesystem Hierarchy Standard (FHS)`_.
 
 High level steps
