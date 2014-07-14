@@ -8,15 +8,14 @@ build system that can be used to rapidly prototype and repeatably build
 any generic Debian-based Linux distribution or TurnKey GNU/Linux system
 `from source`_.
 
-Read the `blog post`_ announcing TKLDev for the background story. Read
-the `documentation`_ for installation and usage instructions.
+To get started read the `documentation`_. Read the `blog post`_
+announcing TKLDev for the background story. 
 
 This appliance includes all the standard features in `TurnKey Core`_,
 and on top of that:
 
-- Includes rapid copy-on-write TurnKey build toolchain including:
-  `fab`_, `deck`_ and a simple Makefile based system that allows rapid
-  prototyping of new turn-key system integrations quickly and easily.
+- Includes a fast copy-on-write build toolchain based on 
+  GNU make, `fab`_, and `deck`_.
 - Turnkey development directory structure with preconfigured CDPATH.
 - Integrated caching proxy for fast and iterative development.
 - Full usage and development `documentation`_.
