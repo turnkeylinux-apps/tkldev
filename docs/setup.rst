@@ -144,10 +144,11 @@ By convention, the source code for TurnKey integrations is placed within
 tkldev in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
 /turnkey/fab/products/wordpress, etc.).
 
-Clone the source code of `TurnKey Core`_ from GitHub::
+If you haven't already done so clone the source code of `TurnKey Core`_ from
+GitHub::
 
     cd /turnkey/fab/products
-    git-clone https://github.com/turnkeylinux-apps/core.git
+    ! [ -d core ] && git-clone https://github.com/turnkeylinux-apps/core.git
 
 Note that if you're behind a web proxy, then you need to set
 ``parentProxy`` in ``/etc/polipo/config`` and restart the ``polipo``
