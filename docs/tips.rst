@@ -54,6 +54,43 @@ packages::
     root@tkldev products/core# rm build/stamps/root.patched 
     root@tkldev products/core# make root.patched
 
+Installing an ISO image to a USB drive
+======================================
+
+This assumes you are running Linux. Turn the ISO into a USB/CDROM hybrid -
+this step happens automatically on newer versions of TKLDev::
+
+    isohybrid build/product.iso
+
+Identify the device path (e.g., /dev/sdc) of your USB drive::
+
+    # lsblk
+    sde                                     8:64   1   7.4G  0 disk  
+    └─sde1                                  8:65   1   7.4G  0 part  /media/usbdrive
+
+If it's been automounted, unmount it::
+
+    umount /media/usbdrive
+
+Use dd to write the ISO image to the disk path. That's /dev/sde NOT /dev/sde1::
+
+    dd if=build/product.iso of=/dev/sde
+
+Things to keep in mind:
+
+- **Root access is required**: You will need to perform the above commands as root.
+  On Ubuntu prepend the commands with sudo (e.g., sudo apt-get install
+  syslinux)
+
+- **dd will completely overwrite your USB drive**:. Any data on it will be lost so
+  if you use this method you'll want to use it with a dedicated USB device.
+
+- **dd needs to write to the disk path, not the partition path**: in the
+  above example /dev/sde is the disk path device, /dev/sde1 is the
+  partition path (e.g., sde1 is the first partition on sde). You need to
+  write to the disk path because isohybrid prepends a partition
+  structure to the ISO.
+
 Suppress building the product.iso
 =================================
 
