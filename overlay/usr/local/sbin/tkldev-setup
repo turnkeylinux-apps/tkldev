@@ -29,7 +29,7 @@ if [ ! -d /turnkey/fab/cdroots ]; then
     set -x
 
     cd /turnkey/fab
-    git-clone https://github.com/turnkeylinux/cdroots.git
+    git clone https://github.com/turnkeylinux/cdroots.git
 
     set +x
 fi
@@ -40,7 +40,7 @@ if [ ! -d /turnkey/fab/common ]; then
     set -x
 
     cd /turnkey/fab
-    git-clone https://github.com/turnkeylinux/common.git
+    git clone https://github.com/turnkeylinux/common.git
 
     set +x
 fi
