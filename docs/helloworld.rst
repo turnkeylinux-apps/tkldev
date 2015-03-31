@@ -225,7 +225,7 @@ And we'll rebuild root.patched::
 Woops. That didn't work because we forgot to tell "make" it needed to
 rebuild the already existing root.patched target. 
 
-We do that by removing the rooot.patched "build stamp"::
+We do that by removing the root.patched "build stamp"::
 
     root@tkldev products/core# rm build/stamps/root.patched 
 
