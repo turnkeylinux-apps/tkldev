@@ -44,3 +44,15 @@ if [ ! -d /turnkey/fab/common ]; then
 
     set +x
 fi
+
+if [ ! -d /turnkey/fab/products/core ]; then
+    echo "Cloning core repo from GitHub"
+    
+    set -x
+
+    mkdir -p /turnkey/fab/products
+    cd /turnkey/fab/products
+    git-clone https://github.com/turnkeylinux-apps/core.git
+    
+    set +x
+fi
