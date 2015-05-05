@@ -88,11 +88,11 @@ Manual setup::
 
     ARCH=$(dpkg --print-architecture)
     CODENAME=$(lsb_release -s -c)
-    SOURCEFORGE="http://downloads.sourceforge.net/project/turnkeylinux"
+    IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
 
     cd /turnkey/fab/bootstraps
-    wget $SOURCEFORGE/bootstrap/bootstrap-$CODENAME-$ARCH.tar.gz
-    wget $SOURCEFORGE/bootstrap/bootstrap-$CODENAME-$ARCH.tar.gz.sig
+    wget $IMAGES/bootstrap/bootstrap-$CODENAME-$ARCH.tar.gz
+    wget $IMAGES/bootstrap/bootstrap-$CODENAME-$ARCH.tar.gz.sig
 
     gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 0xA16EB94D
     gpg --verify bootstrap-$CODENAME-$ARCH.tar.gz.sig
