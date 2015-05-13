@@ -1,12 +1,14 @@
 Playing in the sandbox
 ======================
 
-root.sandbox (root.tmp in earlier TKLDev versions) can be used to
-accelerate development with quick and dirty manual prototyping of
-changes to the root filesystem. 
+The root.sandbox environment can be used to accelerate development 
+with quick and dirty manual prototyping of changes to the root filesystem. 
 
 This makes it easier to test changes without having to edit source code
 and then rebuild from scratch.
+
+``fab-chroot`` will help you switch to the sandbox environment by executing::
+    root@tkldev products/core# fab-chroot build/root.sandbox/
 
 root.sandbox is implemented as a copy-on-write filesystem that branches
 off from root.patched. If you dirty the sandbox by making changes inside
