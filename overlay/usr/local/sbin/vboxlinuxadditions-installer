@@ -1,0 +1,22 @@
+#!/bin/bash -e
+
+# filename:	/usr/local/sbin/vboxlinuxadditions-installer
+# documenation:	http://virtualboxes.org/doc/installing-guest-additions-on-debian/
+
+
+# Update your APT database with
+apt-get update
+
+# Install required packages with
+apt-get install build-essential module-assistant
+
+# Configure your system for building kernel modules by running
+m-a prepare
+
+# Click on Install Guest Additions from the Devices menu, then run
+mkdir -p /media/additions
+mount /dev/cdrom /media/additions
+
+# Run
+/media/additions/VBoxLinuxAdditions.run
+# and follow the instructions on screen. 
