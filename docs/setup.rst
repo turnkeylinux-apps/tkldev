@@ -19,7 +19,9 @@ A. Deploy TKLDev
 ================
 
 Like any other TurnKey system, TKLDev is available for `download`_ in
-multiple build formats from the TurnKey Linux website. 
+multiple build formats from the TurnKey Linux website. To deploy TKLDev,
+download the ISO and prepare a new VM (for example with Virtualbox). Mount
+the downloaded ISO file as boot-cd and start it.
 
 An even easier way to get an instance of TKLDev up and running is to
 deploy it on the Amazon EC2 cloud using the `TurnKey Hub`_. Besides
@@ -37,32 +39,22 @@ building an amd64 type image requires an amd64 build of TKLDev.
 B. Setup the build dependencies
 ===============================
 
-In the next version of TKLDev, you can skip this step because it happens
-automatically on first boot.
+Officially, TKLDev will be setup automatically on first boot.
 
 If it doesn't (e.g., we didn't have a working Internet connection)
 you'll be able to trigger it by running this command inside TKLDev as
-root::
+root:
 
     tkldev-setup
-
-But you're not using the next version of TKLDev (yet), so you'll want to
-download the new tkldev-setup from GitHub::
-
-    cd /usr/local/sbin
-    wget https://raw.githubusercontent.com/turnkeylinux-apps/tkldev/master/overlay/usr/local/sbin/tkldev-setup
-    chmod +x tkldev-setup
-
-    ./tkldev-setup
+    
+This will checkout the build dependencies.
 
 The build dependencies: what are they?
 --------------------------------------
 
 1. **bootstrap** in ``/turnkey/fab/bootstraps``: contains minimal bootstrap filesystems.
-
 2. **cdroots** in ``/turnkey/fab/cdroots``: contains the cdroot template for the built
    ISO.
-
 3. **common** in ``/turnkey/fab/common``: contains source code shared amongst all
    TurnKey systems.
 
@@ -74,9 +66,7 @@ Your Linux distribution's filesystem is first initialized as a copy of
 minimum essential operating system components required to run the
 package manager and install additional packages.
 
-Bootstraps are specific to a specific OS release and architecture. This
-means there are 32-bit and 64-bit versions of bootstrap for each major
-operating system release.
+Bootstraps are specific to a specific OS release and architecture.
 
 TurnKey's bootstrap is similar to the bootstrap filesystem created by
 Debian's debootstrap tool, except it is slightly smaller and more
@@ -144,8 +134,10 @@ By convention, the source code for TurnKey integrations is placed within
 tkldev in /turnkey/fab/products (e.g., /turnkey/fab/products/core,
 /turnkey/fab/products/wordpress, etc.).
 
-If you haven't already done so clone the source code of `TurnKey Core`_ from
-GitHub::
+At first boot, the `TurnKey Core`_ should have been checked out by ``tkldev-setup``
+into ``/turnkey/fab/products/core``. 
+
+If you want to be sure if it did, you can use the following commands::
 
     cd /turnkey/fab/products
     ! [ -d core ] && git-clone https://github.com/turnkeylinux-apps/core.git
@@ -163,6 +155,8 @@ The build should take about 3-5 minutes.
 
 The above will create ``build/product.iso`` which you can image to a USB
 drive, burn on a CD or copy to your host system for testing in a VM.
+
+Congratulations on your first build!
 
 What next?
 ==========
