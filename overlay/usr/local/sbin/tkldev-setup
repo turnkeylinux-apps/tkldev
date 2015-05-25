@@ -52,7 +52,7 @@ if [ ! -d /turnkey/fab/products/core ]; then
 
     mkdir -p /turnkey/fab/products
     cd /turnkey/fab/products
-    git-clone https://github.com/turnkeylinux-apps/core.git
+    git clone https://github.com/turnkeylinux-apps/core.git
     
     set +x
 fi
