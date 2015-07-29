@@ -31,8 +31,9 @@ proxyPort = $POLIPO_PORT
 dnsNameServer = 8.8.8.8
 EOF
 
-# disable webmin and shellinabox
+# disable services so as not to conflict with builds
 sysv-rc-conf webmin off
 sysv-rc-conf stunnel4 off
 sysv-rc-conf shellinabox off
+sysv-rc-conf postfix off
 
