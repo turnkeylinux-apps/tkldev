@@ -4,7 +4,7 @@ mkdir -p /turnkey/fab/bootstraps
 CODENAME=$(lsb_release -s -c)
 
 if [ ! -d /turnkey/fab/bootstraps/$CODENAME ]; then
-    echo "Downloading $CODENAME bootstrap from Sourceforge to /turnkey/fab/bootstraps"
+    echo "Downloading $CODENAME bootstrap to /turnkey/fab/bootstraps"
     set -x
 
     ARCH=$(dpkg --print-architecture)
