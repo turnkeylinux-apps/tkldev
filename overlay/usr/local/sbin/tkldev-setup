@@ -1,58 +1,45 @@
-#!/bin/bash
+#!/bin/bash -e
+# setup/update system ready for building appliances
 
-mkdir -p /turnkey/fab/bootstraps
-CODENAME=$(lsb_release -s -c)
+fatal() { echo "FATAL [$(basename $0)]: $@" 1>&2; exit 1; }
+info() { echo "INFO [$(basename $0)]: $@"; }
 
-if [ ! -d /turnkey/fab/bootstraps/$CODENAME ]; then
-    echo "Downloading $CODENAME bootstrap to /turnkey/fab/bootstraps"
-    set -x
+GPGKEY="A16EB94D"
+IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
+FAB_PATH="/turnkey/fab"
+BOOTSTRAP_NAME="bootstrap-$(lsb_release -s -c)-$(dpkg --print-architecture)"
+BOOTSTRAP_PATH="$FAB_PATH/bootstraps/$(lsb_release -s -c)"
 
-    ARCH=$(dpkg --print-architecture)
-    IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
+if [ ! -d $BOOTSTRAP_PATH ]; then
+    info "downloading $BOOTSTRAP_NAME"
+    mkdir -p $(dirname $BOOTSTRAP_PATH)
+    cd $(dirname $BOOTSTRAP_PATH)
+    wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz
+    wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.sig
 
-    cd /turnkey/fab/bootstraps
-    wget $IMAGES/bootstrap/bootstrap-$CODENAME-$ARCH.tar.gz
-    wget $IMAGES/bootstrap/bootstrap-$CODENAME-$ARCH.tar.gz.sig
+    info "verifying $BOOTSTRAP_NAME"
+    gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 0x$GPGKEY
+    gpg --verify $BOOTSTRAP_NAME.tar.gz.sig
 
-    gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 0xA16EB94D
-    gpg --verify bootstrap-$CODENAME-$ARCH.tar.gz.sig
-
-    mkdir $CODENAME
-    tar -zxf bootstrap-$CODENAME-$ARCH.tar.gz -C $CODENAME
-
-    set +x
+    info "unpacking $BOOTSTRAP_NAME"
+    mkdir $BOOTSTRAP_PATH
+    tar -zxf $BOOTSTRAP_NAME.tar.gz -C $BOOTSTRAP_PATH
 fi
 
-if [ ! -d /turnkey/fab/cdroots ]; then
-    echo "Cloning cdroots repo from GitHub"
+g() {
+    src=https://github.com/$1
+    dst=$2
+    mkdir -p $(dirname $dst)
+    if [ -d $dst ]; then
+        info "updating $dst"
+        GIT_DIR=$dst/.git git pull
+    else
+        info "cloning $src"
+        git clone $src $dst
+    fi
+}
 
-    set -x
+g turnkeylinux/cdroots $FAB_PATH/cdroots
+g turnkeylinux/common $FAB_PATH/common
+g turnkeylinux-apps/core $FAB_PATH/products/core
 
-    cd /turnkey/fab
-    git clone https://github.com/turnkeylinux/cdroots.git
-
-    set +x
-fi
-
-if [ ! -d /turnkey/fab/common ]; then
-    echo "Cloning common repo from GitHub"
-
-    set -x
-
-    cd /turnkey/fab
-    git clone https://github.com/turnkeylinux/common.git
-
-    set +x
-fi
-
-if [ ! -d /turnkey/fab/products/core ]; then
-    echo "Cloning core repo from GitHub"
-    
-    set -x
-
-    mkdir -p /turnkey/fab/products
-    cd /turnkey/fab/products
-    git clone https://github.com/turnkeylinux-apps/core.git
-    
-    set +x
-fi
