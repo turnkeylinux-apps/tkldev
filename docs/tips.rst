@@ -46,13 +46,26 @@ For a more detailed example see `Hello world <helloworld.rst>`_.
 Quick re-patch: how to reapply root.patched configurations
 ==========================================================
 
-If we've only tweaked the configuration scripts in conf.d/ or files in overlay/
-without changing the package installation plan then we can update
-root.patched quickly without having to wait for TKLDev to reinstall all
-packages::
+You'll save a lot of time and accelerate your development cycle if you
+realize you don't have to start the build from scratch with a "make
+clean" every time you make a change to the conf/ or overlay/.
+
+Removing a build stamp forces make to rebuild that step::
 
     root@tkldev products/core# rm build/stamps/root.patched 
-    root@tkldev products/core# make root.patched
+
+    root@tkldev products/core# make root.sandbox
+    root@tkldev products/core# fab-chroot build/root.sandbox
+
+root.sandbox depends on root.patched in the Makefile so after removing
+the root.patched stamp root.sandbox will be automatically rebuilt.
+
+This is very useful after you tweak the configuration scripts in conf.d/
+or files in overlay/ without changing the list of packages in plan/.
+
+Packages listed in plan/ are installed in the root.build step that
+root.patched depends on so if you change the plan you need to rebuild
+root.build.
 
 Installing an ISO image to a USB drive
 ======================================
