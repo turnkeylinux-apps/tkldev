@@ -104,12 +104,19 @@ Things to keep in mind:
   write to the disk path because isohybrid prepends a partition
   structure to the ISO.
 
-Suppress building the product.iso
-=================================
+CHROOT_ONLY: suppress ISO build and packages required for boot
+==============================================================
 
 You can suppress building of the ISO images like this::
 
     export CHROOT_ONLY=yes
+
+Now running "make" will only proceed to the root.patched and
+root.sandbox steps. No cdroot or ISO will be created.
+
+This will also suppress installation of packages that are required to
+boot the system such as the kernel, ISO bootloader (e.g., casper) and
+the init system.
 
 You might want to do this if you're at the stage where you only want to
 experiment inside chroot. You can get a lot of mileage inside chroot
