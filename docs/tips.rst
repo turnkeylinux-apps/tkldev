@@ -1,7 +1,7 @@
 Test as early as possible: faster feedback loops FTW
 ====================================================
 
-Tight feedback loops are the key to having a fun, rewarding development
+Tight feedback loops are the key to having a fun & rewarding development
 experience.
 
 During development your goal should be to test everything as early and
@@ -30,38 +30,8 @@ can catch mistakes, the more you can achieve in less time.
 7) testing the ISO in a VM is faster than burning the ISO to a CD and
    testing on real hardware
 
-Logging in via SSH without a password
-=====================================
-
-To streamline connectivity, it's recommended to update your local
-``/etc/hosts`` to include ``APPLIANCE_IP tkldev`` and setup SSH
-public-key authentication::
-
-    ssh-copy-id root@tkldev
-    ssh root@tkldev
-
-Shellinabox (as well as Webmin) is installed but disabled by default so
-as not to conflict with builds that may use it. You should connect via
-an SSH client.
-
-Jumping around the filesystem with CDPATH
-=========================================
-
-While absolute paths are used in the documentation, the ``CDPATH``
-environment variable is pre-configured to provide quick and easy
-navigation through the filesystem::
-
-    cd core             # changes to /turnkey/fab/products/core
-    cd products/core    # changes to /turnkey/fab/products/core
-    cd common           # changes to /turnkey/fab/common
-
-This will work from any current working directory, saving you from
-the drudgery of having to type in absolute paths.
-
-Note that CDPATH supports tab auto-completion.
-
 Interactively exploring a product's filesystem
-==============================================
+----------------------------------------------
 
 You can chroot into the product's filesystem to explore, hack or test
 stuff interactively without having to make changes to source code::
@@ -76,7 +46,7 @@ these changes you'll need to update the source though.
 For a more detailed example see `Hello world <helloworld.rst>`_.
 
 Quick re-patch: how to reapply root.patched configurations
-==========================================================
+----------------------------------------------------------
 
 You'll save a lot of time and accelerate your development cycle if you
 realize you don't have to start the build from scratch with a "make
@@ -98,6 +68,65 @@ or files in overlay/ without changing the list of packages in plan/.
 Packages listed in plan/ are installed in the root.build step that
 root.patched depends on so if you change the plan you need to rebuild
 root.build.
+
+CHROOT_ONLY: suppress ISO build and packages required for boot
+--------------------------------------------------------------
+
+You can suppress building of the ISO images like this::
+
+    export CHROOT_ONLY=yes
+
+Now running "make" will only proceed to the root.patched and
+root.sandbox steps. No cdroot or ISO will be created.
+
+This will also suppress installation of packages that are required to
+boot the system such as the kernel, ISO bootloader (e.g., casper) and
+the init system.
+
+You might want to do this if you're at the stage where you only want to
+experiment inside chroot. You can get a lot of mileage inside chroot
+before you need to resort to testing an ISO on real hardware or a VM.
+This allows faster development cycles.
+
+If you get tired of setting this in your shell environment you can make
+it permanent::
+    
+    echo "export CHROOT_ONLY=yes" >> /root/.bashrc.d/tkldev
+    chmod +x /root/.bashrc.d/tkldev
+    
+
+Reducing friction
+=================
+
+Jumping around the filesystem with CDPATH
+-----------------------------------------
+
+While absolute paths are used in the documentation, the ``CDPATH``
+environment variable is pre-configured to provide quick and easy
+navigation through the filesystem::
+
+    cd core             # changes to /turnkey/fab/products/core
+    cd products/core    # changes to /turnkey/fab/products/core
+    cd common           # changes to /turnkey/fab/common
+
+This will work from any current working directory, saving you from
+the drudgery of having to type in absolute paths.
+
+Note that CDPATH supports tab auto-completion.
+
+Logging in via SSH without a password
+-------------------------------------
+
+To streamline connectivity, it's recommended to update your local
+``/etc/hosts`` to include ``APPLIANCE_IP tkldev`` and setup SSH
+public-key authentication::
+
+    ssh-copy-id root@tkldev
+    ssh root@tkldev
+
+Shellinabox (as well as Webmin) is installed but disabled by default so
+as not to conflict with builds that may use it. You should connect via
+an SSH client.
 
 Installing an ISO image to a USB drive
 ======================================
@@ -136,31 +165,6 @@ Things to keep in mind:
   write to the disk path because isohybrid prepends a partition
   structure to the ISO.
 
-CHROOT_ONLY: suppress ISO build and packages required for boot
-==============================================================
-
-You can suppress building of the ISO images like this::
-
-    export CHROOT_ONLY=yes
-
-Now running "make" will only proceed to the root.patched and
-root.sandbox steps. No cdroot or ISO will be created.
-
-This will also suppress installation of packages that are required to
-boot the system such as the kernel, ISO bootloader (e.g., casper) and
-the init system.
-
-You might want to do this if you're at the stage where you only want to
-experiment inside chroot. You can get a lot of mileage inside chroot
-before you need to resort to testing an ISO on real hardware or a VM.
-This allows faster development cycles.
-
-If you get tired of setting this in your shell environment you can make
-it permanent::
-    
-    echo "export CHROOT_ONLY=yes" >> /root/.bashrc.d/tkldev
-    chmod +x /root/.bashrc.d/tkldev
-    
 Getting help
 ============
 
