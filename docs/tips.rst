@@ -72,6 +72,13 @@ root.build.
 CHROOT_ONLY: suppress ISO build and packages required for boot
 --------------------------------------------------------------
 
+Here's a time saving tip if you're at the stage where you only want to
+experiment inside chroot. 
+
+You can get a lot of mileage inside chroot before you need to resort to
+testing an ISO on real hardware or a VM.  This allows faster development
+cycles.
+
 You can suppress building of the ISO images like this::
 
     export CHROOT_ONLY=yes
@@ -82,11 +89,6 @@ root.sandbox steps. No cdroot or ISO will be created.
 This will also suppress installation of packages that are required to
 boot the system such as the kernel, ISO bootloader (e.g., casper) and
 the init system.
-
-You might want to do this if you're at the stage where you only want to
-experiment inside chroot. You can get a lot of mileage inside chroot
-before you need to resort to testing an ISO on real hardware or a VM.
-This allows faster development cycles.
 
 If you get tired of setting this in your shell environment you can make
 it permanent::
