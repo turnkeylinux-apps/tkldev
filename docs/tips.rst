@@ -1,3 +1,35 @@
+Test as early as possible: faster feedback loops FTW
+====================================================
+
+Tight feedback loops are the key to having a fun, rewarding development
+experience.
+
+During development your goal should be to test everything as early and
+frequently as possible. The more immediate the feedback you're getting
+the better. The faster you can test something works, the earlier you get
+can catch mistakes, the more you can achieve in less time. 
+
+1) prototyping integration details on a live system (e.g., Core or LAMP
+   Stack) is faster than having to go through the build system. 
+
+2) testing a command is faster than testing a shell script
+
+3) testing a single conf script is faster than testing all conf.d/
+   scripts together
+
+4) testing conf.d scripts in isolation is faster than testing all the
+   changes to root.patched together
+
+5) testing root.patched by rebuilding root.patched from the root.build
+   step is faster than having to wait for root.patched to build from
+   scratch after make clean 
+
+6) testing an app by booting the ISO in live mode is faster than testing
+   an app by installing the ISO to a harddrive
+
+7) testing the ISO in a VM is faster than burning the ISO to a CD and
+   testing on real hardware
+
 Logging in via SSH without a password
 =====================================
 
