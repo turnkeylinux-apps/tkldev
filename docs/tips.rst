@@ -73,11 +73,9 @@ CHROOT_ONLY: suppress ISO build and packages required for boot
 --------------------------------------------------------------
 
 Here's a time saving tip if you're at the stage where you only want to
-experiment inside chroot. 
-
-You can get a lot of mileage inside chroot before you need to resort to
-testing an ISO on real hardware or a VM.  This allows faster development
-cycles.
+experiment inside chroot. You can get a lot of mileage inside chroot
+before you need to resort to testing an ISO on real hardware or a VM.
+This allows faster development cycles.
 
 You can suppress building of the ISO images like this::
 
