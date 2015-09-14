@@ -32,9 +32,9 @@ Credentials *(passwords set at first boot)*
 -  SSH: username **root**
 
 .. _itself: https://github.com/turnkeylinux-apps/tkldev
-.. _blog post: http://www.turnkeylinux.org/blog/introducing-tkldev
+.. _blog post: https://www.turnkeylinux.org/blog/introducing-tkldev
 .. _fab: https://github.com/turnkeylinux/fab
 .. _deck: https://github.com/turnkeylinux/deck
 .. _from source: https://github.com/turnkeylinux-apps/
-.. _TurnKey Core: http://www.turnkeylinux.org/core
+.. _TurnKey Core: https://www.turnkeylinux.org/core
 .. _documentation: https://github.com/turnkeylinux-apps/tkldev/tree/master/docs
