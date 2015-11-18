@@ -315,8 +315,8 @@ Linux library:
 .. _Vanilla inithook: https://github.com/turnkeylinux-apps/vanilla/blob/master/overlay/usr/lib/inithooks/bin/vanilla_pass.php
 .. _MediaWiki conf: https://github.com/turnkeylinux-apps/mediawiki/blob/master/conf.d/main
 .. _DomainController tklweb-cp: https://github.com/turnkeylinux-apps/domaincontroller/blob/master/overlay/var/www/index.shtml
-.. _TurnKey Backup and Migration: http://www.turnkeylinux.org/tklbam/
-.. _directory paths: http://www.turnkeylinux.org/faq/backup-and-migration-tklbam#t601n2382
+.. _TurnKey Backup and Migration: https://www.turnkeylinux.org/tklbam/
+.. _directory paths: https://www.turnkeylinux.org/faq/backup-and-migration-tklbam#t601n2382
 .. _reStructuredText: http://docutils.sourceforge.net/docs/user/rst/quickref.html
 .. _TurnKey Artwork: https://github.com/turnkeylinux/artwork/
 .. _Issue Tracker: https://github.com/turnkeylinux/tracker/issues?labels=new-appliance

@@ -34,7 +34,7 @@ TKLDev doesn't support cross-architecture builds (yet). That means
 building an amd64 type image requires an amd64 build of TKLDev. 
 
 .. _TurnKey Hub: https://hub.turnkeylinux.org/
-.. _download: http://www.turnkeylinux.org/tkldev/
+.. _download: https://www.turnkeylinux.org/tkldev/
 
 B. Setup the build dependencies
 ===============================
@@ -164,4 +164,4 @@ What next?
 * `Hello world`_: say hello by making your first change.
 
 .. _Hello world: helloworld.rst
-.. _TurnKey Core: http://www.turnkeylinux.org/core/
+.. _TurnKey Core: https://www.turnkeylinux.org/core/
