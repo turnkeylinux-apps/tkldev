@@ -1,3 +1,5 @@
-Web shell:  https://$ipaddr:12320 (disabled by default)
-Webmin:     https://$ipaddr:12321 (disabled by default)
+Web shell:  https://$ipaddr:12320
+             (disabled by default)
+Webmin:     https://$ipaddr:12321
+             (disabled by default)
 SSH/SFTP:   root@$ipaddr (port 22)
