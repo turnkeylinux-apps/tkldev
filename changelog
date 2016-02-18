@@ -1,3 +1,13 @@
+turnkey-tkldev-14.1 (1) turnkey; urgency=low
+
+  * Adjusted confconsole text so it is clear that Webmin & Webshell are 
+    disabled by default (#342).
+
+  * Note: Please refer to turnkey-core's changelog for changes common to all
+    appliances. Here we only describe changes specific to this appliance.
+
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Wed, 17 Feb 2016 17:40:20 +1100
+
 turnkey-tkldev-14.0 (1) turnkey; urgency=low
 
   * Includes tkldev-setup script executed on firstboot.
