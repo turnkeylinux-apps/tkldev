@@ -39,6 +39,7 @@ g() {
     fi
 }
 
+g turnkeylinux/buildtasks /turnkey/buildtasks
 g turnkeylinux/cdroots $FAB_PATH/cdroots
 g turnkeylinux/common $FAB_PATH/common
 g turnkeylinux-apps/core $FAB_PATH/products/core
