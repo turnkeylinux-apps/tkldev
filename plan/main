@@ -3,6 +3,15 @@
 fab
 deck
 
+// new for v14.2
+deckdebuild
+pool
+chanko
+autoversion
+repo
+useraufs
+verseek
+
 make
 build-essential
 gnupg

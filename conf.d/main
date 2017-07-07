@@ -1,11 +1,22 @@
 #!/bin/bash -e
 
+CODENAME=$(lsb_release -c | cut -f2)
+
 POLIPO_PORT=8124
 FAB_PATH=/turnkey/fab
 
 # create directory structure
 mkdir -p $FAB_PATH/bootstraps
 mkdir -p $FAB_PATH/products
+mkdir -p $FAB_PATH/pools/$CODENAME
+mkdir -p $FAB_PATH/chankos/$CODENAME.chanko/{config,plan}
+
+# set up pool
+
+
+# setup chanko
+cat /etc/apt/sources.list.d/*.list > $FAB_PATH/chankos/$CODENAME.chanko/config/sources.list
+cat /etc/apt/
 
 # environmental variables and bash tweaks
 mkdir -p /root/.bashrc.d
