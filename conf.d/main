@@ -1,22 +1,44 @@
 #!/bin/bash -e
 
-CODENAME=$(lsb_release -c | cut -f2)
-
+# set vars
 POLIPO_PORT=8124
 FAB_PATH=/turnkey/fab
+CODENAME=$(lsb_release -c | cut -f2)
+PROD_PATH=$FAB_PATH/products
+POOL_PATH=$FAB_PATH/pools/$CODENAME
+CHANKO_PATH=$FAB_PATH/chankos/$CODENAME.chanko
+BUILDROOT=$FAB_PATH/buildroots/$CODENAME
 
-# create directory structure
-mkdir -p $FAB_PATH/bootstraps
-mkdir -p $FAB_PATH/products
-mkdir -p $FAB_PATH/pools/$CODENAME
-mkdir -p $FAB_PATH/chankos/$CODENAME.chanko/{config,plan}
+# create base directory structure
+mkdir -p $FAB_PATH/bootstraps \
+         $FAB_PATH/deckbuilds/{builds,chroots} \
+         $PROD_PATH \
+         $POOL_PATH \
+         $CHANKO_PATH/{config,plan,archives} \
+         $BUILDROOT
 
-# set up pool
+# configure deckdebuild
+cat > /etc/deckdebuild.conf << EOF
+satisfydepends-cmd /usr/lib/pbuilder/pbuilder-satisfydepends-classic
+vardir $FAB_PATH/deckdebuilds
+EOF
 
+# configure chanko
+cat /etc/apt/sources.list.d/*.list > $CHANKO_PATH/config/sources.list
+TRUSTED_KEYS=$CHANKO_PATH/config/trustedkeys.gpg
+cat /etc/apt/trusted.gpg.d/debian.gpg > $TRUSTED_KEYS
+cat /etc/apt/trusted.gpg.d/turnkey.gpg >> $TRUSTED_KEYS
+find /etc/apt/trusted.gpg.d/ -name "*$CODENAME$" -exec cat {} >> $TRUSTED_KEYS +
 
-# setup chanko
-cat /etc/apt/sources.list.d/*.list > $FAB_PATH/chankos/$CODENAME.chanko/config/sources.list
-cat /etc/apt/
+cat > $CHANKO_PATH/config/chanko.conf <<EOF
+RELEASE=debian/$CODENAME
+PLAN_CPP=-DTURNKEY=y
+EOF
+
+# configure pool basics
+cd $POOL_PATH
+pool-init $BUILDROOT
+pool-register $CHANKO_PATH/archives/
 
 # environmental variables and bash tweaks
 mkdir -p /root/.bashrc.d
@@ -25,6 +47,7 @@ cat >/root/.bashrc.d/fab<<EOF
 export FAB_PATH=$FAB_PATH
 export FAB_APT_PROXY=http://127.0.0.1:$POLIPO_PORT
 export FAB_HTTP_PROXY=http://127.0.0.1:$POLIPO_PORT
+export POOL_PATH=$POOL_PATH
 EOF
 chmod +x /root/.bashrc.d/fab
 
