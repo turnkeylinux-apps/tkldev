@@ -1,3 +1,17 @@
+turnkey-tkldev-14.2 (1) turnkey; urgency=low
+
+  * Included buildtasks - supports building optimized builds.
+
+  * Included pool & chanko - supports building Debian packages from source
+    and building appliances offline. 
+
+  * Installed security updates.
+
+  * Note: Please refer to turnkey-core's changelog for changes common to all
+    appliances. Here we only describe changes specific to this appliance.
+
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Fri, 21 Jul 2017 19:03:44 +1000
+
 turnkey-tkldev-14.1 (1) turnkey; urgency=low
 
   * Adjusted confconsole text so it is clear that Webmin & Webshell are 
