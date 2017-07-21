@@ -18,33 +18,26 @@ do the following:
 
 .. code-block:: bash
 
-    PLAN_DIR=$FAB_PATH/common/plans
-    BASE_PLAN=$PLAN_DIR/turnkey/base
-    INCLUDES=$(sed -n "/#include/ s|^.*<|${PLAN_DIR}/|; s|>.*$||p" $BASE_PLAN)
-    grep -v \#include $BASE_PLAN > /tmp/base.plan
-
     cd chanko/jessie.chanko/
     chanko refresh -a
     export AMD64=y
-    for plan in $INCLUDES /tmp/base.plan; do
-        echo y | chanko get $plan
-    done
+    export DEBIAN=y
+    echo y | chanko-get plan/main
 
     # go get yourself a [insert beverage of choice here] while it downloads all
     # those packages
 
 
-That should give you all the packages that you need to build Core offline. For
-other appliances you will need to also download some additional packages. 
-Hopefully that is fairly straight forward?!
+That will collect all the packages needed to build Core offline. For other
+appliances you will need to process the relevant plan(s).
 
 Building your Appliance
 -----------------------
 
-Now you can build your appliance offline. It's almost identical to building
-appliances normally; you just need to explictly tell TKLDev to do it. We do
-that by setting FAB_POOL. It shouldn't also be neccessary to set the RELEASE
-but I'm going to demonstrate that for interest:
+Now you can build Core offline. It's almost identical to building appliances
+normally; you just need to explictly tell TKLDev to do it. We do that by
+setting the FAB_POOL environment variable. It shouldn't also be neccessary to
+set the RELEASE but I'm going to demonstrate that for interest:
 
 .. code-block:: bash
 
@@ -55,13 +48,13 @@ but I'm going to demonstrate that for interest:
     make
 
 As simple as that! If you get any errors noting packages not found, you may
-have missed them when you were loading them via Chanko. To resolve that, simply
-cd to the Chanko dir and get the required package. E.g. I need the hello-world
-package but I don't have it in my Chanko yet: 
+have missed them when you were loading them via Chanko. Chanko can also get
+individual packages. So cd to the Chanko dir and get the required package. E.g.
+I need the hello package but I don't have it in my Chanko yet:
 
 .. code-block:: bash
 
     cd chankos/jessie
-    chanko-get hello-world
+    chanko-get hello
     
 
