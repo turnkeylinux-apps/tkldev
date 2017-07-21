@@ -12,7 +12,7 @@ Before you start
 
 Before you can build any packages, you need to ensure that Chanko is fully
 configured and has been pre-loaded with packages. If you haven't already done
-that, please see docs/building-appliances-offline.rst
+that, please see the relevant `doc page`_.
 
 Build a buildroot
 -----------------
@@ -68,6 +68,10 @@ And after a few moments, you should find the ccurl Debian package ready for use:
 
 You can now move this .deb to where you wish to use it and install with dpkg. 
 Alternatively, if you are building an appliance you can automatically include
-this package by building with 'export FAB_POOL=y'. Note though, you will need
-to ensure that Chanko has all the other required packages already cached.
-See docs/building-appliances-offline.rst
+this package by adding the packagename to the plan and building with 
+`export FAB_POOL=y`. 
+
+Note: you will need to ensure that Chanko has all the other required packages
+already cached. See the relevant `doc page`_.
+
+.. _doc page: https://github.com/turnkeylinux-apps/tkldev/docs/advanced/building-packages-from-source.rst
