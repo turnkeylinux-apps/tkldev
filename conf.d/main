@@ -8,6 +8,7 @@ PROD_PATH=$FAB_PATH/products
 POOL_PATH=$FAB_PATH/pools/$CODENAME
 CHANKO_PATH=$FAB_PATH/chankos/$CODENAME.chanko
 BUILDROOT=$FAB_PATH/buildroots/$CODENAME
+BUILDTASKS=/mnt
 
 # create base directory structure
 mkdir -p $FAB_PATH/bootstraps \
@@ -16,6 +17,7 @@ mkdir -p $FAB_PATH/bootstraps \
          $POOL_PATH \
          $CHANKO_PATH/{config,plan,archives} \
          $BUILDROOT
+         $BUILDTASKS/{isos,builds}
 
 # configure deckdebuild
 cat > /etc/deckdebuild.conf << EOF
