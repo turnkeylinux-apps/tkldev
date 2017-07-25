@@ -16,7 +16,7 @@ mkdir -p $FAB_PATH/bootstraps \
          $PROD_PATH \
          $POOL_PATH \
          $CHANKO_PATH/{config,plan,archives} \
-         $BUILDROOT
+         $BUILDROOT \
          $BUILDTASKS/{isos,builds}
 
 # configure deckdebuild
