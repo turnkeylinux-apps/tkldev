@@ -1,0 +1,26 @@
+create build chain (VM amd64) and update package archive
+========================================================
+
+archive
+-------
+
+cd turnkey-archive/debian
+mkdir $CODENAME
+mkdir $CODENAME-security
+touch $CODENAME-security/main
+
+- copy previous release main plan, tweak if needed
+- freeze previous release per turnkey-archive/README
+
+amd64 related
+-------------
+
+- follow: fab-dev/docs/complete
+- follow: turnkey-archive/README
+
+publish
+-------
+
+- archive: follow turnkey-archive/README
+- bootstraps: follow bootstrap/README
+

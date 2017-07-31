@@ -1,0 +1,154 @@
+Pre-release checklist
+=====================
+
+Live boot and install to hard drive
+-----------------------------------
+
+- create new VM
+- check that core boots in live mode
+- reboot
+- check that core installs to hard drive
+- reboot
+- check that install to hard drive works
+
+Confconsole
+-----------
+
+- Loads after boot, shows TKLBAM not initialized
+
+- Network configuration works (DHCP + Static IP)
+  - Set DNS to 8.8.8.8, check /etc/network/interfaces
+
+Console sysinfo
+---------------
+
+$ ssh testcore
+
+Welcome to Core, TurnKey Linux 12.1 / Debian 6.0.7 Squeeze
+
+  System information (as of Thu Apr 18 11:29:17 2013)
+
+    System load:  0.15             Memory usage:  16%
+    Processes:    70               Swap usage:    0%
+    Usage of /:   7.5% of 6.50GB   IP address for eth0:  10.0.0.6
+
+  TKLBAM (Backup and Migration):  NOT INITIALIZED
+
+    To initialize TKLBAM, run the "tklbam-init" command to link this
+    system to your TurnKey Hub account. For details see the man page or
+    go to:
+
+        http://www.turnkeylinux.org/tklbam
+
+Authentication
+--------------
+
+- log into console with root password
+- log into webmin with root password
+- log into webshell with root password
+
+Service authentication
+----------------------
+
+- web app
+- phpmyadmin
+- phppgadmin
+- others... (see confconsole services)
+
+TKLBAM
+------
+
+- install LAMP on VirtualBox
+- tklbam-init APIKEY
+
+- test backup
+
+  adduser alon
+
+  echo test > /root/test
+  chown alon:alon /root/test
+
+from console cli
+''''''''''''''''
+
+# dry run
+
+tklbam-backup --simulate
+
+- examine /TKLBAM/fsdelta-olist
+    - it should be empty (or close to it), since there is no delta!
+
+- examine /var/lib/tklbam/profile/dirindex
+    - file paths shouldn't have any weird prefix in them
+
+# wet run
+
+tklbam-backup
+
+  TotalDestinationSizeChange should be about 10KB
+
+tklbam-list
+
+# restore from another/new installation
+
+tklbam-restore TESTBACKUPID
+
+  check /root/test exists and is owned by alon:alon
+
+  examine /var/log/tklbam-restore, make sure no error messages
+
+tklbam-rollback
+
+    /root/test shoud be gone, as should user alon in /etc/passwd
+
+from webmin
+'''''''''''
+
+- exercise all the functionality
+- initialize tklbam
+
+Backup
+''''''
+
+- download escrow key
+- enable daily backups: yes
+
+  check that /etc/cron.daily/tklbam-backup is +x
+
+  enable daily backups: no
+
+  check that /etc/cron.daily/tklbam-backup is -x
+
+- advanced configuration:
+
+  # check /etc/tklbam/conf to see that these changes have been applied
+  change size of backup volume to 45 MBs
+  change frequency of full backups to 1M
+
+  # check /etc/tklbam/overrides to see that your changes are applied
+  add override
+
+      -/etc/.git
+
+- Run a local simulation (/etc/.git)
+- Run Backup
+
+- do first backup (for real)
+
+- set passphrase, then check that Passphrase field changed on the Hub
+
+Restore
+'''''''
+
+Test restoration via Webmin from a new instance (same test conditions as
+cli restore)
+
+Should ask for passphrase because we've set one!
+
+PHP XCache
+----------
+
+Check that the default xcache.size is large enough for that application.
+32M is enough for www.turnkeylinux.org
+
+

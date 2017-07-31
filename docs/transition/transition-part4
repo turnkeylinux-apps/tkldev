@@ -1,0 +1,157 @@
+create build masters from core generated in part3 (i386, amd64)
+===============================================================
+
+misc
+----
+
+- prerequisites
+    - create tkldev changelog
+    - sync all projects to github
+
+- everything below needs to be performed for each architecture.
+- recommended to do it in parallel
+
+hub
+---
+
+- change label of core generated in part3
+
+backstage: setup hosts and ssh related
+--------------------------------------
+
+/etc/hosts
+    APPLIANCE_IP fab-dev-$ARCH
+
+~/.ssh/config
+    host fab-dev-$ARCH
+    User root
+
+fab-dev: uninitialize tklbam and hubdns
+---------------------------------------
+
+rm -rf /var/lib/tklbam
+rm -rf /var/lib/hubdns
+
+fab-dev: set hostname
+---------------------
+
+echo fab-dev > /etc/hostname
+
+cat > /etc/hosts <<EOF
+127.0.0.1 localhost
+127.0.1.1 fab-dev
+
+#Required for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+EOF
+
+hostname fab-dev
+
+- reconnect for changes to take effect
+
+backstage: apply fab-dev patch to core
+--------------------------------------
+
+packages
+''''''''
+
+cd fab-dev
+ssh fab-dev-$ARCH apt-get update
+ssh fab-dev-$ARCH apt-get -y install $(echo $(sed 's/^#.*//' plan/main))
+ssh fab-dev-$ARCH apt-get -y install $(echo $(sed 's/\/\*.*//' plan/minimal))
+ssh fab-dev-$ARCH apt-get -y install $(echo $(sed 's/\/\*.*//' plan/buildtasks))
+
+overlay
+'''''''
+
+cd fab-dev
+rsync -av overlay/ --no-owner --no-group fab-dev-$ARCH:/
+
+conf
+''''
+
+ssh fab-dev-$ARCH /etc/init.d/polipo stop
+ssh fab-dev-$ARCH /etc/init.d/webmin stop
+ssh fab-dev-$ARCH /etc/init.d/shellinabox stop
+
+cd fab-dev
+scp conf.d/* fab-dev-$ARCH:/root/
+for f in conf.d/*; do ssh fab-dev-$ARCH /root/$(basename $f); done
+ssh fab-dev-$ARCH rm $(for f in conf.d/*; do echo /root/$(basename $f); done)
+
+ssh fab-dev-$ARCH /etc/init.d/polipo start
+
+extras
+''''''
+
+OVFTOOL=/storage/downloads/vmware/VMware-ovftool-VERSION.ARCH.txt
+rsync -avP $OVFTOOL root@fab-dev-$ARCH:/root/
+
+fab-dev: install ovftool
+------------------------
+
+/root/VMware-ovftool-*
+ovftool -h
+
+- reconnect for changes to take effect
+
+fab-dev: create hubclient-status script (firstboot aren't run)
+--------------------------------------------------------------
+
+mkdir -p /etc/rc.local.d
+BOOTED_SCRIPT=/etc/rc.local.d/90hubstatus-booted
+
+cat>$BOOTED_SCRIPT<<EOF
+#!/bin/bash
+hubclient-status booted
+EOF
+
+chmod +x $BOOTED_SCRIPT
+
+build and publish core, tkldev (iso, ec2)
+-----------------------------------------
+
+backstage
+'''''''''
+
+cd fab-dev/contrib
+cat buildtasks.list | HOST=root@fab-dev-$ARCH ./push.sh
+
+fab-dev
+'''''''
+
+# between builds, make sure nothing broke: findmnt -l; losetup --all
+
+/turnkey/buildtasks/bin/tkldev-setup
+
+/turnkey/buildtasks/bt-iso --publish core
+/turnkey/buildtasks/bt-iso --publish tkldev
+
+/turnkey/buildtasks/bt-ec2 --publish --copy core
+/turnkey/buildtasks/bt-ec2 --publish --copy tkldev
+
+rm -rf /mnt/isos/*
+rm -rf /mnt/builds/ec2/*
+rm -rf /turnkey/buildtasks
+rm -rf /turnkey/tklbam-profiles
+rm -rf /turnkey/fab/products/tkldev
+
+hub: snapshot of fab-dev
+------------------------
+
+- stop instances
+- perform manual snapshot on each (note the snapshot_id's)
+
+hub-server: create ami from snapshot
+------------------------------------
+
+cd /volatile/hub
+./manage.py snapshot-to-ami smp@turnkeylinux.org SNAPSHOT_ID ARCH
+
+- update cloudtasks with AMI_ID's
+

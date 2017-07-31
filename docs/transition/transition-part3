@@ -1,0 +1,82 @@
+build core amazon ec2 ebs (i386, amd64)
+=======================================
+
+buildtasks
+----------
+
+- bump version in buildtasks/config/build.cfg
+- update ec2 task if required
+
+misc
+----
+
+- get ami_ids of previous release from cloudtasks/common.py
+- everything below needs to be performed for each architecture
+
+backstage: launch
+-----------------
+
+AMI_ID=...
+ARCH=...
+FABDEV=fab-dev-$PREV_CODENAME-$ARCH
+
+export HUB_APIKEY=... # smp
+./cmd_launch.py $AMI_ID --type=ebs --arch=$ARCH --label="$FABDEV"
+
+backstage: transfer required files
+----------------------------------
+
+cd fab-dev/contrib
+cat base.list buildtasks.list | HOST=root@$FABDEV ./push.sh
+
+$FABDEV: setup bootstrap
+------------------------
+
+CODENAME=...
+ARCH=$(dpkg --print-architecture)
+SOURCEFORGE="http://downloads.sourceforge.net/project/turnkeylinux"
+
+cd /turnkey/fab/bootstraps
+wget $SOURCEFORGE/bootstrap/bootstrap-$CODENAME-$ARCH.tar.gz
+wget $SOURCEFORGE/bootstrap/bootstrap-$CODENAME-$ARCH.tar.gz.sig
+
+gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 0xA16EB94D
+gpg --verify bootstrap-$CODENAME-$ARCH.tar.gz.sig
+
+mkdir $CODENAME
+tar -zxf bootstrap-$CODENAME-$ARCH.tar.gz -C $CODENAME
+
+$FABDEV: build core iso
+-----------------------
+
+export RELEASE=debian/$CODENAME
+export VERSION_TAG=rc
+cd core
+make
+
+export BT=/turnkey/buildtasks
+export BT_CONFIG=$BT/config
+. $BT_CONFIG/common.cfg
+. $BT_CONFIG/build.cfg
+mkdir -p $BT_ISOS
+$BT/bin/iso-release --force $BT_ISOS
+
+$FABDEV: build core ec2
+-----------------------
+
+cd /turnkey/buildtasks
+./bt-ec2 --backed=ebs core
+
+# take note of amiid
+
+backstage: test launch
+----------------------
+
+./cmd_launch.py ami-XXXXXXXX --type=ebs --arch=$ARCH --label="core-$CODENAME-$ARCH"
+
+# delete test build if required
+cd /volatile/hub
+./manage.py appliancesdelete us-east-1 turnkey-core-VERSION-CODENAME-ARCH
+
+- terminate $FABDEV
+

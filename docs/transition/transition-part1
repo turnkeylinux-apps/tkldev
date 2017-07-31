@@ -1,0 +1,95 @@
+create build chain (host system i386)
+=====================================
+
+chanko
+------
+
+- follow chanko/README.rst
+
+pool
+----
+
+mkdir $FAB_PATH/pools/$CODENAME
+mkdir $FAB_PATH/buildroots/$CODENAME
+
+cd pools/$CODENAME
+pool-init $FAB_PATH/buildroots/$CODENAME
+pool-register $FAB_PATH/chankos/$CODENAME.chanko/archives
+
+bootstrap
+---------
+
+- follow bootstrap/README
+
+buildroot
+---------
+
+- follow buildroot/README
+
+busybox-initramfs
+-----------------
+
+- debian doesn't build initramfs
+- we could patch the debian source package, but its usually easier to
+  grab the same version from ubuntu
+
+/turnkey/public/busybox.$CODENAME
+    - import orig tarball
+    - import debian tarball
+    - git-tag-fork
+    - remove changelog
+
+cd pools/$CODENAME
+pool-register /turnkey/public/busybox.$CODENAME
+pool-get . busybox-initramfs
+
+casper
+------
+
+cd pools/$CODENAME
+pool-register /turnkey/public/casper
+pool-get . casper
+
+minimal
+-------
+
+cd minimal
+- update changelog
+
+export RELEASE=debian/$CODENAME
+export FAB_POOL=y
+
+make
+
+package updates
+---------------
+
+- di-live
+- shellinabox
+- webmin: follow webmin/build/README
+
+register packages in pool
+-------------------------
+
+- go over previous release pool
+    - pool-info | sort
+
+common trusted keys
+-------------------
+
+SRC=$FAB_PATH/chankos/$CODENAME.chanko/config/trustedkeys.gpg
+DST=$FAB_PATH/common/overlays/turnkey.d/apt/etc/apt/trusted.gpg.d/debian.gpg
+
+cp $SRC $DST
+
+core
+----
+
+cd core
+- update changelog, readme
+
+export RELEASE=debian/$CODENAME
+export FAB_POOL=y
+
+make
+

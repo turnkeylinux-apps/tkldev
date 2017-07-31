@@ -1,0 +1,87 @@
+How to setup the complete build infrastructure from scratch
+===========================================================
+
+backstage: setup hosts and ssh related
+--------------------------------------
+
+/etc/hosts
+    APPLIANCE_IP fab-dev
+
+~/.ssh/config
+    host fab-dev
+    User root
+
+ssh-copy-id root@fab-dev
+
+backstage: copy over required files
+-----------------------------------
+
+# if transition, update fab-dev/contrib/*.list release specific
+
+cd fab-dev/contrib
+cat base.list buildtasks.list private.list packages.list | ./push.sh
+
+fab-dev: setup chanko
+---------------------
+
+cd chankos/$CODENAME.chanko
+chanko-upgrade
+
+fab-dev: setup pool
+-------------------
+
+mkdir $FAB_PATH/pools/$CODENAME
+mkdir $FAB_PATH/buildroots/$CODENAME
+
+cd pools/$CODENAME
+pool-init $FAB_PATH/buildroots/$CODENAME
+pool-register $FAB_PATH/chankos/$CODENAME.chanko/archives
+
+fab-dev: build bootstrap
+------------------------
+
+- follow bootstrap/README
+
+# if transition, copy fab-dev:/turnkey/fab/build/bootstrap-*
+
+fab-dev: build buildroot and required packages
+----------------------------------------------
+
+- follow buildroot/README
+
+fab-dev: add packages to pool
+-----------------------------
+
+cd pools/$CODENAME
+for p in /turnkey/public/* /turnkey/private/*; do pool-register $p; done
+pool-info
+
+# if transition, unregister release specific packages (eg., busybox.CODENAME)
+
+fab-dev: build minimal (optional)
+---------------------------------
+
+export FAB_POOL=y
+cd minimal
+make
+
+mkdir -p /mnt/isos
+/turnkey/buildtasks/bin/iso-release /mnt/isos
+
+fab-dev: build core (optional)
+------------------------------
+
+export FAB_POOL=y
+cd core
+make
+
+mkdir -p /mnt/isos
+/turnkey/buildtasks/bin/iso-release /mnt/isos
+
+fab-dev: build core non-pool and iso-release without publish (optional)
+-----------------------------------------------------------------------
+
+rm -rf /mnt/isos/turnkey-core-*
+unset FAB_POOL
+/turnkey/buildtasks/bt-iso core
+
