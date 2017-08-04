@@ -60,11 +60,21 @@ EOF
 chmod +x /root/.bashrc.d/turnkey-paths
 
 # polipo
+# if NAMESERVER not set, use host's nameserver
+# otherwise fall back to Google Public DNS
+RESOLV=/etc/resolv.conf
+[ -f "$RESOLV" ] \
+    && HOST_NS=$(grep -m 1 nameserver $RESOLV \
+        | tr -s '[[:space:]]' \
+        | sed -e "s|^[[:space:]]*||" \
+        | cut -d' ' -f2)
+NAMESERVER="${NAMESERVER:-${HOST_NS:-8.8.8.8}}"
+
 chmod -x /etc/cron.daily/polipo
 cat >> /etc/polipo/config <<EOF
 
 proxyPort = $POLIPO_PORT
-dnsNameServer = 8.8.8.8
+dnsNameServer = $NAMESERVER
 EOF
 
 # disable services so as not to conflict with builds
