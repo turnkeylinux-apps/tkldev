@@ -43,21 +43,20 @@ pool-init $BUILDROOT
 pool-register $CHANKO_PATH/archives/
 
 # environmental variables and bash tweaks
-mkdir -p /root/.bashrc.d
+PROFILE_D=/etc/profile.d
+mkdir -p $PROFILE_D
 
-cat >/root/.bashrc.d/fab<<EOF
+cat > $PROFILE_D/fab.sh <<EOF
 export FAB_PATH=$FAB_PATH
 export FAB_APT_PROXY=http://127.0.0.1:$POLIPO_PORT
 export FAB_HTTP_PROXY=http://127.0.0.1:$POLIPO_PORT
 export POOL_PATH=$POOL_PATH
 EOF
-chmod +x /root/.bashrc.d/fab
 
-cat >/root/.bashrc.d/turnkey-paths<<EOF
+cat > $PROFILE_D/turnkey-paths.sh <<EOF
 CDPATH=.:$FAB_PATH:/turnkey:$FAB_PATH/products
 export _CDPATH=\$CDPATH
 EOF
-chmod +x /root/.bashrc.d/turnkey-paths
 
 # polipo
 chmod -x /etc/cron.daily/polipo
