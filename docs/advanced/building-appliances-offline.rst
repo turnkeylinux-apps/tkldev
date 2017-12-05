@@ -18,7 +18,7 @@ do the following:
 
 .. code-block:: bash
 
-    cd chanko/jessie.chanko/
+    cd chankos/jessie.chanko/
     chanko refresh -a
     export AMD64=y
     export DEBIAN=y
