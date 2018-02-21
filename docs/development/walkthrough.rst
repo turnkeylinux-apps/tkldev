@@ -77,7 +77,7 @@ the future it will be used to automatically generate listings for
 .. _TurnKey Core: https://github.com/turnkeylinux-apps/core/
 .. _common: https://github.com/turnkeylinux/common/
 .. _Makefile: https://github.com/turnkeylinux-apps/core/blob/master/Makefile
-.. _fab/share/product.mk: https://github.com/turnkeylinux/fab/blog/master/share/product.mk
+.. _fab/share/product.mk: https://github.com/turnkeylinux/fab/blob/master/share/product.mk
 .. _common/mk/turnkey.mk: https://github.com/turnkeylinux/common/blob/master/mk/turnkey.mk
 .. _common/overlays/turnkey.d: https://github.com/turnkeylinux/common/tree/master/overlays/turnkey.d
 .. _common/conf/turnkey.d: https://github.com/turnkeylinux/common/tree/master/conf/turnkey.d
