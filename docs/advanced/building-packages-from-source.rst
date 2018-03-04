@@ -74,4 +74,4 @@ this package by adding the packagename to the plan and building with
 Note: you will need to ensure that Chanko has all the other required packages
 already cached. See the relevant `doc page`_.
 
-.. _doc page: https://github.com/turnkeylinux-apps/tkldev/docs/advanced/building-packages-from-source.rst
+.. _doc page: https://github.com/turnkeylinux-apps/tkldev/blob/master/docs/advanced/building-packages-from-source.rst
