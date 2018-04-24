@@ -9,7 +9,6 @@ pool
 chanko
 autoversion
 repo
-useraufs
 verseek
 
 make
@@ -22,3 +21,5 @@ sysv-rc-conf
 
 syslinux
 syslinux-utils
+
+dirmngr

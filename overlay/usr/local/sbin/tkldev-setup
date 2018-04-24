@@ -15,11 +15,11 @@ if [ ! -d $BOOTSTRAP_PATH ]; then
     mkdir -p $(dirname $BOOTSTRAP_PATH)
     cd $(dirname $BOOTSTRAP_PATH)
     wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz
-    wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.sig
+    wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash
 
     info "verifying $BOOTSTRAP_NAME"
     gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 0x$GPGKEY
-    gpg --verify $BOOTSTRAP_NAME.tar.gz.sig
+    gpg --verify $BOOTSTRAP_NAME.tar.gz.hash
 
     info "unpacking $BOOTSTRAP_NAME"
     mkdir $BOOTSTRAP_PATH
