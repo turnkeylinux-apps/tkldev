@@ -3,13 +3,13 @@
 fab
 deck
 
-// new for v14.2
-deckdebuild
-pool
-chanko
-autoversion
-repo
-verseek
+deckdebuild             /* pool depends */
+pool                    /* required for building packages */
+chanko                  /* required for building buildroot & building offline */
+autoversion             /* pool depends */
+repo                    /* pool depends */
+verseek                 /* pool depends */
+tklpatch                /* buildtasks optimized builds depends */
 
 make
 build-essential

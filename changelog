@@ -4,8 +4,11 @@ turnkey-tkldev-15.0rc1 (1) turnkey; urgency=low
     filesystem).
     [ Stefan Davis ]
 
-  * New package: dirmngr - new dependency for tkldev-setup
+  * New packages:
+
+    - dirmngr - new dependency for tkldev-setup
     [ Stefan Davis ]
+    - tklpatch - required for buildtasks optimized builds
 
   * Updated tkldev-setup to use .hash files (previously .sig files)
     [ Stefan Davis ]
@@ -23,7 +26,7 @@ turnkey-tkldev-15.0rc1 (1) turnkey; urgency=low
   * Note: Please refer to turnkey-core's changelog for changes common to all
     appliances. Here we only describe changes specific to this appliance.
 
- -- Jeremy Davis <jeremy@turnkeylinux.org>  Fri, 27 Apr 2018 13:27:18 +1000
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Mon, 07 May 2018 09:23:56 +1000
 
 turnkey-tkldev-14.2 (1) turnkey; urgency=low
 
