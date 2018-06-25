@@ -1,4 +1,4 @@
-turnkey-tkldev-15.0rc1 (1) turnkey; urgency=low
+turnkey-tkldev-15.0 (1) turnkey; urgency=low
 
   * Replace auFS support with OverlayFS support (new default Debian union 
     filesystem).
