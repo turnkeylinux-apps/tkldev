@@ -1,24 +1,64 @@
 Building Applicances Offline
 ============================
 
-Chanko - Download packages
---------------------------
-
 It is possible to build TurnKey appliances offline; although you will
 need to at least initially be online to collect the required packages.
-That's where Chanko comes in.
+That's where Chanko_ comes in.
+
+
+Chanko
+------
+
+Chanko is a tool to download and cache Debian packages.
 
 It is highly recommended that you double check that you have all the required
 packages cached before trusting that it will successfully build offline. If you
-try to build offline and you have missing pacakges, it will fail.
+try to build offline and you have missing packages, it will fail.
 
-As of TKLDev v14.2, Chanko is included and pre-configed for initial basic
-useage. So to download and cache all the packages to build core; using chanko,
-do the following:
+
+Chanko - Initial Setup
+----------------------
+
+Whilst Chanko is included in TKLDev, there is some initital config required.
+If you haven't already, please run:
 
 .. code-block:: bash
 
-    cd chankos/jessie.chanko/
+    tkldev-chanko-setup
+
+Note: this script may not yet be included in TKLDev, you may  need to download
+and prepare the script first:
+
+.. code-block:: bash
+
+    GH_URL=https://raw.githubusercontent.com/turnkeylinux-apps/tkldev/master/overlay
+    SCRIPT=usr/local/bin/tkldev-chanko-setup
+    wget -o /$SCRIPT $GH_URL/$SCRIPT
+    chmod +x /$SCRIPT
+
+
+Chanko - packages for Core
+--------------------------
+
+You'll also need to configure the packages which Chanko will download. If you
+want to build appliances offline, then this will do the job for Core:
+
+.. code-block:: bash
+
+    PLAN_DIR=/turnkey/fab/common/plans
+    PLANS="boot net console turnkey/base"
+    for plan in ${PLANS}; do
+        echo "/* ${plan} */" >> ${CHANKO}/plan/main
+        cat ${PLAN_DIR}/${plan} >> ${CHANKO}/plan/main
+        echo >> ${CHANKO}/plan/main
+    done
+    sed -i "s|#include.*||" ${CHANKO}/plan/main
+
+To download and cache all the required packages using chanko, do the following:
+
+.. code-block:: bash
+
+    cd ${CHANKO}
     chanko refresh -a
     export AMD64=y
     export DEBIAN=y
@@ -31,6 +71,7 @@ do the following:
 That will collect all the packages needed to build Core offline. For other
 appliances you will need to process the relevant plan(s).
 
+
 Building your Appliance
 -----------------------
 
@@ -41,7 +82,7 @@ set the RELEASE but I'm going to demonstrate that for interest:
 
 .. code-block:: bash
 
-    CODENAME=$(lsb_release -c | cut -f2)
+    CODENAME=$(lsb_release -cs)
     cd core
     export FAB_POOL=y
     export RELEASE=debian/$CODENAME
@@ -54,7 +95,7 @@ I need the hello package but I don't have it in my Chanko yet:
 
 .. code-block:: bash
 
-    cd chankos/jessie
+    cd ${CHANKO}
     chanko-get hello
-    
 
+.. _Chanko: https://github.com/turnkeylinux/chanko
