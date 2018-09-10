@@ -4,11 +4,15 @@
 fatal() { echo "FATAL [$(basename $0)]: $@" 1>&2; exit 1; }
 info() { echo "INFO [$(basename $0)]: $@"; }
 
+RELEASE="${RELEASE:-debian/$(lsb_release -s -c)}"
+CODENAME="$(basename $RELEASE)"
+ARCH="${ARCH:-$(dpkg --print-architecture)}"
+
 GPGKEY="A16EB94D"
 IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
 FAB_PATH="/turnkey/fab"
-BOOTSTRAP_NAME="bootstrap-$(lsb_release -s -c)-$(dpkg --print-architecture)"
-BOOTSTRAP_PATH="$FAB_PATH/bootstraps/$(lsb_release -s -c)"
+BOOTSTRAP_NAME="bootstrap-${CODENAME}-${ARCH}"
+BOOTSTRAP_PATH="$FAB_PATH/bootstraps/${CODENAME}"
 
 if [ ! -d $BOOTSTRAP_PATH ]; then
     info "downloading $BOOTSTRAP_NAME"
