@@ -77,7 +77,8 @@ Now to gather the plans for Chanko:
     turnkey-pylib
     pyproject-common
     autoversion
-    EOF # note the 'EOF' must be at the start of a line
+    EOF
+    # note the 'EOF' must be at the start of a line and the only thing on said line
 
 Then download the packages like this:
 
