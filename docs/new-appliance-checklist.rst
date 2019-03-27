@@ -1,73 +1,176 @@
-New Appliance
-=============
+How to Create a New Appliance
+=============================
 
-* install upstream software
-    1. install software from debian repositories. to do this. Simply put the package name(s)
-        inside ``plan/main``.
+Sane Base
+    #. The first thing you should do is find a sane base for your new appliance. Many popular
+       software solutions have already been dealt with in turnkey. If this new appliance uses
+       PHP it might be best based off LAMP or LAPP, if it uses NodeJS then the nodejs base is
+       for you.
 
-    2. use upstream third party apt repos.
+        These common bases are used via the Makefile, here is a list of appliances which use
+        these bases for you to use as examples.
+
+            ====== ================== ==============
+            Base   Appliance Name     URL
+            ====== ================== ==============
+            lamp   ``<some example>`` ``<some url>``
+            lapp   ``<some example>`` ``<some url>``
+            node   ``<some example>`` ``<some url>``
+            rails  ``<some example>`` ``<some url>``
+            web2py ``<some example>`` ``<some url>``
+            ====== ================== ==============
+
+    #. Now you've chosen a base we can get started. For this howto we'll use lamp as a base.
+
+        The next thing to do is to cd into /turnkey/fab/products and create your directory
+        structure, make it roughly as follows.
+
+        .. code-block:: bash
+
+            APP_NAME=myapp
+
+            mkdir -p $APP_NAME/{overlay,conf.d,plan}
+            cd $APP_NAME
+
+        Now we've got our basic appliance build code directory structure first thing we'll
+        want to do is create a Makefile.
+
+        All turnkey appliances must include ``$(FAB_PATH)/common/mk/turnkey.mk``
+        And all lamp-based appliances must include ``$(FAB_PATH)/common/mk/turnkey/lamp.mk``
+
+        .. note::
+
+            all appliance-base specific common makefiles must be included BEFORE turnkey.mk
+            as they may modify how turnkey.mk behaves.
+
+        For our lamp based appliance our Makefile will be as follows
+
+        .. code-block:: Makefile
+
+            include $(FAB_PATH)/common/mk/turnkey/lamp.mk
+            include $(FAB_PATH)/common/mk/turnkey.mk
+
+Install upstream software
+    #. Install software from Debian repositories. To do this. Simply put the package name(s)
+       inside ``plan/main``.
+
+    #. Use upstream third party apt repos.
 
         to do this you must:
 
-        a. check if gpg key is ascii armored or not. Often ascii armored keys are suffixed with
+        #. Check if GPG key is ASCII armored or not. Often ASCII armored keys are suffixed with
             ``.asc`` however running ``file <key.gpg|asc>`` will give you a definitive result.
 
-            ``<filename>: PGP public key block ...`` for ascii armored
+            ``<filename>: PGP public key block ...`` for ASCII armored
 
-            ``<filename>: GPG key public ring ...`` for un-armored
+            ``<filename>: GPG key public ring ...`` for unarmored
 
-        b. if the gpg key IS armored, you need to either ensure it has a ``.asc`` extension OR
-           dearmor the key using ``cat <file> | gpg --dearmor > <file>-unarmored.gpg``
+        #. If the GPG key IS armored, you need to either ensure it has a ``.asc`` extension OR
+            de-armor the key using ``cat <file> | gpg --dearmor > <file>-unarmored.gpg``
 
-        c. place a copy of the repositories gpg key in ``/usr/share/keyrings``
+        #. Place a copy of the repositories GPG key in ``/usr/share/keyrings``
 
-        d. add ``deb [signed-by=/usr/share/keyrings/<key-name>.gpg] <url> <codename> <component>``
-            where ``key-name`` is the filename of the gpg key.
+        #. Add ``deb [signed-by=/usr/share/keyrings/<key-name>.gpg] <url> <codename> <component>``
+            where ``key-name`` is the filename of the GPG key.
 
-        e. in a ``conf.d/...`` script run ``apt update`` and ``apt install <package>``
+        #. In a ``conf.d/...`` script run ``apt update`` and ``apt install <package>``
 
-    3. use a third party package management system such as pip, npm, composer, etc.
+    #. Use a third party package management system such as pip, npm, composer, etc.
 
-    4. install from upstream binary release
+        It's worth remembering third party package managers still need to be installed i.e. pip is
+        provided by Debian repos and should be added to the plan if required.
 
-    5. install from upstream source
+    #. Install from upstream (applies to source and binary packages)
+
+        #. Create ``conf.d/downloads``
+
+        #. Add the following
+
+            .. code-block:: bash
+
+                dl() {
+                    [ "$FAB_HTTP_PROXY" ] && PROXY="--proxy $FAB_HTTP_PROXY"
+                    cd $2; curl -L -f -O $PROXY $1; cd -
+                }
+
+            This code adds a bash function called ``dl``, it takes 2 arguments, a URL and
+            a directory location. It downloads the URL to the given location whilst abiding
+            by the proxy settings.
+
+        #. Add variable "URL" which is the download URL of the upstream software and includes
+           http/https/etc.
+
+            If the version appears in the URL e.g.:
+
+                "https://www.example.com/download/v3.6.9.tar.gz"
+
+            Then add an addition variable "VERSION" e.g.:
+
+                ``VERSION="3.6.9"``
+
+            And interpolate the VERSION variable into URL variable e.g.:
+
+                ``URL="https://www.example.com/download/v${VERSION}.tar.gz"``
+
+        #. Add ``dl $URL /usr/local/src``
+
+        #. Unpack, set permissions and if applicable; compile in the ``conf.d/main`` script.
+
+    .. note::
+
+        add apt pinning information
+        add common plan info
 
 
-* Makefile
+Makefile
+    1. Copy the makefile from core
 
-    1. copy the makefile from core
-
-    2. set any appropriate build flags within the makefile
+    2. Set any appropriate build flags within the makefile
 
         WEBMIN_FW_TCP_INCOMING
-            tcp ports which are allowed through firewall
+            TCP ports which are allowed through firewall
 
         WEBMIN_FW_UDP_INCOMING
-            tcp ports which are allowed through firewall
+            UDP ports which are allowed through firewall
 
         WEBMIN_FW_NAT_EXTRA
-            extra nat controls?
+            extra NAT controls?
     
         NONFREE
-            enable nonfree debian repo
+            enable non-free Debian repo
 
-        more build flags
+        COMMON_CONF
+            space separated list of conf scripts to be included from common
 
-* inithooks
+        COMMON_OVERLAYS
+            space separated list of overlays to be included from common
+
+        CREDIT_ANCHORTEXT
+            FIXME: don't know what this does
+
+        CREDIT_LOCATION
+            FIXME: don't know what this does
+
+        PHP56
+
+        .. note::
+            including common stuff
+
+inithooks
     (For more information regarding inithooks see inithooks package source on github
     https://github.com/turnkeylinux/inithooks)
 
-    1. the majority of actions performed by inithooks should be in a python script
-        called ``<appname>.py`` within /usr/lib/inithooks/bin
+    1. The majority of actions performed by inithooks should be in a python script
+       called ``<appname>.py`` within /usr/lib/inithooks/bin
 
-        this script should be idempotent
+        This script should be idempotent
 
-    2. this python script should be called by an executable bash script called
-        ``<weight><appname>.sh`` where weight is a number used to ensure the inithook
-        is ordered correctly, usually 40-50 for general initial setup. These scripts
-        should also be made executable.
+    2. This python script should be called by an executable bash script called
+       ``<weight><appname>.sh`` where weight is a number used to ensure the inithook
+       is ordered correctly, usually 40-50 for general initial setup. These scripts
+       should also be made executable.
 
-        this script should be idempotent
+        This script should be idempotent
 
         firstboot scripts should source ``/etc/default/inithooks``
 
@@ -75,7 +178,9 @@ New Appliance
         variables that hold preseeded values, set sane default values when needed but
         not found and pass them to the python inithook where applicable.
 
-        Note: the following preseedable values are GARUANTEED to be set. even if their
+        Important: ALL values that do NOT apply to your software should be ignored.
+
+        Note: the following preseedable values are GARUANTEED to be set. Even if their
             value is "DEFAULT", they all should be set.
 
             ROOT_PASS should be entirely ignored as it is the root user password for
@@ -98,12 +203,19 @@ New Appliance
 
             SEC_UPDATES should be entirely ignored as it is used internally
             
-        other preseed values can be checked and used however sane defaults must
+        Other preseed values can be checked and used however sane defaults must
         be put in place to ensure that the appliance is fully functional when only
         base values are pre-seeded. 
 
+    .. note::
+            secret (re)generation
+
+FIXME: the following items have not been documented
+* directory structure
+* what a chroot is
+* build targets and stamps
+* buildtasks
 * tklbam profile
 * readme
 * screenshots
 * changelog
-
