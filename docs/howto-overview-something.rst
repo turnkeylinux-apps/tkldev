@@ -38,7 +38,7 @@ Sane Base
         All turnkey appliances must include ``$(FAB_PATH)/common/mk/turnkey.mk``
         And all lamp-based appliances must include ``$(FAB_PATH)/common/mk/turnkey/lamp.mk``
 
-        .. note::
+        .. note:: 
 
             all appliance-base specific common makefiles must be included BEFORE turnkey.mk
             as they may modify how turnkey.mk behaves.
@@ -58,20 +58,29 @@ Install upstream software
 
         to do this you must:
 
-        #. Check if GPG key is ASCII armored or not. Often ASCII armored keys are suffixed with
-            ``.asc`` however running ``file <key.gpg|asc>`` will give you a definitive result.
+        #. Setup the repo's GPG key.
 
-            ``<filename>: PGP public key block ...`` for ASCII armored
+            #. Find the third party repo's GPG key.
 
-            ``<filename>: GPG key public ring ...`` for unarmored
+            #. Check if GPG key is ASCII armored or not. Often ASCII armored keys are suffixed with
+                ``.asc`` however running ``file <key.gpg|asc>`` will give you a definitive result.
 
-        #. If the GPG key IS armored, you need to either ensure it has a ``.asc`` extension OR
-            de-armor the key using ``cat <file> | gpg --dearmor > <file>-unarmored.gpg``
+                ``<filename>: PGP public key block ...`` for ASCII armored
 
-        #. Place a copy of the repositories GPG key in ``/usr/share/keyrings``
+                ``<filename>: GPG key public ring ...`` for unarmored
 
-        #. Add ``deb [signed-by=/usr/share/keyrings/<key-name>.gpg] <url> <codename> <component>``
-            where ``key-name`` is the filename of the GPG key.
+            #. If the GPG key IS armored, you need to either ensure it has a ``.asc`` extension OR
+               de-armor the key using ``cat <file> | gpg --dearmor > <file>-unarmored.gpg``.
+               Likewise if the key is NOT armored it must be suffixed with ``.gpg``.
+                
+            #. Place a copy of the repositories GPG key in ``/usr/share/keyrings``
+
+            #. Add ``deb [signed-by=/usr/share/keyrings/<key-name>.gpg] <url> <codename> <component>``
+               where ``key-name`` is the filename of the GPG key.
+
+        #. Pin the specific packages you want to get from your repo.
+
+
 
         #. In a ``conf.d/...`` script run ``apt update`` and ``apt install <package>``
 
@@ -156,7 +165,7 @@ Makefile
         .. note::
             including common stuff
 
-inithooks
+Inithooks
     (For more information regarding inithooks see inithooks package source on github
     https://github.com/turnkeylinux/inithooks)
 
