@@ -1,7 +1,10 @@
 Makefile
 --------
 
-- [ ] ensure any /common/mk/turnkey/* loaded BEFORE /common/mk/turnkey.mk
+See `Sane Base <howto-overview-something.rst#Sane Base>`_ and 
+    `Makefile <howto-overview-something.rst#Makefile>`_.
+
+- [ ] ensure any ``/common/mk/turnkey/*`` loaded BEFORE ``/common/mk/turnkey.mk``
 - [ ] shared code included from common rather than re-implemented
 
 Upstream Software
@@ -12,7 +15,7 @@ Third Party Apt Repos
 - [ ] gpg keys are set up correctly
     - [ ] gpg keys downloaded to ``/usr/share/keyrings``
     - [ ] ascii armored gpg keys are either dearmored or have a ``.asc`` suffix
-    - [ ] /etc/apt/sources.list line includes ``[signed-by=/usr/share/keyrings/<key>.gpg]``
+    - [ ] ``/etc/apt/sources.list`` line includes ``[signed-by=/usr/share/keyrings/<key>.gpg]``
 - [ ] apt pinning
     - [ ] packages MEANT for install are pinned to 500
     - [ ] packages NOT meant for install are pinned to 10
@@ -29,7 +32,7 @@ Install from Upstream
 
 - [ ] ``conf.d/downloads`` setup correctly
     - [ ] ``conf.d/downloads`` includes proxy compliant ``dl`` function.
-    - [ ] URL variable points to download url.
+    - [ ] URL variable points to download URL.
     - [ ] VERSION variables interpolates into URL variable if applicable.
     - [ ] both source and binary packages downloaded to ``/usr/local/src``
 
@@ -59,3 +62,11 @@ Inithooks
 - [ ] all non standard pre-seed values MUST have sane defaults or initialization from hub wont work.
 - [ ] ensure passwords are all set
 - [ ] ensure admin email is set and added to inithooks cache
+
+Other
+-----
+
+- [ ] tklbam profile is up-to-date and working
+- [ ] changelog has been updated
+- [ ] if applicable readme has been updated
+- [ ] if applicable artwork has been updated
