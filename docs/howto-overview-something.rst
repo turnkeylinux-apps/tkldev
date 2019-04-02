@@ -92,12 +92,12 @@ Inithooks
     (For more information regarding inithooks see inithooks package source on github
     https://github.com/turnkeylinux/inithooks)
 
-    1. The majority of actions performed by inithooks should be in a python script
-       called ``<appname>.py`` within /usr/lib/inithooks/bin
+    #. The majority of actions performed by inithooks should be in a python script
+       called ``<appname>.py`` within ``/usr/lib/inithooks/bin``
 
         This script should be idempotent
 
-    2. This python script should be called by an executable bash script called
+    #. This python script should be called by an executable bash script called
        ``<weight><appname>.sh`` where weight is a number used to ensure the inithook
        is ordered correctly, usually 40-50 for general initial setup. These scripts
        should also be made executable.
@@ -138,6 +138,14 @@ Inithooks
         Other preseed values can be checked and used however sane defaults must
         be put in place to ensure that the appliance is fully functional when only
         base values are pre-seeded. 
+
+    #. Any secret values need to be regenerated (these are things such as
+       API keys, encryption keys, etc. things which should be secret AND unique for
+       each server) should be regenerated in a SEPERATE firstboot script usually
+       weighted at 20, with a name something like ``20regen-<appname>-secrets``.
+
+        What does and doesn't count as a secret can seem a bit arbitrary so if
+        you're having trouble deciding please ask on the forums.
 
     .. note::
             secret (re)generation
