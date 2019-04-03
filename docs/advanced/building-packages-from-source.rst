@@ -42,7 +42,7 @@ and prepare the script first:
 
     GH_URL=https://raw.githubusercontent.com/turnkeylinux-apps/tkldev/master/overlay
     SCRIPT=usr/local/bin/tkldev-chanko-setup
-    wget -o /$SCRIPT $GH_URL/$SCRIPT
+    wget -O /$SCRIPT $GH_URL/$SCRIPT
     chmod +x /$SCRIPT
 
 
