@@ -1,3 +1,14 @@
+PLEASE NOTE: Currently the sandbox is broken!
+=============================================
+
+We hope to resolve that at some point in the future, but there is no ETA.
+
+Until it's fixed (or we rewrite this doc page) please feel free to post on
+the TUrnKey forums_ (new threads require a separate free website user
+account) for advice on development and testing.
+
+----
+
 Playing in the sandbox
 ======================
 
@@ -420,5 +431,6 @@ What next?
 
 * `Development`_: understand how stuff works in greater detail.
 
+.. _forums: https://www.turnkeylinux.org/forum/
 .. _Development: development/README.rst
 
