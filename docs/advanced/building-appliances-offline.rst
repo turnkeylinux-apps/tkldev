@@ -45,14 +45,14 @@ want to build appliances offline, then this will do the job for Core:
 
 .. code-block:: bash
 
-    PLAN_DIR=/turnkey/fab/common/plans
-    PLANS="boot net console turnkey/base"
-    for plan in ${PLANS}; do
-        echo "/* ${plan} */" >> ${CHANKO}/plan/main
-        cat ${PLAN_DIR}/${plan} >> ${CHANKO}/plan/main
-        echo >> ${CHANKO}/plan/main
-    done
-    sed -i "s|#include.*||" ${CHANKO}/plan/main
+    # set CHANKO if not already set:
+    export CHANKO=${CHANKO:-$FAB_PATH/chankos/$(lsb_release -sc).chanko}
+
+    export FAB_PLAN_INCLUDE_PATH=$FAB_PATH/common/plans
+    fab-plan-resolve $FAB_PATH/products/core/plan/main > ${CHANKO}/plan/main
+
+Note: to download packages for an alternate product, replace 'core' with the
+name of the appliance whose plan you wish to process.
 
 To download and cache all the required packages using chanko, do the following:
 
