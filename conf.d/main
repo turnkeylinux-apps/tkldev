@@ -12,7 +12,7 @@ BUILDTASKS=/mnt
 
 # create base directory structure
 mkdir -p $FAB_PATH/bootstraps \
-         $FAB_PATH/deckbuilds/{builds,chroots} \
+         $FAB_PATH/deckdebuilds/{builds,chroots} \
          $PROD_PATH \
          $POOL_PATH \
          $CHANKO_PATH/{config,plan,archives} \
