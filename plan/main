@@ -3,12 +3,6 @@
 fab
 deck
 
-deckdebuild             /* pool depends */
-pool                    /* required for building packages */
-chanko                  /* required for building buildroot & building offline */
-autoversion             /* pool depends */
-repo                    /* pool depends */
-verseek                 /* pool depends */
 tklpatch                /* buildtasks optimized builds depends */
 
 make
@@ -17,7 +11,6 @@ gnupg
 genisoimage
 squashfs-tools
 polipo
-sysv-rc-conf
 
 syslinux
 syslinux-utils
