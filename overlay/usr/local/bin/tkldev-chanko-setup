@@ -1,5 +1,10 @@
 #!/bin/bash -ex
 
+if ! which chanko >/dev/null ; then
+    apt update -q
+    apt install chanko -y
+fi
+
 [[ -n ${CODENAME} ]] || CODENAME=$(lsb_release -cs)
 CHANKO=/turnkey/fab/chankos/${CODENAME}.chanko
 

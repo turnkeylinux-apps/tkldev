@@ -3,44 +3,14 @@
 # set vars
 POLIPO_PORT=8124
 FAB_PATH=/turnkey/fab
-CODENAME=$(lsb_release -c | cut -f2)
+CODENAME=$(lsb_release -cs)
 PROD_PATH=$FAB_PATH/products
-POOL_PATH=$FAB_PATH/pools/$CODENAME
-CHANKO_PATH=$FAB_PATH/chankos/$CODENAME.chanko
-BUILDROOT=$FAB_PATH/buildroots/$CODENAME
 BUILDTASKS=/mnt
 
 # create base directory structure
 mkdir -p $FAB_PATH/bootstraps \
-         $FAB_PATH/deckbuilds/{builds,chroots} \
          $PROD_PATH \
-         $POOL_PATH \
-         $CHANKO_PATH/{config,plan,archives} \
-         $BUILDROOT \
          $BUILDTASKS/{isos,builds}
-
-# configure deckdebuild
-cat > /etc/deckdebuild.conf << EOF
-satisfydepends-cmd /usr/lib/pbuilder/pbuilder-satisfydepends-classic
-vardir $FAB_PATH/deckdebuilds
-EOF
-
-# configure chanko
-cat /etc/apt/sources.list.d/*.list > $CHANKO_PATH/config/sources.list
-TRUSTED_KEYS=$CHANKO_PATH/config/trustedkeys.gpg
-cat /etc/apt/trusted.gpg.d/debian.gpg > $TRUSTED_KEYS
-cat /etc/apt/trusted.gpg.d/turnkey.gpg >> $TRUSTED_KEYS
-find /etc/apt/trusted.gpg.d/ -name "*$CODENAME$" -exec cat {} >> $TRUSTED_KEYS +
-
-cat > $CHANKO_PATH/config/chanko.conf <<EOF
-RELEASE=debian/$CODENAME
-PLAN_CPP=-DTURNKEY=y
-EOF
-
-# configure pool basics
-cd $POOL_PATH
-pool-init $BUILDROOT
-pool-register $CHANKO_PATH/archives/
 
 # environmental variables and bash tweaks
 mkdir -p /root/.bashrc.d
@@ -68,8 +38,8 @@ dnsNameServer = 8.8.8.8
 EOF
 
 # disable services so as not to conflict with builds
-sysv-rc-conf webmin off
-sysv-rc-conf stunnel4 off
-sysv-rc-conf shellinabox off
-sysv-rc-conf postfix off
-
+systemctl disable webmin
+systemctl disable webmin@stunnel4
+systemctl disable shellinabox
+systemctl disable shellinabox@stunnel4
+systemctl disable postfix
