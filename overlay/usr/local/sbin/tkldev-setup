@@ -5,6 +5,10 @@ fatal() { echo "FATAL [$(basename $0)]: $@" 1>&2; exit 1; }
 warning() { echo "WARNING [$(basename $0)]: $@"; }
 info() { echo "INFO [$(basename $0)]: $@"; }
 
+[[ -z "$DEBUG" ]] || set -x
+
+GIT_DEPTH=1
+
 RELEASE="${RELEASE:-debian/$(lsb_release -s -c)}"
 CODENAME="$(basename $RELEASE)"
 ARCH="${ARCH:-$(dpkg --print-architecture)}"
@@ -33,7 +37,7 @@ clone_or_update() {
         fi
     else
         info "Cloning $src into $dst."
-        git clone $src $dst || warning "Cloning $dst failed, skipping."
+        git clone --depth $GIT_DEPTH $src $dst || warning "Cloning $dst failed, skipping."
     fi
 }
 
@@ -64,8 +68,8 @@ else
         || fatal "Downloading $BOOTSTRAP_NAME hash file failed."
 
     if [[ -f "$BT_VERIFY" ]]; then
-        bootstrap_file=$BOOTSTRAP_PATH/$BOOTSTRAP_NAME.tar.gz
-        $BT_VERIFY --force-gpg $bootstrap_file $bootstrap_file.hash
+        bootstrap_file=$(dirname $BOOTSTRAP_PATH)/$BOOTSTRAP_NAME.tar.gz
+        BT_DEBUG=$DEBUG $BT_VERIFY --force-gpg $bootstrap_file $bootstrap_file.hash
     else
         fatal "$BT_VERIFY script not found, unable to verfiy downloaded files."
     fi
