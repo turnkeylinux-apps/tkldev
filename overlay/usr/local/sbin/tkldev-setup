@@ -2,50 +2,79 @@
 # setup/update system ready for building appliances
 
 fatal() { echo "FATAL [$(basename $0)]: $@" 1>&2; exit 1; }
+warning() { echo "WARNING [$(basename $0)]: $@"; }
 info() { echo "INFO [$(basename $0)]: $@"; }
+
+[[ -z "$DEBUG" ]] || set -x
+
+GIT_DEPTH=1
 
 RELEASE="${RELEASE:-debian/$(lsb_release -s -c)}"
 CODENAME="$(basename $RELEASE)"
 ARCH="${ARCH:-$(dpkg --print-architecture)}"
 
-GPGKEY="A16EB94D"
 IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
 FAB_PATH="/turnkey/fab"
 BOOTSTRAP_NAME="bootstrap-${CODENAME}-${ARCH}"
 BOOTSTRAP_PATH="$FAB_PATH/bootstraps/${CODENAME}"
+BT_PATH="/turnkey/buildtasks"
+BT_VERIFY="$BT_PATH/bin/signature-verify"
 
-if [ ! -d $BOOTSTRAP_PATH ]; then
-    info "downloading $BOOTSTRAP_NAME"
-    mkdir -p $(dirname $BOOTSTRAP_PATH)
-    cd $(dirname $BOOTSTRAP_PATH)
-    wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz
-    wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash
+[[ $(id -u) -eq 0 ]] || fatal "Root user required. Please rerun with sudo."
 
-    info "verifying $BOOTSTRAP_NAME"
-    gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 0x$GPGKEY
-    gpg --verify $BOOTSTRAP_NAME.tar.gz.hash
-
-    info "unpacking $BOOTSTRAP_NAME"
-    mkdir $BOOTSTRAP_PATH
-    tar -zxf $BOOTSTRAP_NAME.tar.gz -C $BOOTSTRAP_PATH
-fi
-
-g() {
+clone_or_update() {
     src=https://github.com/$1
     dst=$2
     mkdir -p $(dirname $dst)
-    if [ -d $dst ]; then
-        info "updating $dst"
-        GIT_DIR=$dst/.git git pull
+    if [[ -d "$dst" ]]; then
+        info "$dst exists, attempting update."
+        git_dir=$dst/.git
+        if [[ -d "$git_dir" ]]; then
+            GIT_DIR=$git_dir git pull || warning "Updating $dst failed, skipping."
+        else
+            warning "$dst exists, but is not a git repo - skipping."
+            return
+        fi
     else
-        info "cloning $src"
-        git clone $src $dst
+        info "Cloning $src into $dst."
+        git clone --depth $GIT_DEPTH $src $dst || warning "Cloning $dst failed, skipping."
     fi
 }
 
-g turnkeylinux/buildtasks /turnkey/buildtasks
-g turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
-g turnkeylinux/cdroots $FAB_PATH/cdroots
-g turnkeylinux/common $FAB_PATH/common
-g turnkeylinux-apps/core $FAB_PATH/products/core
+clone_or_update turnkeylinux/buildtasks $BT_PATH
+clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
+clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots
+clone_or_update turnkeylinux/common $FAB_PATH/common
+clone_or_update turnkeylinux-apps/core $FAB_PATH/products/core
 
+if [[ -f "$BT_PATH/config/common.cfg" ]]; then
+    . $BT_PATH/config/common.cfg
+elif [[ -f "$BT_PATH/config.example/common.cfg" ]]; then
+    . $BT_PATH/config.example/common.cfg
+else
+    fatal "$BT_PATH config not found, unable to determine GPG key ID (BT_GPGKEY)."
+fi
+
+if [[ -d "$BOOTSTRAP_PATH" ]]; then
+    info "$BOOTSTRAP_PATH exists, skipping download."
+else
+    info "Downloading $BOOTSTRAP_NAME"
+    mkdir -p $(dirname $BOOTSTRAP_PATH)
+    cd $(dirname $BOOTSTRAP_PATH)
+    bootstrap_file=$BOOTSTRAP_PATH
+    wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz \
+        || fatal "Downloading $BOOTSTRAP_NAME failed."
+    wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash \
+        || fatal "Downloading $BOOTSTRAP_NAME hash file failed."
+
+    if [[ -f "$BT_VERIFY" ]]; then
+        bootstrap_file=$(dirname $BOOTSTRAP_PATH)/$BOOTSTRAP_NAME.tar.gz
+        BT_DEBUG=$DEBUG $BT_VERIFY --force-gpg $bootstrap_file $bootstrap_file.hash
+    else
+        fatal "$BT_VERIFY script not found, unable to verfiy downloaded files."
+    fi
+    info "Unpacking $BOOTSTRAP_NAME"
+    mkdir $BOOTSTRAP_PATH
+    tar -zxf $BOOTSTRAP_NAME.tar.gz -C $BOOTSTRAP_PATH
+fi
+info "$(basename $0) complete."
