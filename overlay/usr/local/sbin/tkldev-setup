@@ -8,10 +8,15 @@ info() { echo "INFO [$(basename $0)]: $@"; }
 [[ -z "$DEBUG" ]] || set -x
 
 GIT_DEPTH=1
+APP=${1}
+[[ -n "$APP" ]] || APP="core"
 
-RELEASE="${RELEASE:-debian/$(lsb_release -s -c)}"
-CODENAME="$(basename $RELEASE)"
-ARCH="${ARCH:-$(dpkg --print-architecture)}"
+distro="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
+[[ "$distro" == "turnkey" ]] && distro="debian"
+
+export RELEASE="${RELEASE:-${distro}/$(lsb_release -s -c)}"
+export CODENAME="$(basename $RELEASE)"
+export ARCH="${ARCH:-$(dpkg --print-architecture)}"
 
 IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
 FAB_PATH="/turnkey/fab"
@@ -45,7 +50,7 @@ clone_or_update turnkeylinux/buildtasks $BT_PATH
 clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
 clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots
 clone_or_update turnkeylinux/common $FAB_PATH/common
-clone_or_update turnkeylinux-apps/core $FAB_PATH/products/core
+clone_or_update turnkeylinux-apps/$APP $FAB_PATH/products/$APP
 
 if [[ -f "$BT_PATH/config/common.cfg" ]]; then
     . $BT_PATH/config/common.cfg
