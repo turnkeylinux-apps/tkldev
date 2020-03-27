@@ -33,12 +33,12 @@ Install upstream software
 
 			See `AptPreferences <https://wiki.debian.org/AptPreferences>`_ for more information on
 			apt pinning. However the following should be enough for turnkey development.
-			
+
 			#. Create a file in ``/etc/apt/preferences.d/<name>``
 
 			#. Pin all packages from this repo to never install by adding the following:
 
-				.. code-block:: 
+				.. code-block::
 
 					Package: *
 					Pin: origin "<url-to-apt-repo>"
@@ -48,7 +48,7 @@ Install upstream software
 
 			#. Pin all packages you require to priority over default repos.
 
-				.. code-block:: 
+				.. code-block::
 
 					Package: *
 					Pin: origin "<url-to-apt-repo>"

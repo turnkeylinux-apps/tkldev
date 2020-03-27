@@ -19,7 +19,7 @@ Third Party Apt Repos
 - [ ] apt pinning
     - [ ] packages MEANT for install are pinned to 500
     - [ ] packages NOT meant for install are pinned to 10
-    
+
 Third Party Package Management
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

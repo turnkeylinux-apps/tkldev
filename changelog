@@ -4,12 +4,12 @@ turnkey-tkldev-16.0 (1) turnkey; urgency=low
     script has been tweaked and some config setup has been moved to package
     postinst scripts.
 
-    NOTE: more work is still required to make it possible for users to easily
-    build packages.
+    TODO: more work is still required to make it possible for users to easily
+          build packages. Plus the buildroot repo needs update.
 
   * fab:
 
-    - major changes to way that the bootstrap is built. Now leverage Debian's
+    - major changes to way that the bootstrap is built. Now leverages Debian's
       debootstrap directly (bootstrap components removed from fab, remaining
       changes in turnkey/bootstrap repo).
 
@@ -41,7 +41,7 @@ turnkey-tkldev-16.0 (1) turnkey; urgency=low
   * Note: Please refer to turnkey-core's changelog for changes common to all
     appliances. Here we only describe changes specific to this appliance.
 
- -- Jeremy Davis <jeremy@turnkeylinux.org>  Fri, 13 Mar 2020 17:05:15 +1100
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Fri, 27 Mar 2020 16:23:05 +1100
 
 turnkey-tkldev-15.0 (1) turnkey; urgency=low
 

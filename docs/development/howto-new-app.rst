@@ -38,7 +38,7 @@ Sane Base
         All turnkey appliances must include ``$(FAB_PATH)/common/mk/turnkey.mk``
         And all lamp-based appliances must include ``$(FAB_PATH)/common/mk/turnkey/lamp.mk``
 
-        .. note:: 
+        .. note::
 
             all appliance-base specific common makefiles must be included BEFORE turnkey.mk
             as they may modify how turnkey.mk behaves.
@@ -67,9 +67,15 @@ Makefile
 
         WEBMIN_FW_NAT_EXTRA
             extra NAT controls?
-    
-        NONFREE
-            enable non-free Debian repo
+
+        NONFREE=y
+            enable non-free Debian repo - install packages via plan
+
+        BACKPORTS=y
+            enable Debian backports repo - install packages via plan
+
+        TKL_TESTING=y
+            enable TurnKey 'testing' apt repo - install packages via plan
 
         COMMON_CONF
             space separated list of conf scripts to be included from common
@@ -83,7 +89,9 @@ Makefile
         CREDIT_LOCATION
             FIXME: don't know what this does
 
-        PHP56
+        PHP_VERSION=XY
+            Configure PHP X.Y version third party apt repo (deb.sury.org)
+            - install packages via plan
 
         .. note::
             including common stuff

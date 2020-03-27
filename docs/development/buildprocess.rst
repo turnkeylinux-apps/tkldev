@@ -128,9 +128,9 @@ Extra note
 ----------
 
 If you wish to build a "production ready" ISO which is named correctly and
-a hash file also generated, you can use the ``bt-iso`` script from 
+a hash file also generated, you can use the ``bt-iso`` script from
 `buildtasks`_. Note that ``bit-iso`` will name the ISO by the standard TKL
-naming convention (we refer to this internally as "appver"::
+naming convention (we refer to this internally as "appver")::
 
     turnkey-_APPLIANCE-NAME_-VERSION-CODENAME_ARCH.iso
 
