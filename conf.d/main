@@ -37,6 +37,9 @@ proxyPort = $POLIPO_PORT
 dnsNameServer = 8.8.8.8
 EOF
 
+# disable confconsole auto run on firstboot
+sed -i "s|^autostart.*|autostart false|g" /etc/confconsole/confconsole.conf
+
 # disable services so as not to conflict with builds
 systemctl disable webmin
 systemctl disable webmin@stunnel4
