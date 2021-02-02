@@ -16,3 +16,5 @@ syslinux
 syslinux-utils
 
 dirmngr
+
+debootstrap             /* required for building bootstrap */
