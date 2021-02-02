@@ -1,3 +1,14 @@
+turnkey-tkldev-16.1 (1) turnkey; urgency=low
+
+  * Include debootstrap package by default - closes #1450.
+
+  * Minor tweak to bootstrap generation to provide transition guidance.
+
+  * Note: Please refer to turnkey-core's 16.1 changelog for changes common to
+    all appliances. Here we only describe changes specific to this appliance.
+
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Tue, 02 Feb 2021 11:55:19 +1100
+
 turnkey-tkldev-16.0 (1) turnkey; urgency=low
 
   * No longer include pool, chanko and friends by default. tkldev-chanko-setup
