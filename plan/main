@@ -10,7 +10,6 @@ build-essential
 gnupg
 genisoimage
 squashfs-tools
-polipo
 
 syslinux
 syslinux-utils
