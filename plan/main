@@ -8,12 +8,14 @@ tklpatch                /* buildtasks optimized builds depends */
 make
 build-essential
 gnupg
-genisoimage
+xorriso                 /* xorriso supports writing UEFI partition */
 squashfs-tools
 
 syslinux
 syslinux-utils
 
 dirmngr
+
+apt-cacher-ng           /* cache debian packages for builds */
 
 debootstrap             /* required for building bootstrap */
