@@ -6,6 +6,11 @@ CODENAME=$(lsb_release -cs)
 PROD_PATH=$FAB_PATH/products
 BUILDTASKS=/mnt
 
+# Use apt-cacher-ng on non-standard port (to avoid potential conflicts)
+CONF=/etc/apt-cacher-ng/acng.conf
+sed -i "/Port:/ s|^# *||; s|^Port:[0-9]*|Port:3140|;" $CONF
+service apt-cacher-ng restart
+
 # create base directory structure
 mkdir -p $FAB_PATH/bootstraps \
          $PROD_PATH \
@@ -29,7 +34,8 @@ EOF
 chmod +x /root/.bashrc.d/turnkey-paths
 
 # disable confconsole auto run on firstboot
-sed -i "s|^autostart.*|autostart false|g" /etc/confconsole/confconsole.conf
+CONF=/etc/confconsole/confconsole.conf
+sed -i "s|^autostart.*|autostart false|g" $CONF
 
 # disable services so as not to conflict with builds
 systemctl disable webmin
