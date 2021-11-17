@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
 # set vars
-POLIPO_PORT=8124
 FAB_PATH=/turnkey/fab
 CODENAME=$(lsb_release -cs)
 PROD_PATH=$FAB_PATH/products
@@ -17,8 +16,8 @@ mkdir -p /root/.bashrc.d
 
 cat >/root/.bashrc.d/fab<<EOF
 export FAB_PATH=$FAB_PATH
-export FAB_APT_PROXY=http://127.0.0.1:$POLIPO_PORT
-export FAB_HTTP_PROXY=http://127.0.0.1:$POLIPO_PORT
+#export FAB_APT_PROXY=http://127.0.0.1:$POLIPO_PORT
+#export FAB_HTTP_PROXY=http://127.0.0.1:$POLIPO_PORT
 export POOL_PATH=$POOL_PATH
 EOF
 chmod +x /root/.bashrc.d/fab
