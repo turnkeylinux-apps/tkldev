@@ -1,3 +1,33 @@
+turnkey-tkldev-17.0beta (1) turnkey; urgency=low
+
+  * Beta test build of TKLDev v17.0.
+
+  * Upgraded base distribution to Debian 11.1/Bullseye.
+
+  * Switch from Polipo (http caching proxy - no longer available) to Squid,
+    configured as a caching http/https proxy. (Using 'squid-ssl' package,
+    configured to act as a MITM caching proxy). Closes #1560.
+
+  * fab:
+
+    - Port code to python3 and major code refactoring.
+    - Use new 'turnkey-chroot' library for use in 'fab-chroot'.
+
+  * pool:
+
+    - Port code to python3 and major code refactoring.
+    - (Still not pre-installed by default).
+
+  * bootstrap:
+
+    - Include 'ca-certificates' package (to support https apt repos via squid
+      https proxy).
+
+  * Note: Please refer to turnkey-core's 17.0 changelog for changes common to
+    all appliances. Here we only describe changes specific to this appliance.
+
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Mon, 22 Nov 2021 17:08:29 +1100
+
 turnkey-tkldev-16.1 (1) turnkey; urgency=low
 
   * Include debootstrap package by default - closes #1450.

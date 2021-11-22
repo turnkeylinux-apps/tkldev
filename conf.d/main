@@ -5,11 +5,20 @@ FAB_PATH=/turnkey/fab
 CODENAME=$(lsb_release -cs)
 PROD_PATH=$FAB_PATH/products
 BUILDTASKS=/mnt
+PROXY_PORT=3128
 
-# Use apt-cacher-ng on non-standard port (to avoid potential conflicts)
-CONF=/etc/apt-cacher-ng/acng.conf
-sed -i "/Port:/ s|^# *||; s|^Port:[0-9]*|Port:3140|;" $CONF
-service apt-cacher-ng restart
+## configure squid
+# bump max file descriptors
+OVERRIDE=etc/systemd/system/squid.service.d/override.conf
+mkdir -p $(basename $OVERRIDE)
+cat > $OVERRIDE <<EOF
+[Service]
+LimitNOFILE=65535
+EOF
+# configure TLS interception
+/usr/lib/squid/security_file_certgen -c -s /var/spool/squid_ssldb -M 4MB
+# leverage firstboot script to generate cert (DRY)
+/usr/lib/inithooks/firstboot.d/20regen-proxy-cert
 
 # create base directory structure
 mkdir -p $FAB_PATH/bootstraps \
@@ -21,8 +30,9 @@ mkdir -p /root/.bashrc.d
 
 cat >/root/.bashrc.d/fab<<EOF
 export FAB_PATH=$FAB_PATH
-#export FAB_APT_PROXY=http://127.0.0.1:$POLIPO_PORT
-#export FAB_HTTP_PROXY=http://127.0.0.1:$POLIPO_PORT
+export FAB_HTTP_PROXY=http://127.0.0.1:$PROXY_PORT
+# https proxy must be connected to via http
+export FAB_HTTPS_PROXY=http://127.0.0.1:$PROXY_PORT
 export POOL_PATH=$POOL_PATH
 EOF
 chmod +x /root/.bashrc.d/fab

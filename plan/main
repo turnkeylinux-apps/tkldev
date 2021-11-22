@@ -16,6 +16,6 @@ syslinux-utils
 
 dirmngr
 
-apt-cacher-ng           /* cache debian packages for builds */
+squid-openssl           /* general cacher - with https support */
 
 debootstrap             /* required for building bootstrap */
