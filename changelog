@@ -12,10 +12,14 @@ turnkey-tkldev-17.0beta (1) turnkey; urgency=low
 
     - Port code to python3 and major code refactoring.
     - Use new 'turnkey-chroot' library for use in 'fab-chroot'.
+    - Use xorriso (instead of genisoimage) for generating ISO. This provides
+      UEFI boot support (note this only supports booting the ISO via UEFI;
+      additional work in di-live required to complete UEFI install support).
+      Part of #1435.
 
   * pool:
 
-    - Port code to python3 and major code refactoring.
+    - Port code to python3 and major code refactoring. Closes #1272.
     - (Still not pre-installed by default).
 
   * bootstrap:
