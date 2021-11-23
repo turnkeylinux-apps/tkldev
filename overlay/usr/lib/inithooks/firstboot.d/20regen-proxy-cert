@@ -6,7 +6,7 @@
 # Preperation
 DAYS_VALID=3650 # ten years...
 CERT_D=/etc/squid/cert/
-CERT=$CERT/squid_proxyCA.pem
+CERT=$CERT_D/squid_proxyCA.pem
 CA_CRT=/usr/local/share/ca-certificates/squid_proxyCA.crt
 mkdir -p $CERT_D $(dirname $CA_CRT)
 rm -rf $CERT $CA_CRT
