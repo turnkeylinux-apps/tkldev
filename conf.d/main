@@ -10,7 +10,7 @@ PROXY_PORT=3128
 ## configure squid
 # bump max file descriptors
 OVERRIDE=etc/systemd/system/squid.service.d/override.conf
-mkdir -p $(basename $OVERRIDE)
+mkdir -p $(dirname $OVERRIDE)
 cat > $OVERRIDE <<EOF
 [Service]
 LimitNOFILE=65535
