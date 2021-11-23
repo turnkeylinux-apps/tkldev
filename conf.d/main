@@ -16,7 +16,7 @@ cat > $OVERRIDE <<EOF
 LimitNOFILE=65535
 EOF
 # configure TLS interception
-/usr/lib/squid/security_file_certgen -c -s /var/spool/squid_ssldb -M 4MB
+/usr/lib/squid/security_file_certgen -c -s /var/spool/squid/ssldb -M 4MB
 # leverage firstboot script to generate cert (DRY)
 /usr/lib/inithooks/firstboot.d/20regen-proxy-cert
 
