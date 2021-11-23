@@ -1,0 +1,12 @@
+#
+# CA SSL template for TKLDev squid proxy
+#
+
+[ req ]
+default_bits            = 2048
+distinguished_name      = req_distinguished_name
+prompt                  = no
+policy                  = policy_anything
+
+[ req_distinguished_name ]
+commonName              = @HostName@

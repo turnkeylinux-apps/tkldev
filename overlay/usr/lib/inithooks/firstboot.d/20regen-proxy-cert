@@ -12,7 +12,7 @@ mkdir -p $CERT_D $(dirname $CA_CRT)
 rm -rf $CERT $CA_CRT
 
 # Generate local self-signed CA certificate/key (in the same file)
-openssl req -new -newkey rsa:4096 -sha256 \
+openssl req -config /etc/squid/tkl-openssl.cnf -new -newkey rsa:4096 -sha256 \
     -days $DAYS_VALID -nodes -x509 -keyout $CERT -out $CERT
 chown -R proxy:proxy $CERT_D
 chmod 0400 $CERT
