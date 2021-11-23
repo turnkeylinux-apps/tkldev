@@ -19,5 +19,5 @@ chmod 0400 $CERT
 
 # Add squid_proxyCA cert to system trusted CAs (so squid cert is trusted by
 # default)
-openssl x509 -inform PEM -in $CERT -outform CRT -out $CA_CRT
+openssl x509 -inform PEM -in $CERT -outform PEM -out $CA_CRT
 update-ca-certificates
