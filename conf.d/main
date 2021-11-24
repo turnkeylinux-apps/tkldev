@@ -6,6 +6,7 @@ CODENAME=$(lsb_release -cs)
 PROD_PATH=$FAB_PATH/products
 BUILDTASKS=/mnt
 PROXY_PORT=3128
+POOL_PATH=$FAB_PATH/pools/$CODENAME
 
 ## configure squid
 # bump max file descriptors
@@ -37,7 +38,6 @@ export FAB_PATH=$FAB_PATH
 export FAB_HTTP_PROXY=http://127.0.0.1:$PROXY_PORT
 # https proxy must be connected to via http
 export FAB_HTTPS_PROXY=http://127.0.0.1:$PROXY_PORT
-export POOL_PATH=$POOL_PATH
 EOF
 chmod +x /root/.bashrc.d/fab
 
