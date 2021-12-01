@@ -16,12 +16,9 @@ cat > $OVERRIDE <<EOF
 [Service]
 LimitNOFILE=65535
 EOF
-# configure TLS interception
-runuser proxy -s /bin/bash -c "/usr/lib/squid/security_file_certgen \
-    -c -s /var/spool/squid/ssl_db -M 4MB"
-# leverage firstboot script to generate cert (DRY)
+# leverage firstboot script to configure TLS interception (DRY)
 /usr/lib/inithooks/firstboot.d/20regen-proxy-cert
-# use squid for future apt usage by moving conf added by fab during build
+# use squid for future apt caching by moving conf added by fab during build
 # (otherwise it will be removed at end of build process)
 mv /etc/apt/apt.conf.d/01proxy /etc/apt/apt.conf.d/00proxy
 
