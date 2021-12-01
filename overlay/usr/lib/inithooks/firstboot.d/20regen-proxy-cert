@@ -3,21 +3,35 @@
 # This script regenerates squid MITM proxy CA cert (to generate valid SSL/TLS
 # certs on the fly)
 
+# Unless squid is fully restarted, there are issues with the self-signed CA
+echo "Please wait while squid is stopped."
+systemctl stop squid.service
+
 # Preperation
 DAYS_VALID=3650 # ten years...
 CERT_D=/etc/squid/cert
 CERT=$CERT_D/squid_proxyCA.pem
-CA_CRT=/usr/local/share/ca-certificates/squid_proxyCA.crt
-mkdir -p $CERT_D $(dirname $CA_CRT)
-rm -rf $CERT $CA_CRT
+CA_CERT_D=/usr/local/share/ca-certificates
+CA_CERT=$CA_CERT_D/squid_proxyCA.crt
+SQUID_SSL_DB=/var/spool/squid/ssl_db
+
+# Ensure clean slate
+mkdir -p $CERT_D $CA_CERT_D
+rm -rf $CERT $CA_CERT $SQUID_SSL_DB
+update-ca-certificates --fresh
 
 # Generate local self-signed CA certificate/key (in the same file)
+# & squid SSL DB
+echo "Generating squid self signed CA (for use with https proxying)."
 openssl req -config /etc/squid/tkl-openssl.cnf -new -newkey rsa:4096 -sha256 \
     -days $DAYS_VALID -nodes -x509 -keyout $CERT -out $CERT
-chown -R proxy:proxy $CERT_D
+/usr/lib/squid/security_file_certgen -c -s $SQUID_SSL_DB -M 4MB
+chown -R proxy:proxy $CERT_D $SQUID_SSL_DB
 chmod 0400 $CERT
 
 # Add squid_proxyCA cert to system trusted CAs (so squid cert is trusted by
 # default)
-openssl x509 -inform PEM -in $CERT -outform PEM -out $CA_CRT
-update-ca-certificates
+openssl x509 -inform PEM -in $CERT -outform PEM -out $CA_CERT
+echo "Cleaning up and starting squid."
+update-ca-certificates --fresh
+systemctl start squid.service
