@@ -1,11 +1,26 @@
 #!/bin/bash -e
 
 # set vars
-POLIPO_PORT=8124
 FAB_PATH=/turnkey/fab
 CODENAME=$(lsb_release -cs)
 PROD_PATH=$FAB_PATH/products
 BUILDTASKS=/mnt
+PROXY_PORT=3128
+POOL_PATH=$FAB_PATH/pools/$CODENAME
+
+## configure squid
+# bump max file descriptors
+OVERRIDE=etc/systemd/system/squid.service.d/override.conf
+mkdir -p $(dirname $OVERRIDE)
+cat > $OVERRIDE <<EOF
+[Service]
+LimitNOFILE=65535
+EOF
+# leverage firstboot script to configure TLS interception (DRY)
+/usr/lib/inithooks/firstboot.d/20regen-proxy-cert
+# use squid for future apt caching by moving conf added by fab during build
+# (otherwise it will be removed at end of build process)
+mv /etc/apt/apt.conf.d/01proxy /etc/apt/apt.conf.d/00proxy
 
 # create base directory structure
 mkdir -p $FAB_PATH/bootstraps \
@@ -17,9 +32,9 @@ mkdir -p /root/.bashrc.d
 
 cat >/root/.bashrc.d/fab<<EOF
 export FAB_PATH=$FAB_PATH
-export FAB_APT_PROXY=http://127.0.0.1:$POLIPO_PORT
-export FAB_HTTP_PROXY=http://127.0.0.1:$POLIPO_PORT
-export POOL_PATH=$POOL_PATH
+export FAB_HTTP_PROXY=http://127.0.0.1:$PROXY_PORT
+# https proxy must be connected to via http
+export FAB_HTTPS_PROXY=http://127.0.0.1:$PROXY_PORT
 EOF
 chmod +x /root/.bashrc.d/fab
 
@@ -29,16 +44,9 @@ export _CDPATH=\$CDPATH
 EOF
 chmod +x /root/.bashrc.d/turnkey-paths
 
-# polipo
-chmod -x /etc/cron.daily/polipo
-cat >> /etc/polipo/config <<EOF
-
-proxyPort = $POLIPO_PORT
-dnsNameServer = 8.8.8.8
-EOF
-
 # disable confconsole auto run on firstboot
-sed -i "s|^autostart.*|autostart false|g" /etc/confconsole/confconsole.conf
+CONF=/etc/confconsole/confconsole.conf
+sed -i "s|^autostart.*|autostart false|g" $CONF
 
 # disable services so as not to conflict with builds
 systemctl disable webmin
