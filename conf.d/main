@@ -18,9 +18,11 @@ LimitNOFILE=65535
 EOF
 # leverage firstboot script to configure TLS interception (DRY)
 /usr/lib/inithooks/firstboot.d/20regen-proxy-cert
-# use squid for future apt caching by moving conf added by fab during build
+# use squid for future apt caching; but change the name
 # (otherwise it will be removed at end of build process)
 mv /etc/apt/apt.conf.d/01proxy /etc/apt/apt.conf.d/00proxy
+# when built on TKLDev <17.0 the port will be wrong
+sed -i "s|8124|$PROXY_PORT|" /etc/apt/apt.conf.d/00proxy
 
 # create base directory structure
 mkdir -p $FAB_PATH/bootstraps \
