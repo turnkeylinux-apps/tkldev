@@ -17,6 +17,8 @@ turnkey-tkldev-17.0 (1) turnkey; urgency=low
       UEFI boot support (note this only supports booting the ISO via UEFI;
       additional work in di-live required to complete UEFI install support).
       Part of #1435.
+      NOTE: The UEFI support started for v17.0 di-live and ISO builds has been
+      (temporarily) rolled back and won't be implmented in v17.0.
 
   * pool:
 
@@ -38,7 +40,7 @@ turnkey-tkldev-17.0 (1) turnkey; urgency=low
   * Note: Please refer to turnkey-core's 17.0 changelog for changes common to
     all appliances. Here we only describe changes specific to this appliance.
 
- -- Jeremy Davis <jeremy@turnkeylinux.org>  Mon, 22 Nov 2021 17:08:29 +1100
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Fri, 01 Apr 2022 03:49:39 +0000
 
 turnkey-tkldev-16.1 (1) turnkey; urgency=low
 
