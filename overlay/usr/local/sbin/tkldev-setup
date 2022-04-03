@@ -48,9 +48,12 @@ clone_or_update() {
 
 clone_or_update turnkeylinux/buildtasks $BT_PATH
 clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
-clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots
 clone_or_update turnkeylinux/common $FAB_PATH/common
 clone_or_update turnkeylinux-apps/$APP $FAB_PATH/products/$APP
+
+if [[ "${ARCH}" == "amd64" ]]; then
+  clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots master
+fi
 
 if [[ -f "$BT_PATH/config/common.cfg" ]]; then
     . $BT_PATH/config/common.cfg
@@ -67,9 +70,9 @@ else
     mkdir -p $(dirname $BOOTSTRAP_PATH)
     cd $(dirname $BOOTSTRAP_PATH)
     bootstrap_file=$BOOTSTRAP_PATH
-    wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz \
+    wget -nc -nv $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz \
         || fatal "Downloading $BOOTSTRAP_NAME failed."
-    wget -nc $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash \
+    wget -nc -nv $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash \
         || fatal "Downloading $BOOTSTRAP_NAME hash file failed."
 
     if [[ -f "$BT_VERIFY" ]]; then
