@@ -30,7 +30,7 @@ turnkey-tkldev-17.0 (1) turnkey; urgency=low
       additional work in di-live required to complete UEFI install support).
       Part of #1435.
       NOTE: The UEFI support started for v17.0 di-live and ISO builds has been
-      (temporarily) rolled back and won't be implmented in v17.0.
+      (temporarily) rolled back and won't be implemented in v17.0.
 
   * pool:
 
@@ -85,7 +85,7 @@ turnkey-tkldev-16.0 (1) turnkey; urgency=low
     - significant refactoring, including inclusion of bt-bootstrap script to
       build bootstrap if relevant bootstrap not currently available.
     - updates to most bt- scripts for Buster.
-    - refactoring of bin/signiture-verify to support forcing check of hashfile
+    - refactoring of bin/signature-verify to support forcing check of hashfile
       GPG signing via '--force-gpg' switch (default behaviour remains unsigned
       files just giving warning).
 
@@ -95,7 +95,7 @@ turnkey-tkldev-16.0 (1) turnkey; urgency=low
     - change order of repo cloning (now 1st) & bootstrap download (now 2nd).
     - leverage buildtasks/config/common.cfg (fallback to config.example if not
       setup) to set relevant GPG key ID (BT_GPGKEY).
-    - leverage buildtasks/bin/signiture-verify script to check downloaded
+    - leverage buildtasks/bin/signature-verify script to check downloaded
       bootstrap file.
 
   * Docs:
@@ -173,7 +173,7 @@ turnkey-tkldev-14.0 (1) turnkey; urgency=low
 
   * Improved documentation.
 
-  * Miscallaneous:
+  * Miscellaneous:
 
     - Fab: root.tmp has been renamed to root.sandbox.
     - Fab: pre-process ISO's with iso-hybrid.
