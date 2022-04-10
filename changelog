@@ -1,3 +1,15 @@
+turnkey-tkldev-17.1 (1) turnkey; urgency=low
+
+  * UNRELEASED - remove this line and update prior to release
+
+  * Add preliminary support for Raspberry Pi.
+    [Yannick Heneault <https://github.com/heneault>]
+
+  * Note: Please refer to turnkey-core's 17.1 changelog for changes common to
+    all appliances. Here we only describe changes specific to this appliance.
+
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Sun, 10 Apr 2022 22:50:42 +0000
+
 turnkey-tkldev-17.0 (1) turnkey; urgency=low
 
   * Upgraded base distribution to Debian 11.1/Bullseye.
