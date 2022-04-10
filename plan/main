@@ -8,11 +8,18 @@ tklpatch                /* buildtasks optimized builds depends */
 make
 build-essential
 gnupg
+
+#ifndef ARM64
 xorriso                 /* xorriso supports writing UEFI partition */
 squashfs-tools
-
 syslinux
 syslinux-utils
+#else
+kpartx
+xz-utils
+qemu-utils
+dosfstools
+#endif
 
 dirmngr
 
