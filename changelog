@@ -1,5 +1,15 @@
 turnkey-tkldev-17.1 (1) turnkey; urgency=low
 
+  * Updated all Debian packages to latest.
+    [ autopatched by buildtasks ]
+
+  * Patched bugfix release. Closes #1734.
+    [ autopatched by buildtasks ]
+
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Tue, 12 May 2022 01:41:55 +0000
+
+turnkey-tkldev-17.1 (1) turnkey; urgency=low
+
   * UNRELEASED - remove this line and update prior to release
 
   * Add preliminary support for Raspberry Pi.
