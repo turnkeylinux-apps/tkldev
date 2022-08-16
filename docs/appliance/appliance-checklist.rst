@@ -1,8 +1,8 @@
 Makefile
 --------
 
-See `Sane Base </development/customizations/howto-new-app.rst>`_ and
-    `Makefile </development/customizations/howto-new-app.rst>`_.
+See `Sane Base <../development/customizations/howto-new-app.rst>`_ and
+    `Makefile <../development/customizations/howto-new-app.rst>`_.
 
 - [ ] ensure any ``/common/mk/turnkey/*`` loaded BEFORE ``/common/mk/turnkey.mk``
 - [ ] shared code included from common rather than re-implemented
