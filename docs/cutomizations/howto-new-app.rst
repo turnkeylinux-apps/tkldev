@@ -101,11 +101,7 @@ Inithooks
     regarding inithooks
 
 FIXME: the following items have not been documented
-* directory structure
+
 * what a chroot is
 * build targets and stamps
-* buildtasks
 * tklbam profile
-* readme
-* screenshots
-* changelog
