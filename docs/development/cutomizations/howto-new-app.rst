@@ -97,15 +97,11 @@ Makefile
             including common stuff
 
 Inithooks
-    See `Inithooks Overview <inithooks-overview.rst>`_ for information
+    See `Inithooks Overview <docs/development/inithooks-overview.rst>`_ for information
     regarding inithooks
 
 FIXME: the following items have not been documented
-* directory structure
+
 * what a chroot is
 * build targets and stamps
-* buildtasks
 * tklbam profile
-* readme
-* screenshots
-* changelog
