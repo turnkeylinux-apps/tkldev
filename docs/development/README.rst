@@ -16,11 +16,11 @@ After that you're ready to dive in:
 
 Notes on how we use Git:
 
-* `Git Configuration and Workflow <../getting-started/git.rst>`_
+* `Git Configuration and Workflow </getting-started/git.rst>`_
 
 
 
-.. _Setup: ../getting-started/setup.rst
+.. _Setup: /getting-started/setup.rst
 .. _TurnKey Core: https://github.com/turnkeylinux-apps/core/
-.. _Hello world: ../getting-started/helloworld.rst
+.. _Hello world: /getting-started/helloworld.rst
 
