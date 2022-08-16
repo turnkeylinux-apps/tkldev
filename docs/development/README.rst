@@ -16,7 +16,7 @@ After that you're ready to dive in:
 
 Notes on how we use Git:
 
-* `Git Configuration and Workflow <git.rst>`_
+* `Git Configuration and Workflow <../getting-started/git.rst>`_
 
 
 
