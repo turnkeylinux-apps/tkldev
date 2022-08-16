@@ -97,7 +97,7 @@ Makefile
             including common stuff
 
 Inithooks
-    See `Inithooks Overview <docs/development/inithooks-overview.rst>`_ for information
+    See `Inithooks Overview <../development/inithooks-overview.rst>`_ for information
     regarding inithooks
 
 FIXME: the following items have not been documented

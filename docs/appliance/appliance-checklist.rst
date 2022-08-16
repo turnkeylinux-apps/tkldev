@@ -67,6 +67,6 @@ Other
 -----
 
 - [ ] tklbam profile is up-to-date and working
-- [ ] changelog has been updated - see `Changelog </docs/development/changelog.rst>`_
+- [ ] changelog has been updated - see `Changelog <../development/changelog.rst>`_
 - [ ] if applicable readme has been updated
 - [ ] if applicable artwork has been updated
