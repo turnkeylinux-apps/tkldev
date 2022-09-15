@@ -10,17 +10,17 @@ After that you're ready to dive in:
 * `Understanding the build process / terminology <buildprocess.rst>`_
 * `Walking through example source code <walkthrough.rst>`_
 * `Improving and maintaining an integration <maintenance.rst>`_
-* `Developing a new integration <new.rst>`_
+* `Developing a new integration <new-app.rst>`_
 
-* `Tips and tricks <../tips.rst>`_
+* `Tips and tricks <../getting-started/tips.rst>`_
 
 Notes on how we use Git:
 
-* `Git Configuration and Workflow <git.rst>`_
+* `Git Configuration and Workflow </getting-started/git.rst>`_
 
 
 
-.. _Setup: ../setup.rst
+.. _Setup: ../getting-started/setup.rst
 .. _TurnKey Core: https://github.com/turnkeylinux-apps/core/
-.. _Hello world: ../helloworld.rst
+.. _Hello world: ../getting-started/helloworld.rst
 

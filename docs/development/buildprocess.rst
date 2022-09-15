@@ -140,7 +140,7 @@ the build host - e.g. buster) and ARCH is the architecture (comes from
 the build host - e.g. amd64). The iso and the hash file will go into the
 directory stored in the value of BT_ISOS (/mnt/isos by default).
 
-.. _Setup: ../setup.rst
+.. _Setup: ../getting-started/setup.rst
 .. _TurnKey mirror: http://mirror.turnkeylinux.org/turnkeylinux/images/bootstrap/
 .. _bootstrap buildcode: https://github.com/turnkeylinux/bootstrap
 .. _copy-on-write: https://en.wikipedia.org/wiki/Copy-on-write

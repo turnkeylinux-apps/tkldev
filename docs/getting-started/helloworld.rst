@@ -432,5 +432,5 @@ What next?
 * `Development`_: understand how stuff works in greater detail.
 
 .. _forums: https://www.turnkeylinux.org/forum/
-.. _Development: development/README.rst
+.. _Development: ../development/README.rst
 

@@ -45,7 +45,7 @@ requests::
     git-push github initial-tweaks
     # send pull request on github
 
-.. _new: new.rst
-.. _requirements: new.rst#requirements
+.. _new: ../development/new-app.rst
+.. _requirements: ../development/new-app.rst
 .. _Git Flow: https://github.com/turnkeylinux/tracker/blob/master/GITFLOW.rst
 
