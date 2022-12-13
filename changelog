@@ -3,7 +3,7 @@ turnkey-tkldev-17.2 (1) turnkey; urgency=low
   * Rebuild to include latest fab (v1.0.2) improvements/bugfixes.
 
   * Add preliminary support for Raspberry Pi. (Much more work required to
-    complete this - bit it's a start).
+    complete this - but it's a start).
     [Yannick Heneault <https://github.com/heneault>]
 
  -- Jeremy Davis <jeremy@turnkeylinux.org>  Mon, 12 Dec 2022 03:33:26 +0000
