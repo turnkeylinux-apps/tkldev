@@ -1,3 +1,13 @@
+turnkey-tkldev-17.2 (1) turnkey; urgency=low
+
+  * Rebuild to include latest fab (v1.0.2) improvements/bugfixes.
+
+  * Add preliminary support for Raspberry Pi. (Much more work required to
+    complete this - but it's a start).
+    [Yannick Heneault <https://github.com/heneault>]
+
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Mon, 12 Dec 2022 03:33:26 +0000
+
 turnkey-tkldev-17.1 (1) turnkey; urgency=low
 
   * Updated all Debian packages to latest.
@@ -7,18 +17,6 @@ turnkey-tkldev-17.1 (1) turnkey; urgency=low
     [ autopatched by buildtasks ]
 
  -- Jeremy Davis <jeremy@turnkeylinux.org>  Tue, 12 May 2022 01:41:55 +0000
-
-turnkey-tkldev-17.1 (1) turnkey; urgency=low
-
-  * UNRELEASED - remove this line and update prior to release
-
-  * Add preliminary support for Raspberry Pi.
-    [Yannick Heneault <https://github.com/heneault>]
-
-  * Note: Please refer to turnkey-core's 17.1 changelog for changes common to
-    all appliances. Here we only describe changes specific to this appliance.
-
- -- Jeremy Davis <jeremy@turnkeylinux.org>  Sun, 10 Apr 2022 22:50:42 +0000
 
 turnkey-tkldev-17.0 (1) turnkey; urgency=low
 
