@@ -5,19 +5,57 @@ fatal() { echo "FATAL [$(basename $0)]: $@" 1>&2; exit 1; }
 warning() { echo "WARNING [$(basename $0)]: $@"; }
 info() { echo "INFO [$(basename $0)]: $@"; }
 
+
+
+
+usage() {
+    exit_code=0
+    if [[ $# -ge 1 ]]; then
+        echo "FATAL: $@"
+        exit_code=1
+    fi
+    cat <<EOF
+$(basename $0): [-h|--help] [APP] [... APP]
+
+Tool to initialize and maintain TKLDev
+
+The default action is to download the bootstrap (if it doesn't already exist)
+and clone (or update) the following repos (to the corresponding paths):
+
+    turnkeylinux/buildtasks $BT_PATH (\$BT_PATH)
+    turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
+    turnkeylinux/common $FAB_PATH/common (\$FAB_PATH/common)
+    turnkeylinux-apps/APP $FAB_PATH/products/APP
+    turnkeylinux/cdroots $FAB_PATH/cdroots master (amd64 only)
+
+buildtasks, common & cdroots will be checked out at the relevant major version
+branch ($BRANCH).
+
+It will also update the apt packages (to the latest available) of these:
+
+    fab, pool
+
+If the repos are dirty (uncommited files) they are
+
+Env vars:
+
+    BT_PATH     Buildtasks path
+EOF
+
 [[ -z "$DEBUG" ]] || set -x
 
-GIT_DEPTH=1
-APP=${1}
+GIT_DEPTH=${GIT_DEPTH:-1}
+APP="${@}"
 [[ -n "$APP" ]] || APP="core"
 
 distro="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
 [[ "$distro" == "turnkey" ]] && distro="debian"
+tkl_ver=$(turnkey-version -t)
 
 export RELEASE="${RELEASE:-${distro}/$(lsb_release -s -c)}"
 export CODENAME="$(basename $RELEASE)"
 export ARCH="${ARCH:-$(dpkg --print-architecture)}"
-
+export BRANCH="${tkl_ver::2}.x"
 IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
 FAB_PATH="/turnkey/fab"
 BOOTSTRAP_NAME="bootstrap-${CODENAME}-${ARCH}"
@@ -27,22 +65,46 @@ BT_VERIFY="$BT_PATH/bin/signature-verify"
 
 [[ $(id -u) -eq 0 ]] || fatal "Root user required. Please rerun with sudo."
 
+
 clone_or_update() {
     src=https://github.com/$1
     dst=$2
+    branch=$3
+    git_depth=""
+    [[ "$GIT_DEPTH" == "full" ]] || git_depth="--depth $GIT_DEPTH"
     mkdir -p $(dirname $dst)
+    if [[ -n "$branch" ]]; then
+        $branch_arg="--branch $branch"
+    else
+        branch='master'
+    fi
     if [[ -d "$dst" ]]; then
         info "$dst exists, attempting update."
         git_dir=$dst/.git
         if [[ -d "$git_dir" ]]; then
-            GIT_DIR=$git_dir git pull || warning "Updating $dst failed, skipping."
+            _git="git --git-dir=$git_dir --work-dir=$dst"
+            remote="$($_git remote -v | grep -m1 turnkeylinux/common | cut -f1)"
+            if [[ -z $($_git status -s) ]]; then
+                current_branch=$($_git branch --show-current)
+                if ! $_git fetch $remote; then
+                    warning "($dst) Fetching remote: $remote failed, skipping."
+                elif [[ "$current_branch" == "$branch" ]] \
+                        && ! $_git checkout $branch; then
+                    warning "($dst) Checking out branch: $branch failed, skipping."
+                elif ! $_git pull $remote $branch; then
+                    warning "($dst) Updating failed, skipping."
+                fi
+            else
+                warning "$dst has uncommitted files, skipping."
+            fi
         else
             warning "$dst exists, but is not a git repo - skipping."
             return
         fi
     else
         info "Cloning $src into $dst."
-        git clone --depth $GIT_DEPTH $src $dst || warning "Cloning $dst failed, skipping."
+        git clone $git_depth $src $dst \
+            || warning "Cloning $dst failed, skipping."
     fi
 }
 
