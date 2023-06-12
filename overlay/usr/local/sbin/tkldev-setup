@@ -70,8 +70,40 @@ BT_VERIFY="$BT_PATH/bin/signature-verify"
 [[ $(id -u) -eq 0 ]] || fatal "Root user required. Please rerun with sudo."
 
 
+update_repo() {
+    dst=$1
+    git_dir=$dst/.git
+    repo=$2
+    branch=$3
+    _git="git --git-dir=$git_dir --work-tree=$dst"
+    remote="$($_git remote -v | grep -m1 "$repo" | cut -f1)"
+    if [[ -n "$($_git status -s)" ]]; then
+        warning "$dst has uncommitted files, skipping."
+        return
+    fi
+    current_branch=$($_git branch --show-current)
+    if ! $_git fetch $remote; then
+        warning "($dst) Fetching remote: $remote failed, skipping."
+        return
+    fi
+    if [[ "$current_branch" != "$branch" ]]; then
+        if ! $_git checkout $branch &&
+                ! $_git checkout $branch-dev; then
+            warning "($dst) Checking out '$branch' failed, skipping."
+            return
+        fi
+    fi
+    if ! $_git pull $remote $branch; then
+        warning "($dst) Updating '$branch' failed, skipping."
+        return
+    fi
+
+}
+
+
 clone_or_update() {
-    src=https://github.com/$1
+    repo=$1
+    src=https://github.com/$repo
     dst=$2
     branch=$3
     git_depth=""
@@ -80,36 +112,25 @@ clone_or_update() {
     mkdir -p $(dirname $dst)
     if [[ -n "$branch" ]]; then
         branch_arg="--branch $branch"
+        branch_dev_arg="--branch $branch-dev"
     else
         branch='master'
     fi
     if [[ -d "$dst" ]]; then
-        info "$dst exists, attempting update."
-        git_dir=$dst/.git
-        if [[ -d "$git_dir" ]]; then
-            _git="git --git-dir=$git_dir --work-tree=$dst"
-            remote="$($_git remote -v | grep -m1 "$1" | cut -f1)"
-            if [[ -z $($_git status -s) ]]; then
-                current_branch=$($_git branch --show-current)
-                if ! $_git fetch $remote; then
-                    warning "($dst) Fetching remote: $remote failed, skipping."
-                elif [[ "$current_branch" == "$branch" ]] \
-                        && ! $_git checkout $branch; then
-                    warning "($dst) Checking out branch: $branch failed, skipping."
-                elif ! $_git pull $remote $branch; then
-                    warning "($dst) Updating failed, skipping."
-                fi
-            else
-                warning "$dst has uncommitted files, skipping."
-            fi
+        if [[ -d "$dst/.git" ]]; then
+            info "$dst exists and is a git repo, attempting update."
+            update_repo $dst $repo $branch
         else
             warning "$dst exists, but is not a git repo - skipping."
             return
         fi
     else
         info "Cloning $src into $dst."
-        git clone $git_depth $src $dst \
-            || warning "Cloning $dst failed, skipping."
+        if ! git clone $branch_arg $git_depth $src $dst \
+            && ! git clone $branch_dev_arg $git_depth $src $dst; then
+                warning "Cloning $dst failed, skipping."
+                return
+        fi
     fi
 }
 
