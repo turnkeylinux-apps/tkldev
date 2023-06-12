@@ -19,6 +19,9 @@ $(basename $0): [-h|--help] [APP] [... APP]
 
 Tool to initialize and maintain TKLDev
 
+Options:
+    -h|--help   Show this help and exit
+
 The default action is to download the bootstrap (if it doesn't already exist)
 and clone (or update) the following repos (to the corresponding paths):
 
@@ -41,6 +44,7 @@ Env vars:
 
     BT_PATH     Buildtasks path
 EOF
+}
 
 [[ -z "$DEBUG" ]] || set -x
 
@@ -71,10 +75,11 @@ clone_or_update() {
     dst=$2
     branch=$3
     git_depth=""
+    branch_arg=""
     [[ "$GIT_DEPTH" == "full" ]] || git_depth="--depth $GIT_DEPTH"
     mkdir -p $(dirname $dst)
     if [[ -n "$branch" ]]; then
-        $branch_arg="--branch $branch"
+        branch_arg="--branch $branch"
     else
         branch='master'
     fi
@@ -82,8 +87,8 @@ clone_or_update() {
         info "$dst exists, attempting update."
         git_dir=$dst/.git
         if [[ -d "$git_dir" ]]; then
-            _git="git --git-dir=$git_dir --work-dir=$dst"
-            remote="$($_git remote -v | grep -m1 turnkeylinux/common | cut -f1)"
+            _git="git --git-dir=$git_dir --work-tree=$dst"
+            remote="$($_git remote -v | grep -m1 "$1" | cut -f1)"
             if [[ -z $($_git status -s) ]]; then
                 current_branch=$($_git branch --show-current)
                 if ! $_git fetch $remote; then
@@ -108,13 +113,13 @@ clone_or_update() {
     fi
 }
 
-clone_or_update turnkeylinux/buildtasks $BT_PATH
+clone_or_update turnkeylinux/buildtasks $BT_PATH $BRANCH
 clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
-clone_or_update turnkeylinux/common $FAB_PATH/common
+clone_or_update turnkeylinux/common $FAB_PATH/common $BRANCH
 clone_or_update turnkeylinux-apps/$APP $FAB_PATH/products/$APP
 
 if [[ "${ARCH}" == "amd64" ]]; then
-  clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots master
+    clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots $BRANCH
 fi
 
 if [[ -f "$BT_PATH/config/common.cfg" ]]; then
