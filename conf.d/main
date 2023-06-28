@@ -52,7 +52,4 @@ sed -i "s|^autostart.*|autostart false|g" $CONF
 
 # disable services so as not to conflict with builds
 systemctl disable webmin
-systemctl disable webmin@stunnel4 || true
-systemctl disable shellinabox
-systemctl disable shellinabox@stunnel4 || true
 systemctl disable postfix
