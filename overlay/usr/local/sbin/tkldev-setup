@@ -5,9 +5,6 @@ fatal() { echo "FATAL [$(basename $0)]: $@" 1>&2; exit 1; }
 warning() { echo "WARNING [$(basename $0)]: $@"; }
 info() { echo "INFO [$(basename $0)]: $@"; }
 
-
-
-
 usage() {
     exit_code=0
     if [[ $# -ge 1 ]]; then
@@ -20,55 +17,67 @@ $(basename $0): [-h|--help] [APP] [... APP]
 Tool to initialize and maintain TKLDev
 
 Options:
-    -h|--help   Show this help and exit
+    -f|--force      If the branch to be updated is not already checked out,
+                    rather than skip, it will be checked out (no updates if
+                    repo dirty)*
+    -n|--full-clone Full clone (rather than default shallow clone)*
+    -h|--help       Show this help and exit
+
+*- only applies to git repos listed below
 
 The default action is to download the bootstrap (if it doesn't already exist)
 and clone (or update) the following repos (to the corresponding paths):
 
-    turnkeylinux/buildtasks $BT_PATH (\$BT_PATH)
-    turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
-    turnkeylinux/common $FAB_PATH/common (\$FAB_PATH/common)
-    turnkeylinux-apps/APP $FAB_PATH/products/APP
-    turnkeylinux/cdroots $FAB_PATH/cdroots master (amd64 only)
+    turnkeylinux/buildtasks $BT_PATH (\$BT_PATH - branch:$BRANCH)
+    turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles (branch:master)
+    turnkeylinux/common $FAB_PATH/common (\$FAB_PATH/common) (branch:$BRANCH)
+    turnkeylinux-apps/APP $FAB_PATH/products/APP (branch:master)
+    turnkeylinux/cdroots $FAB_PATH/cdroots (amd64 only - branch:$BRANCH)
 
-buildtasks, common & cdroots will be checked out at the relevant major version
-branch ($BRANCH).
+The 'fab' apt package will be updated when possible (to the latest available).
 
-It will also update the apt packages (to the latest available) of these:
-
-    fab, pool
-
-If the repos are dirty (uncommited files) they are
+If the repos are dirty (uncommited files) they are skipped, if they have an
+alternate branch checked out, they will be skipped (unless -f|--force used).
 
 Env vars:
 
-    BT_PATH     Buildtasks path
+    FAB_PATH    Fab PATH (default: $FAB_PATH)
+    BT_PATH     Buildtasks PATH (default: $BT_PATH)
+    RELEASE     Release to target - e.g. debian/bookworm (default: $RELEASE)
+    ARCH        Arch to target (default: $ARCH)
+    BRANCH      Branch to checkout (default: $BRANCH)
+    GIT_DEPTH   Depth to clone (default: $GIT_DEPTH) - setting to 'full' gives
+                same behavior as -n|--full-clone
+    DEBUG       Verbose output (useful for debugging)
+
 EOF
+    exit $exit_code
 }
 
 [[ -z "$DEBUG" ]] || set -x
+[[ $(id -u) -eq 0 ]] || fatal "Root user required."
 
 GIT_DEPTH=${GIT_DEPTH:-1}
 APP="${@}"
 [[ -n "$APP" ]] || APP="core"
 
-distro="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
-[[ "$distro" == "turnkey" ]] && distro="debian"
+distro="$(lsb_release -si)"
+if [[ "${distro,,}" == "turnkey" ]] || [[ "${distro,,}" == "debian" ]]; then
+   distro="debian"
+fi
 tkl_ver=$(turnkey-version -t)
+unset FORCE
 
 export RELEASE="${RELEASE:-${distro}/$(lsb_release -s -c)}"
 export CODENAME="$(basename $RELEASE)"
 export ARCH="${ARCH:-$(dpkg --print-architecture)}"
 export BRANCH="${tkl_ver::2}.x"
 IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
-FAB_PATH="/turnkey/fab"
+FAB_PATH="${FAB_PATH:-/turnkey/fab}"
 BOOTSTRAP_NAME="bootstrap-${CODENAME}-${ARCH}"
 BOOTSTRAP_PATH="$FAB_PATH/bootstraps/${CODENAME}"
-BT_PATH="/turnkey/buildtasks"
+BT_PATH="${BT_PATH:-/turnkey/buildtasks}"
 BT_VERIFY="$BT_PATH/bin/signature-verify"
-
-[[ $(id -u) -eq 0 ]] || fatal "Root user required. Please rerun with sudo."
-
 
 update_repo() {
     dst=$1
@@ -87,9 +96,24 @@ update_repo() {
         return
     fi
     if [[ "$current_branch" != "$branch" ]]; then
-        if ! $_git checkout $branch &&
-                ! $_git checkout $branch-dev; then
-            warning "($dst) Checking out '$branch' failed, skipping."
+        if [[ -n "$FORCE" ]]; then
+            warning "Force used - attempting to checkout $branch"
+            if ! $_git checkout $branch && ! $_git checkout $branch-dev; then
+                warning "($dst) Checking out '$branch' failed, skipping."
+                return
+            fi
+        elif [[ "${current_branch}" =~ [0-9]\.x ]]; then
+            if [[ "${current_branch::4}" == "$branch" ]]; then
+                warning "($dst) current checked out branch is $current_branch"\
+                        " attempting to checkout $branch"
+                if ! $_git checkout $branch; then
+                    warning "($dst) checkout failed - skipping"
+                    return
+                fi
+            fi
+        else
+            warning "($dst) current checked out branch is $current_branch"\
+                    " (not $branch) so skipping"
             return
         fi
     fi
@@ -97,9 +121,7 @@ update_repo() {
         warning "($dst) Updating '$branch' failed, skipping."
         return
     fi
-
 }
-
 
 clone_or_update() {
     repo=$1
@@ -125,14 +147,35 @@ clone_or_update() {
             return
         fi
     else
-        info "Cloning $src into $dst."
-        if ! git clone $branch_arg $git_depth $src $dst \
-            && ! git clone $branch_dev_arg $git_depth $src $dst; then
+        info "Attempting to clone $src into $dst."
+        if ! git clone $branch_arg $git_depth $src $dst; then
+           warning "Cloning $branch failed, trying $branch-dev"
+           if ! git clone $branch_dev_arg $git_depth $src $dst; then
                 warning "Cloning $dst failed, skipping."
                 return
+           fi
         fi
     fi
 }
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            ;;
+        -f|--force)
+            FORCE=y
+            shift
+            ;;
+        -n|--full-clone)
+            GIT_DEPTH='full'
+            shift
+            ;;
+        *)
+            usage "Unrecognised switch: $1"
+            ;;
+    esac
+done
 
 clone_or_update turnkeylinux/buildtasks $BT_PATH $BRANCH
 clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
@@ -143,17 +186,24 @@ if [[ "${ARCH}" == "amd64" ]]; then
     clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots $BRANCH
 fi
 
+if [[ ! -d "$BT_PATH/config" ]]; then
+    cp -r "$BT_PATH/config.example" "$BT_PATH/config"
+fi
 if [[ -f "$BT_PATH/config/common.cfg" ]]; then
     . $BT_PATH/config/common.cfg
-elif [[ -f "$BT_PATH/config.example/common.cfg" ]]; then
-    . $BT_PATH/config.example/common.cfg
 else
     fatal "$BT_PATH config not found, unable to determine GPG key ID (BT_GPGKEY)."
 fi
 
+info "Updating apt database"
+apt-get update -qq
+info "Installing newer fab version (if available)"
+DEBIAN_FRONTEND=noninteractive apt-get install -y fab
+
 if [[ -d "$BOOTSTRAP_PATH" ]]; then
     info "$BOOTSTRAP_PATH exists, skipping download."
 else
+    errmsg=''
     info "Downloading $BOOTSTRAP_NAME"
     mkdir -p $(dirname $BOOTSTRAP_PATH)
     cd $(dirname $BOOTSTRAP_PATH)
@@ -162,12 +212,11 @@ else
         || fatal "Downloading $BOOTSTRAP_NAME failed."
     wget -nc -nv $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash \
         || fatal "Downloading $BOOTSTRAP_NAME hash file failed."
-
     if [[ -f "$BT_VERIFY" ]]; then
         bootstrap_file=$(dirname $BOOTSTRAP_PATH)/$BOOTSTRAP_NAME.tar.gz
         BT_DEBUG=$DEBUG $BT_VERIFY --force-gpg $bootstrap_file $bootstrap_file.hash
     else
-        fatal "$BT_VERIFY script not found, unable to verfiy downloaded files."
+        fatal "$BT_VERIFY script not found, unable to verify downloaded files."
     fi
     info "Unpacking $BOOTSTRAP_NAME"
     mkdir $BOOTSTRAP_PATH
