@@ -1,0 +1,51 @@
+#!/bin/bash -eu
+
+usage() {
+    cat <<EOF
+Syntax:
+
+    $(basename $0) path/to/chroot
+
+EOF
+    exit $1
+}
+
+[[ -n "$FAB_PATH" ]] || FAB_PATH="/turnkey/fab"
+
+if [[ $# -ne 1 ]]; then
+    echo "Error: Must provide path to chroot"
+    usage 1
+fi
+
+if [[ "$PWD" == "$FAB_PATH/products/"* ]]; then
+    app_name=$(basename $PWD)
+    # shorten app_name by removing first dash and everything after
+    app_name=${app_name%%-*}
+else
+    app_name="random"
+fi
+
+target=${1%/} # remove trailing slash if it exists
+local_bin=usr/local/bin
+dst=$1/$local_bin
+src=$FAB_PATH/common/overlays/turnkey.d/systemd-chroot/$local_bin
+
+for script in service systemctl; do
+    cp "$src/$script" "$dst/"
+done
+
+# disable confconsole from starting
+chmod -x "$target/root/.bashrc.d/confconsole-auto" || true
+
+# make prompt show that we're in a chroot
+echo "$app_name chroot" > "$target/etc/debian_chroot"
+
+fab-chroot $target
+
+# after running undo what was done
+for script in service systemctl; do
+    rm -rf "$dst/$script"
+done
+chmod +x "$target/root/.bashrc.d/confconsole-auto" || true
+rm -rf "$target/etc/debian_chroot"
+echo "complete"
