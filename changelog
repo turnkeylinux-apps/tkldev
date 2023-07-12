@@ -1,3 +1,42 @@
+turnkey-tkldev-18.0rc1 (1) turnkey; urgency=low
+
+  * Upgraded base distribution to Debian 12/Bookworm.
+
+  * fab:
+    - Improve typing and implemnt fstrings.
+    - Improved code styling (mostly PEP8 compliant now).
+    - Support debug logging via '-d|--debug' switch.
+    [ Stefan Davis <stefan@turnkeylinux.org> & Jeremy Davis ]
+    - Ensure that pool doesn't choke on invalid versions generated from git
+      tags.
+    - Default pool-info to use '--registered' - closes #1699.
+    [ Stefan Davis <stefan@turnkeylinux.org> ]
+    - Properly handle branch names that include a slash ('/') - closes #1761.
+    [ Stefan Davis <stefan@turnkeylinux.org> ]
+
+  * autoversion:
+    - Typing and code style updates/improvements (mostly PEP8 compliant now).
+    - Now defaults to 'autoversion HEAD' if no args given.
+    - support for debian style branch/tag names (i.e. owner/branch or
+      owner/tag - e.g. debian/dev or debian/2.1.4).
+
+  * bootstrap:
+    - Update to streamline build process - add install target to install
+      bootstrap into tkldev.
+    [ Stefan Davis <stefan@turnkeylinux.org> ]
+    - add lsb_release as bootstrap dependency.
+    [ Stefan Davis <stefan@turnkeylinux.org> ]
+
+  * misc:
+    - Require RELEASE to be set (rather than CODENAME). Falls back to current
+      host if not set (eases transition).
+    - Include tkldev-changelog, fab-rewind & fab-investigate scripts in TKLDev
+      by default.
+    - Support setting NODE_VER / RBY_VER (NodeJS / Ruby versions respectively)
+      from Makefile (only applies to apps that include NodeJS/Ruby).
+
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Wed, 12 Jul 2023 02:35:23 +0000
+
 turnkey-tkldev-17.2 (1) turnkey; urgency=low
 
   * Rebuild to include latest fab (v1.0.2) improvements/bugfixes.
