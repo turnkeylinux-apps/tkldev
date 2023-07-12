@@ -1,0 +1,25 @@
+#!/bin/bash -e
+
+if [[ ! $(systemctl is-active -q squid) ]]; then
+    echo "- Killing squid"
+    kill -9 $(cat /run/squid.pid)
+else
+    echo "Squid process ID not found, continuing"
+fi
+
+echo "- Deleteing squid's on disk cache files"
+find /var/spool/squid/ -maxdepth 1 -type d -name 0[0-9A-F] -exec rm -r {} +
+
+echo "- Clearing host's apt cache (host also uses squid)"
+apt clean
+find /var/lib/apt -type f \
+    \( -name "*\.turnkeylinux\.org*" -o -name "*\.debian\.org*" \) \
+    -exec rm {} +
+
+echo "- Restarting squid"
+systemctl start squid
+
+echo "- Updating host's apt lists (please wait)"
+apt-get update -qq
+
+echo "Done"

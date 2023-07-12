@@ -17,7 +17,7 @@ and on top of that:
 - Includes a fast copy-on-write build toolchain based on 
   GNU make, `fab`_, and `deck`_.
 - Turnkey development directory structure with preconfigured CDPATH.
-- Integrated caching proxy for fast and iterative development.
+- Integrated caching proxy (squid) for fast and iterative development.
 - Full usage and development `documentation`_.
 
 Example build sources
