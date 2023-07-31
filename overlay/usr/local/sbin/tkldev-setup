@@ -158,6 +158,7 @@ clone_or_update() {
     fi
 }
 
+APPS=''
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -h|--help)
@@ -172,7 +173,8 @@ while [[ "$#" -gt 0 ]]; do
             shift
             ;;
         *)
-            usage "Unrecognised switch: $1"
+            APPS="$APPS $1"
+            shift
             ;;
     esac
 done
@@ -180,7 +182,9 @@ done
 clone_or_update turnkeylinux/buildtasks $BT_PATH $BRANCH
 clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
 clone_or_update turnkeylinux/common $FAB_PATH/common $BRANCH
-clone_or_update turnkeylinux-apps/$APP $FAB_PATH/products/$APP
+for app in $APPS; do
+    clone_or_update turnkeylinux-apps/$app $FAB_PATH/products/$app
+done
 
 if [[ "${ARCH}" == "amd64" ]]; then
     clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots $BRANCH
