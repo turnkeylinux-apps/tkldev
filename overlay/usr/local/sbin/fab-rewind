@@ -42,7 +42,7 @@ if [[ -n "$RELEASE" ]]; then
 elif [[ -n "$CODENAME" ]]; then
     codename=$CODENAME
 else
-    warn "CODENAME and RELEASE unset, using $codename"
+    warn "RELEASE and CODENAME unset, using $codename"
 fi
 
 targets=("bootstrap" "root.build" "root.patched")
@@ -51,15 +51,15 @@ target=$1
 [[ " ${targets[*]} " =~ " ${target} " ]] || usage 1 "Only valid targets can be used."
 
 stop_services() {
-    targ=$1
-    info "Stopping services in $targ"
-    for service in mysql pgsql apache2 lighttpd nginx; do
-        fab-chroot build/$targ service $service stop 2>/dev/null || true
-    done
+    local targ=$1
+    if [[ -d "$targ" ]]; then
+        info "Stopping processes in $targ"
+        fuser -k $targ
+    fi
 }
 
 undeck() {
-    targ=$1
+    local targ=$1
     if [[ -d build/$targ ]]; then
         stop_services $targ
         if [[ "$targ" == "cdroot" ]]; then
@@ -69,6 +69,7 @@ undeck() {
             deck -D build/$targ
         fi
     fi
+    rm -rf build/$targ
     rm -f build/stamps/$targ
 }
 
@@ -80,9 +81,9 @@ mount_if_not_mounted() {
         targets_array_len=${#targets[@]}
         for (( i=0; i<${targets_array_len}; i++ )); do
             if [[ "${targets[$i]}" == "bootstrap" ]]; then
-                deck $FAB_PATH/bootstraps/$codename
+                deck $FAB_PATH/bootstraps/$codename build/bootstrap
             else
-                deck build/${targets[$((i - 1))]} build/${targets[$i]}
+                deck build/${target}
             fi
         done
      fi
