@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-if [[ ! $(systemctl is-active -q squid) ]]; then
+if [[ $(systemctl is-active -q squid) ]]; then
     echo "- Killing squid"
     kill -9 $(cat /run/squid.pid)
 else
