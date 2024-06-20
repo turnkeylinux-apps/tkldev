@@ -3,7 +3,10 @@ turnkey-tkldev-18.1 (1) turnkey; urgency=low
   * Rebuild for v18.1 - including more recent v18.0 common bugfixes & latest
     Debian packages.
 
-  * Confconsole: bugfix broken DNS-01 Let's Encrypt challenge- closes #1876 &
+  * Clone "core" buildcode on firstboot - reintroduce previous default
+    behaviour - closes #1857.
+
+  * Confconsole: bugfix broken DNS-01 Let's Encrypt challenge - closes #1876 &
     #1895.
     [Jeremy Davis <jeremy@turnkeylinux.org>]
 
