@@ -1,25 +1,18 @@
 turnkey-tkldev-18.1 (1) turnkey; urgency=low
 
-  * Rebuild for v18.1 - including more recent v18.0 common bugfixes & latest
-    Debian packages.
+  * v18.1 rebuild - includes latest Debian & TurnKey packages.
 
   * Clone "core" buildcode on firstboot - reintroduce previous default
     behaviour - closes #1857.
 
-  * Confconsole: bugfix broken DNS-01 Let's Encrypt challenge - closes #1876 &
-    #1895.
-    [Jeremy Davis <jeremy@turnkeylinux.org>]
-
   * Ensure hashfile includes URL to public key - closes #1864.
 
-  * Include webmin-logviewer module by default - closes #1866.
-
   * Web management console (webmin):
+    - Include webmin-logviewer module by default - closes #1866.
     - Upgraded webmin to v2.105.
     - Replace webmin-shell with webmin-xterm module by default - closes #1904.
-    - Disabled Webmin Let's Encrypt (for now).
 
- -- Jeremy Davis <jeremy@turnkeylinux.org>  Thu, 20 Jun 2024 03:21:43 +0000
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Fri, 05 Jul 2024 11:17:04 +0000
 
 turnkey-tkldev-18.0 (1) turnkey; urgency=low
 
