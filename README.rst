@@ -34,8 +34,7 @@ Credentials *(passwords set at first boot)*
 
 .. _TKLDev: https://github.com/turnkeylinux-apps/tkldev
 .. _from source: https://github.com/turnkeylinux-apps/
-.. _building packages from source: \
-    https://github.com/turnkeylinux-apps/tkldev/blob/master/docs/advanced/building-packages-from-source.rst
+.. _building packages from source: https://github.com/turnkeylinux-apps/tkldev/blob/master/docs/advanced/building-packages-from-source.rst
 .. _documentation: https://github.com/turnkeylinux-apps/tkldev/blob/master/docs
 .. _blog post: https://www.turnkeylinux.org/blog/introducing-tkldev
 .. _TurnKey Core: https://www.turnkeylinux.org/core
