@@ -42,6 +42,7 @@ alternate branch checked out, they will be skipped (unless -f|--force used).
 Env vars:
 
     FAB_PATH    Fab PATH (default: $FAB_PATH)
+    FAB_ARCH    Fab architecture (default: $FAB_ARCH)
     BT_PATH     Buildtasks PATH (default: $BT_PATH)
     RELEASE     Release to target - e.g. debian/bookworm (default: $RELEASE)
     ARCH        Arch to target (default: $ARCH)
@@ -70,11 +71,11 @@ unset FORCE
 
 export RELEASE="${RELEASE:-${distro}/$(lsb_release -s -c)}"
 export CODENAME="$(basename $RELEASE)"
-export ARCH="${ARCH:-$(dpkg --print-architecture)}"
+export FAB_ARCH="${FAB_ARCH:-$(dpkg --print-architecture)}"
 export BRANCH="${tkl_ver::2}.x"
 IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
 FAB_PATH="${FAB_PATH:-/turnkey/fab}"
-BOOTSTRAP_NAME="bootstrap-${CODENAME}-${ARCH}"
+BOOTSTRAP_NAME="bootstrap-${CODENAME}-${FAB_ARCH}"
 BOOTSTRAP_PATH="$FAB_PATH/bootstraps/${CODENAME}"
 BT_PATH="${BT_PATH:-/turnkey/buildtasks}"
 BT_VERIFY="$BT_PATH/bin/signature-verify"
@@ -186,7 +187,7 @@ for app in $APPS; do
     clone_or_update turnkeylinux-apps/$app $FAB_PATH/products/$app
 done
 
-if [[ "${ARCH}" == "amd64" ]]; then
+if [[ "${FAB_ARCH}" == "amd64" ]]; then
     clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots $BRANCH
 fi
 
