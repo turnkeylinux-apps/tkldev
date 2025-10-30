@@ -130,6 +130,5 @@ enough so anyone that wants to can jump in and make cool stuff happen.
 .. _common: https://github.com/turnkeylinux/common
 .. _Setup: ./getting-started/setup.rst
 .. _Hello world: ./getting-started/helloworld.rst
-.. _Tips and tricks: ./getting-started/tips.rst
+.. _Tips and tricks: ./tips/
 .. _Development: ./development/README.rst
-
