@@ -68,7 +68,7 @@ lines of "code"::
     root@tkldev fab/products$ git-clone https://github.com/turnkeylinux-apps/lamp
     Cloning into lamp...
 
-    root@tkldev fab/products$ wc -l $(find lamp -type f|grep -v '\.git\|png\|jpg\|changelog\|README.rst\|txt$')
+    root@tkldev fab/products$ wc -l $(find lamp -type f | grep -v '\.git\|png\|jpg\|changelog\|README.rst\|txt$')
       11 lamp/plan/main
        1 lamp/overlay/etc/skel/.bashrc.d/php-xdebug
       17 lamp/overlay/etc/apache2/mods-available/status.conf
