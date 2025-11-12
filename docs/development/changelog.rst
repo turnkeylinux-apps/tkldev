@@ -59,13 +59,13 @@ name & the version number. The other info remains the same.::
 
 **Changelog line**
 
-Each individual change should be within a separate "dot point", preceeded by 2
+Each individual change should be within a separate "dot point", preceded by 2
 spaces and an asterisk. In some cases it may make sense to have a "nested" list
 of sub-changes. If so, indent a further 2 spaces, and start the line with a
 dash ('-'). See example entries below.
 
 If changes include a bugfix and/or a feature request, then the associated issue
-number preceeded by a hash should be included (e.g. if issue number 123 was
+number preceded by a hash should be included (e.g. if issue number 123 was
 addressed, then include 'closes #123' or similar). See example entry below.
 
 If someone else worked on a specific change, then give credit by appending
@@ -134,10 +134,10 @@ Every new appliance release, must have a new changelog entry, with the new
 version noted. Any changes of significance since the previous release should
 be included within the changelog entry.
 
-What consititues a "change of significance" is somewhat subjective. But as a
+What constitutes a "change of significance" is somewhat subjective. But as a
 general rule, any changes done since the last release should be noted. If the
 change is something that may be useful for the end user to know, or a future
-developer to be aware of; it should definiately be noted. For example, bugs
+developer to be aware of; it should definitely be noted. For example, bugs
 fixed should always be noted. Even if an appliance is simply rebuilt (with no
 changes to the build code) then it still needs a new changelog entry.
 
@@ -170,7 +170,7 @@ new entry as per above.
 If you are unsure whether to create a new entry, or update the existing one,
 then you can check. Compare the top changelog entry version against the latest
 "stable" version noted on the relevant (website) appliance page. Checking the
-lastest build on the mirror is another good option. If in doubt ask Jeremy.
+latest build on the mirror is another good option. If in doubt ask Jeremy.
 
 Ideally in the future we will have some sort of tool that can automagically
 work out whether a changelog needs to be updated, or a new entry made. But
@@ -182,7 +182,7 @@ timestamp. The previous developer's name (and possibly email) should be
 surrounded by square brackets and moved to any/all relevant previous "dot
 point" entries.
 
-For further details on formating, please see previous sections
+For further details on formatting, please see previous sections
 
 
 New appliances
@@ -190,7 +190,7 @@ New appliances
 
 If you are creating a new appliance, then when you make your final submission,
 it should include a changelog file. It should only have a *single* changelog
-entry pertaining to the new appliance. If based from another applaince, then
+entry pertaining to the new appliance. If based from another appliance, then
 all previous entries should be replaced with a single point. E.g. something
 like this::
 

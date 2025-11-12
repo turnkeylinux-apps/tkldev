@@ -100,7 +100,7 @@ There are no strings attached. If you don't want to, you don't have to
 include common TurnKey functionality or any of the custom TurnKey
 components.
 
-Sadly, we've gotten into the nasty habit of prepending TKL - the TurnKey
+Sadly, we've gotten into the nasty habit of pre-pending TKL - the TurnKey
 Linux initials - to all things TurnKey but don't let that fool you.
 Under the hood TKLDev is 100% general purpose.
 

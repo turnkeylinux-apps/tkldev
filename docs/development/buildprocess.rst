@@ -61,7 +61,7 @@ F) product specific ``removelists``.
 G) common ``removelists-final`` (i.e. /turnkey/fab/common/removelists-final/).
 
 An ``overlay``: a directory containing files to be overlaid on top of
-``root.patched``, relevative to /. For example youroverlay/etc/hostname will be
+``root.patched``, relative to /. For example your overlay/etc/hostname will be
 copied into root.patched/etc/hostname.
 
 A ``conf`` script: any executable script in ``conf.d`` of the product
@@ -96,7 +96,7 @@ really exists to make life easier for developers.
 
 ``root.sandbox`` is just like ``root.patched`` except it is designed to
 hold temporary, manual modifications to the root filesystem. It serves
-as a sandbox for quick & dirty protyping of changes. This accelerates
+as a sandbox for quick & dirty prototyping of changes. This accelerates
 the development cycle by making it easy to test proposed changes to the
 root filesystem quickly, without changing product source code and
 without having to wait for the build process to resquash the

@@ -4,7 +4,7 @@ PLEASE NOTE: Currently the sandbox is broken!
 We hope to resolve that at some point in the future, but there is no ETA.
 
 Until it's fixed (or we rewrite this doc page) please feel free to post on
-the TUrnKey forums_ (new threads require a separate free website user
+the TurnKey forums_ (new threads require a separate free website user
 account) for advice on development and testing.
 
 ----
@@ -235,7 +235,7 @@ And we'll rebuild root.patched::
     root@tkldev products/core# make root.patched
     make: Nothing to be done for `root.patched'.
 
-Woops. That didn't work because we forgot to tell "make" it needed to
+Whoops. That didn't work because we forgot to tell "make" it needed to
 rebuild the already existing root.patched target. 
 
 We do that by removing the root.patched "build stamp"::

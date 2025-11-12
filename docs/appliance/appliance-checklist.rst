@@ -45,7 +45,7 @@ Inithooks vs Conf.d/Main
 - [ ] any one-time configuration that doesn't include secrets should always be in ``conf.d/main``
 - [ ] any idempotent configuration which isn't required for basic functionality should PROBABLY be in inithooks
 - [ ] any one-time configuration that does include secrets should be treated on a case-by-case basis possibly
-      in ``conf.d/main`` with secret regeneration occuring in firstboot scripts.
+      in ``conf.d/main`` with secret regeneration occurring in firstboot scripts.
 
 Inithooks
 ~~~~~~~~~

@@ -37,7 +37,7 @@ For example, let's build Core as an LXC container (aka Proxmox) build. Note
 that if there isn't already a Core ISO and matching hash file in /mnt/isos
 buildtasks will download it from the TurnKey mirror.
 
-Note: As of v14.2, you need to explictly use the full appliance-version name.
+Note: As of v14.2, you need to explicitly use the full appliance-version name.
 That is in the form:
 
     APPLIANCE_NAME-VERSION-DEBIAN_CODENAME-ARCH

@@ -76,8 +76,8 @@ Building your Appliance
 -----------------------
 
 Now you can build Core offline. It's almost identical to building appliances
-normally; you just need to explictly tell TKLDev to do it. We do that by
-setting the FAB_POOL environment variable. It shouldn't also be neccessary to
+normally; you just need to explicitly tell TKLDev to do it. We do that by
+setting the FAB_POOL environment variable. It shouldn't also be necessary to
 set the RELEASE but I'm going to demonstrate that for interest:
 
 .. code-block:: bash

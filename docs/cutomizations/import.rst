@@ -2,7 +2,7 @@ Importing a new app into turnkeylinux-apps
 ==========================================
 
 Below we describe the current process used to import a `new`_ app into
-turnkeylinux-apps. The idea is to faciliate easy collaboration with the
+turnkeylinux-apps. The idea is to facilitate easy collaboration with the
 original integration developer/maintainer.
 
 Fork
@@ -31,7 +31,7 @@ Review and test
 Optional: Bugfix, tweak, refactor
 ---------------------------------
 
-The main branch will be ``master``, but to faciliate collaboration with
+The main branch will be ``master``, but to facilitate collaboration with
 the upstream developer/maintainer, adhere to the `Git Flow`_ for pull
 requests::
 
