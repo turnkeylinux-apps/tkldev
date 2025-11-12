@@ -2,7 +2,7 @@ Building Packages from Source
 =============================
 
 TKLDev includes most of the components needed to build Debian packages from
-souce code OOTB. This can be useful if you want to test changes you've made
+source code OOTB. This can be useful if you want to test changes you've made
 to an existing package or create a new package - of your code or someone
 else's.
 
@@ -36,7 +36,7 @@ Always run `make clean` if/when you rebuild the buildroot.
 Note that using a pre-built buildroot will speed up package building,
 although strictly speaking is not required. A vanilla bootstrap may
 be used, as the dependencies noted in the [Build-Depends][build-deps] section
-of the pacakge control file will be installed into the buildroot prior
+of the package control file will be installed into the buildroot prior
 to building the package.
 
 Pool configuration
@@ -52,7 +52,7 @@ to go.
 Build a package with pool
 -------------------------
 
-I'll use TurnKey's "inithooks" package as an example:
+I'll use Turnkey's "inithooks" package as an example:
 
 First, clone or copy your source code to an appropriate location. We use
 /turnkey/public, but it can be any directory you like:
@@ -103,10 +103,10 @@ as you make changes. By default, that requires manual update to the changelog
 version for each rebuild - and remembering to do it.
 
 To help out, our default buildroot includes our custom
-[autoversion][autoversion] tool. As the name suggests, it can generate a unique
+[auto version][autoversion] tool. As the name suggests, it can generate a unique
 version for you; each time you rebuild a package.
 
-The requiremens for autoversion to generate a custom version are:
+The requirements for autoversion to generate a custom version are:
 - package source code must be in a git repo
 - changes must be committed
 - the must not be a changelog in the source debian directory
@@ -131,7 +131,7 @@ in the form of '0+<YYYY>.<MM>.<DD>+<HH>.<MM>.<SS>+<commit_id>'. E.g.:
 
 The versions will sort properly, so it's no issue to push them to an apt
 package repo as is, but ideally you want to have a "nice" version number for a
-stable pacakge. So either give it a new version tag - add/replace the
+stable package. So either give it a new version tag - add/replace the
 changelog.
 
 [chroot]: https://en.wikipedia.org/wiki/Chroot
