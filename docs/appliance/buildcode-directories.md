@@ -2,7 +2,7 @@ Appliance buildcode directory overview
 ======================================
 
 This page provides an overview of the contents of a both an appliance git
-repository and the common (shared) build code git repospitory. They are
+repository and the common (shared) build code git repository. They are
 displayed as a file tree which hopefully makes it easy to see.
 
 Formatting explanation

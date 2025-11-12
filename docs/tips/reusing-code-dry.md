@@ -74,7 +74,7 @@ keep this in mind when naming your conf scripts so one script doesn't try to
 get information from a file that does not yet exist.
 
 If you only want to have a few environment variables shared between conf
-scripts, then you can just use echo a line or 2 driectly to a file.
+scripts, then you can just use echo a line or 2 directly to a file.
 
 E.g. to write an env var to `/tmp/env` in `downloads`:
 

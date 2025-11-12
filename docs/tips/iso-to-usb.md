@@ -5,7 +5,7 @@ TurnKey ISOs are built as a "hybrid" image, which means that the structure of
 the ISO can be written directly to a USB and it should "just work" - either to
 boot in "live" mode or to install to bare metal if you wish.
 
-Note that if you copy the ISO file to an existing fillesystem on a USB, it can
+Note that if you copy the ISO file to an existing filesystem on a USB, it can
 be shared with others and used for a VM. However to be able to boot directly
 from the USB, the ISO filesystem must be written directly to the USB -
 overwriting all existing content.
@@ -22,7 +22,7 @@ On Linux and Mac, no third party tools are required as the 'dd' CLI tool can
 be used. Be careful that you are writing to the right device as the contents of
 it will be lost.
 
-The follwoing instructions are for Linux, but will likely also work on Mac. The
+The following instructions are for Linux, but will likely also work on Mac. The
 first step is to confirm the identify the device path (e.g., /dev/sdc) of your
 USB drive. There are a number of ways to do that, but 'lsblk' works well. E.g.
 an "8GB" USB ('lsblk' reports size in GiB):

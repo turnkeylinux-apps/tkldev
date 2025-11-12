@@ -8,7 +8,7 @@ By default TKLDev has auto-completion enabled for commands and paths. Many
 commands also have auto-completion for sub commands as well. The way it works
 is that you start typing and then use the <Tab> key to complete the
 command/path. If there are multiple options, then it requires 2x <Tab> to see
-the possibilities. If there are many otions, then it will ask if you wish to
+the possibilities. If there are many options, then it will ask if you wish to
 display them all.
 
 git aliases
