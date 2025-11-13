@@ -68,7 +68,7 @@ lines of "code"::
     root@tkldev fab/products$ git-clone https://github.com/turnkeylinux-apps/lamp
     Cloning into lamp...
 
-    root@tkldev fab/products$ wc -l $(find lamp -type f|grep -v '\.git\|png\|jpg\|changelog\|README.rst\|txt$')
+    root@tkldev fab/products$ wc -l $(find lamp -type f | grep -v '\.git\|png\|jpg\|changelog\|README.rst\|txt$')
       11 lamp/plan/main
        1 lamp/overlay/etc/skel/.bashrc.d/php-xdebug
       17 lamp/overlay/etc/apache2/mods-available/status.conf
@@ -100,7 +100,7 @@ There are no strings attached. If you don't want to, you don't have to
 include common TurnKey functionality or any of the custom TurnKey
 components.
 
-Sadly, we've gotten into the nasty habit of prepending TKL - the TurnKey
+Sadly, we've gotten into the nasty habit of pre-pending TKL - the TurnKey
 Linux initials - to all things TurnKey but don't let that fool you.
 Under the hood TKLDev is 100% general purpose.
 
@@ -130,6 +130,5 @@ enough so anyone that wants to can jump in and make cool stuff happen.
 .. _common: https://github.com/turnkeylinux/common
 .. _Setup: ./getting-started/setup.rst
 .. _Hello world: ./getting-started/helloworld.rst
-.. _Tips and tricks: ./getting-started/tips.rst
+.. _Tips and tricks: ./tips/
 .. _Development: ./development/README.rst
-

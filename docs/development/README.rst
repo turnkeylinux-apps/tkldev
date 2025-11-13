@@ -12,7 +12,7 @@ After that you're ready to dive in:
 * `Improving and maintaining an integration <maintenance.rst>`_
 * `Developing a new integration <new-app.rst>`_
 
-* `Tips and tricks <../getting-started/tips.rst>`_
+* `Tips and tricks <../tips/>`_
 
 Notes on how we use Git:
 
@@ -23,4 +23,3 @@ Notes on how we use Git:
 .. _Setup: ../getting-started/setup.rst
 .. _TurnKey Core: https://github.com/turnkeylinux-apps/core/
 .. _Hello world: ../getting-started/helloworld.rst
-

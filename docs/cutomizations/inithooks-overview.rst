@@ -24,7 +24,7 @@ https://github.com/turnkeylinux/inithooks)
 
     Important: ALL values that do NOT apply to your software should be ignored.
 
-    Note: the following preseedable values are GARUANTEED to be set. Even if their
+    Note: the following preseedable values are GUARANTEED to be set. Even if their
         value is "DEFAULT", they all should be set.
 
         ROOT_PASS should be entirely ignored as it is the root user password for
@@ -53,7 +53,7 @@ https://github.com/turnkeylinux/inithooks)
 
 #. Any secret values need to be regenerated (these are things such as
    API keys, encryption keys, etc. things which should be secret AND unique for
-   each server) should be regenerated in a SEPERATE firstboot script usually
+   each server) should be regenerated in a SEPARATE firstboot script usually
    weighted at 20, with a name something like ``20regen-<appname>-secrets``.
 
     What does and doesn't count as a secret can seem a bit arbitrary so if

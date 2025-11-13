@@ -111,7 +111,7 @@ Each system has its own unique package plans, conf scripts and overlay,
 but can also inherit from a common pool of configurations that live in
 the "common" repository.
 
-This prevents wasteful and ineffecient repetition of build instructions
+This prevents wasteful and inefficient repetition of build instructions
 that would otherwise have to be repeated for each system (I.e., AKA the
 DRY - Don't repeat yourself - principle).
 

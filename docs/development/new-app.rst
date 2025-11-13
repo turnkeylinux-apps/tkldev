@@ -25,9 +25,9 @@ Update the Tracker Wiki
 '''''''''''''''''''''''
 
 The `Wiki`_ is used to track candidates as well as a whiteboard. To
-faciliate the open development model, it's recommended that you:
+facilitate the open development model, it's recommended that you:
 
-* Create a whiteboard page for the integration you're develloping.
+* Create a whiteboard page for the integration you're developing.
 * Create a candidate, and link it to the whiteboard.
 * Ideally, the whiteboard page is updated periodically with the state of
   development. It's also a good place to keep ideas, development notes
@@ -93,7 +93,7 @@ reinitialize the git repository to reset the history::
     rm -rf .git
     git-init
 
-Now you can start hacking and commiting new code. You'll usually want to
+Now you can start hacking and committing new code. You'll usually want to
 start with the ``Makefile``, ``plan`` and finally ``conf.d and
 overlay``.
 
@@ -119,7 +119,7 @@ Then, test your code::
     deck -D build/root.patched
     make CHROOT_ONLY=y
 
-Rince and repeat as needed.
+Rinse and repeat as needed.
 
 Completely automated build
 ''''''''''''''''''''''''''
