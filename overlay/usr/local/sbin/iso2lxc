@@ -1,0 +1,165 @@
+#!/bin/bash
+# iso2lxc.sh - Convert TurnKey Linux ISO to Proxmox LXC template
+#
+# Usage: Run from a TKLDev product directory after 'make'
+#
+#   cd /turnkey/fab/products/moodle
+#   make
+#   ./iso2lxc.sh
+#
+# Output: build/debian-13-turnkey-moodle_19.0-1_amd64.tar.gz
+# (follows TKL naming: debian-{DEBVER}-turnkey-{APP}_{TKLVER}-{REV}_{ARCH}.tar.gz)
+#
+# Extracts the squashfs from the TurnKey ISO and repackages it as a
+# Proxmox-compatible LXC container template, removing device nodes
+# and mount points that break unprivileged containers.
+
+set -euo pipefail
+
+fatal() { echo "FATAL: $*" >&2; exit 1; }
+info()  { echo "==> $*"; }
+
+# --- Must run from product dir ---
+[ -f build/product.iso ] || fatal "build/product.iso not found. Run 'make' first."
+[ -f changelog ]         || fatal "changelog not found. Are you in a product directory?"
+
+# --- Extract naming components from changelog ---
+# First line format: turnkey-moodle-18.0 (1) turnkey; urgency=low
+FIRSTLINE=$(head -1 changelog)
+FULLNAME=$(echo "$FIRSTLINE" | awk '{print $1}')
+REVISION=$(echo "$FIRSTLINE" | sed 's/.*(\([^)]*\)).*/\1/')
+
+# turnkey-moodle-18.0 -> APP=moodle, TKLVER=18.0
+APP=$(echo "$FULLNAME" | sed 's/^turnkey-//; s/-[0-9]*\.[0-9]*$//')
+TKLVER=$(echo "$FULLNAME" | grep -oP '[0-9]+\.[0-9]+$')
+
+# Detect Debian version and arch from the build
+DEBVER=$(. /etc/os-release 2>/dev/null && echo "${VERSION_ID}" || echo "13")
+ARCH=$(dpkg --print-architecture 2>/dev/null || echo "amd64")
+
+TEMPLATE_NAME="debian-${DEBVER}-turnkey-${APP}_${TKLVER}-${REVISION}_${ARCH}.tar.gz"
+OUTPUT="build/${TEMPLATE_NAME}"
+
+info "Product: ${APP}"
+info "Version: ${TKLVER}-${REVISION}"
+info "Target:  ${OUTPUT}"
+
+# --- Temp dirs ---
+WORKDIR=$(mktemp -d /tmp/iso2lxc.XXXXXX)
+ISO_MNT="${WORKDIR}/iso"
+SQUASH_MNT="${WORKDIR}/squashfs"
+ROOTFS="${WORKDIR}/rootfs"
+
+cleanup() {
+    info "Cleaning up..."
+    umount "${SQUASH_MNT}" 2>/dev/null || true
+    umount "${ISO_MNT}" 2>/dev/null || true
+    rm -rf "${WORKDIR}"
+}
+trap cleanup EXIT
+
+mkdir -p "${ISO_MNT}" "${SQUASH_MNT}" "${ROOTFS}"
+
+# --- Step 1: Mount ISO and extract squashfs ---
+info "Mounting ISO..."
+mount -o loop,ro "build/product.iso" "${ISO_MNT}"
+
+SQUASHFS="${ISO_MNT}/live/10root.squashfs"
+[ -f "${SQUASHFS}" ] || fatal "squashfs not found at ${SQUASHFS}"
+
+info "Mounting squashfs..."
+mount -o loop,ro "${SQUASHFS}" "${SQUASH_MNT}"
+
+# --- Step 2: Copy rootfs (exclude problematic paths) ---
+info "Copying rootfs (this may take a minute)..."
+rsync -aHAX \
+    --exclude='/dev/*' \
+    --exclude='/proc/*' \
+    --exclude='/sys/*' \
+    --exclude='/run/*' \
+    --exclude='/tmp/*' \
+    --exclude='/boot/vmlinuz*' \
+    --exclude='/boot/initrd*' \
+    --exclude='/boot/grub' \
+    --exclude='/lib/modules/*/kernel' \
+    --exclude='/usr/lib/ISOLINUX' \
+    --exclude='/usr/lib/syslinux' \
+    "${SQUASH_MNT}/" "${ROOTFS}/"
+
+# --- Step 3: Create minimal /dev structure (LXC-safe, no mknod) ---
+info "Creating minimal /dev structure..."
+mkdir -p "${ROOTFS}/dev/pts"
+mkdir -p "${ROOTFS}/dev/shm"
+ln -s /proc/self/fd   "${ROOTFS}/dev/fd"
+ln -s /proc/self/fd/0 "${ROOTFS}/dev/stdin"
+ln -s /proc/self/fd/1 "${ROOTFS}/dev/stdout"
+ln -s /proc/self/fd/2 "${ROOTFS}/dev/stderr"
+ln -s pts/ptmx        "${ROOTFS}/dev/ptmx"
+
+# --- Step 4: Create empty mount points ---
+mkdir -p "${ROOTFS}/proc"
+mkdir -p "${ROOTFS}/sys"
+mkdir -p "${ROOTFS}/run"
+mkdir -p "${ROOTFS}/tmp"
+chmod 1777 "${ROOTFS}/tmp"
+
+# --- Step 5: LXC-specific adjustments ---
+info "Applying LXC adjustments..."
+
+# Remove fstab entries (LXC manages mounts)
+if [ -f "${ROOTFS}/etc/fstab" ]; then
+    echo "# LXC - no fstab needed" > "${ROOTFS}/etc/fstab"
+fi
+
+# Mask kernel-dependent services that fail in containers
+MASK_SERVICES=(
+    systemd-modules-load.service
+    systemd-sysctl.service
+    sys-kernel-config.mount
+    sys-kernel-debug.mount
+)
+for svc in "${MASK_SERVICES[@]}"; do
+    ln -sf /dev/null "${ROOTFS}/etc/systemd/system/${svc}" 2>/dev/null || true
+done
+
+# Ensure console works in LXC
+mkdir -p "${ROOTFS}/etc/systemd/system/console-getty.service.d"
+cat > "${ROOTFS}/etc/systemd/system/console-getty.service.d/override.conf" << 'EOF'
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --noclear --keep-baud console 115200,38400,9600 $TERM
+EOF
+
+# Fix securetty for LXC console
+if [ -f "${ROOTFS}/etc/securetty" ]; then
+    grep -q "^pts/0" "${ROOTFS}/etc/securetty" || {
+        printf '\n# LXC\npts/0\npts/1\npts/2\npts/3\n' >> "${ROOTFS}/etc/securetty"
+    }
+fi
+
+# Remove hardcoded hostname (Proxmox sets this via pct)
+sed -i '/^127.0.1.1/d' "${ROOTFS}/etc/hosts" 2>/dev/null || true
+
+# Empty machine-id (regenerated on first boot)
+: > "${ROOTFS}/etc/machine-id"
+rm -f "${ROOTFS}/var/lib/dbus/machine-id"
+
+# Clean caches and logs
+rm -rf "${ROOTFS}/var/cache/apt/archives/"*.deb
+rm -rf "${ROOTFS}/var/lib/apt/lists/"*
+rm -f "${ROOTFS}/var/log/apt/"*
+rm -f "${ROOTFS}/var/log/dpkg.log"
+
+# --- Step 6: Pack as Proxmox LXC template ---
+info "Creating LXC template..."
+tar -czf "${OUTPUT}" -C "${ROOTFS}" .
+
+SIZE=$(du -h "${OUTPUT}" | cut -f1)
+info "Done! ${TEMPLATE_NAME} (${SIZE})"
+info ""
+info "Copy to Proxmox and create container:"
+info "  scp ${OUTPUT} proxmox:/var/lib/vz/template/cache/"
+info "  pct create <VMID> local:vztmpl/${TEMPLATE_NAME} \\"
+info "    --hostname ${APP} --memory 2048 --cores 2 \\"
+info "    --net0 name=eth0,bridge=vmbr0,ip6=auto \\"
+info "    --unprivileged 1 --features nesting=1"
