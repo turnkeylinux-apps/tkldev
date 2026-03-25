@@ -2,27 +2,34 @@
 
 # set vars
 FAB_PATH=/turnkey/fab
-CODENAME=$(lsb_release -cs)
 PROD_PATH=$FAB_PATH/products
 BUILDTASKS=/mnt
-PROXY_PORT=3128
-POOL_PATH=$FAB_PATH/pools/$CODENAME
 
-## configure squid
-# bump max file descriptors
-OVERRIDE=etc/systemd/system/squid.service.d/override.conf
-mkdir -p $(dirname $OVERRIDE)
-cat > $OVERRIDE <<EOF
+if [[ "$NO_PROXY" == "true" ]]; then
+    cat >&2 <<EOF
+Warning - NO_PROXY=true - Squid & FAB_PROXY config set up will be skipped.
+EOF
+    PROXY_PORT=
+    FAB_HTTP_PROXY=
+    FAB_HTTPS_PROXY=
+else
+    PROXY_PORT=3128
+    FAB_HTTP_PROXY=http://127.0.0.1:$PROXY_PORT
+    FAB_HTTPS_PROXY=http://127.0.0.1:$PROXY_PORT
+    ## configure squid
+    # bump max file descriptors
+    OVERRIDE=etc/systemd/system/squid.service.d/override.conf
+    mkdir -p "$(dirname $OVERRIDE)"
+    cat > $OVERRIDE <<EOF
 [Service]
 LimitNOFILE=65535
 EOF
-# leverage firstboot script to configure TLS interception (DRY)
-/usr/lib/inithooks/firstboot.d/20regen-proxy-cert
-# use squid for future apt caching; but change the name
-# (otherwise it will be removed at end of build process)
-mv /etc/apt/apt.conf.d/01proxy /etc/apt/apt.conf.d/00proxy
-# when built on TKLDev <17.0 the port will be wrong
-sed -i "s|8124|$PROXY_PORT|" /etc/apt/apt.conf.d/00proxy
+    # leverage firstboot script to configure TLS interception (DRY)
+    /usr/lib/inithooks/firstboot.d/20regen-proxy-cert
+    # use squid for future apt caching; but change the name
+    # (otherwise it will be removed at end of build process)
+    mv /etc/apt/apt.conf.d/01proxy /etc/apt/apt.conf.d/00proxy
+fi
 
 # create base directory structure
 mkdir -p $FAB_PATH/bootstraps \
@@ -34,9 +41,9 @@ mkdir -p /root/.bashrc.d
 
 cat >/root/.bashrc.d/fab<<EOF
 export FAB_PATH=$FAB_PATH
-export FAB_HTTP_PROXY=http://127.0.0.1:$PROXY_PORT
+export FAB_HTTP_PROXY=$FAB_HTTP_PROXY
 # https proxy must be connected to via http
-export FAB_HTTPS_PROXY=http://127.0.0.1:$PROXY_PORT
+export FAB_HTTPS_PROXY=$FAB_HTTPS_PROXY
 EOF
 chmod +x /root/.bashrc.d/fab
 
@@ -50,6 +57,8 @@ chmod +x /root/.bashrc.d/turnkey-paths
 CONF=/etc/confconsole/confconsole.conf
 sed -i "s|^autostart.*|autostart false|g" $CONF
 
-# disable services so as not to conflict with builds
-systemctl disable webmin
+# disable postfix so as not to conflict with builds
 systemctl disable postfix
+
+# remove webmin to avoid conflict with builds and slim rootfs
+apt-get purge --yes --autoremove webmin
