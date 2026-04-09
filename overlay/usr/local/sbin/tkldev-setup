@@ -17,7 +17,7 @@ $(basename $0): [-h|--help] [APP] [... APP]
 Tool to initialize and maintain TKLDev
 
 Options:
-    -f|--force      If the branch to be updated is not already checked out,
+    -f|--force      If the ref to be updated is not already checked out,
                     rather than skip, it will be checked out (no updates if
                     repo dirty)*
     -n|--full-clone Full clone (rather than default shallow clone)*
@@ -28,11 +28,16 @@ Options:
 The default action is to download the bootstrap (if it doesn't already exist)
 and clone (or update) the following repos (to the corresponding paths):
 
-    turnkeylinux/buildtasks $BT_PATH (\$BT_PATH - branch:$BRANCH)
-    turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles (branch:master)
-    turnkeylinux/common $FAB_PATH/common (\$FAB_PATH/common) (branch:$BRANCH)
-    turnkeylinux-apps/APP $FAB_PATH/products/APP (branch:master)
-    turnkeylinux/cdroots $FAB_PATH/cdroots (amd64 only - branch:$BRANCH)
+    turnkeylinux/buildtasks $BT_PATH
+    turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
+    turnkeylinux/common $FAB_PATH/common
+    turnkeylinux-apps/APP $FAB_PATH/products/APP
+    turnkeylinux/cdroots $FAB_PATH/cdroots (amd64 only)
+
+Git refs are resolved per-repo. By default tkldev-setup prefers the current
+TurnKey series ref (e.g. 19.x), then <series>-dev, then master. This allows
+older TKLDev releases to avoid tracking a moving default branch while still
+remaining compatible with repos that have not yet grown stable series branches.
 
 The 'fab' apt package will be updated when possible (to the latest available).
 
@@ -46,7 +51,12 @@ Env vars:
     BT_PATH     Buildtasks PATH (default: $BT_PATH)
     RELEASE     Release to target - e.g. debian/bookworm (default: $RELEASE)
     ARCH        Arch to target (default: $ARCH)
-    BRANCH      Branch to checkout (default: $BRANCH)
+    BRANCH      Preferred series ref (default: $BRANCH)
+    BT_REFS     Candidate refs for turnkeylinux/buildtasks
+    TKLBAM_REFS Candidate refs for turnkeylinux/tklbam-profiles
+    COMMON_REFS Candidate refs for turnkeylinux/common
+    APP_REFS    Candidate refs for turnkeylinux-apps/APP
+    CDROOTS_REFS Candidate refs for turnkeylinux/cdroots
     GIT_DEPTH   Depth to clone (default: $GIT_DEPTH) - setting to 'full' gives
                 same behavior as -n|--full-clone
     DEBUG       Verbose output (useful for debugging)
@@ -80,6 +90,31 @@ BOOTSTRAP_PATH="$FAB_PATH/bootstraps/${CODENAME}"
 BT_PATH="${BT_PATH:-/turnkey/buildtasks}"
 BT_VERIFY="$BT_PATH/bin/signature-verify"
 
+BT_REFS=${BT_REFS:-$BRANCH ${BRANCH}-dev master}
+TKLBAM_REFS=${TKLBAM_REFS:-$BRANCH ${BRANCH}-dev master}
+COMMON_REFS=${COMMON_REFS:-$BRANCH ${BRANCH}-dev master}
+APP_REFS=${APP_REFS:-$BRANCH ${BRANCH}-dev master}
+CDROOTS_REFS=${CDROOTS_REFS:-$BRANCH ${BRANCH}-dev master}
+
+
+resolve_ref() {
+    local repo="$1"
+    shift
+    local src="https://github.com/$repo"
+    local ref
+
+    for ref in "$@"; do
+        [[ -n "$ref" ]] || continue
+        if git ls-remote --exit-code --heads "$src" "$ref" >/dev/null 2>&1; then
+            echo "$ref"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+
 update_repo() {
     dst=$1
     git_dir=$dst/.git
@@ -95,6 +130,9 @@ update_repo() {
     if ! $_git fetch $remote; then
         warning "($dst) Fetching remote: $remote failed, skipping."
         return
+    fi
+    if [[ -z "$branch" ]]; then
+        branch="$current_branch"
     fi
     if [[ "$current_branch" != "$branch" ]]; then
         if [[ -n "$FORCE" ]]; then
@@ -128,21 +166,25 @@ clone_or_update() {
     repo=$1
     src=https://github.com/$repo
     dst=$2
-    branch=$3
+    shift 2
+    refs=("$@")
     git_depth=""
     branch_arg=""
+    resolved_ref=""
     [[ "$GIT_DEPTH" == "full" ]] || git_depth="--depth $GIT_DEPTH"
     mkdir -p $(dirname $dst)
-    if [[ -n "$branch" ]]; then
-        branch_arg="--branch $branch"
-        branch_dev_arg="--branch $branch-dev"
+
+    if resolved_ref=$(resolve_ref "$repo" "${refs[@]}"); then
+        info "Resolved $repo to ref: $resolved_ref"
+        branch_arg="--branch $resolved_ref"
     else
-        branch='master'
+        warning "Could not resolve preferred refs for $repo; falling back to repo default branch."
     fi
+
     if [[ -d "$dst" ]]; then
         if [[ -d "$dst/.git" ]]; then
             info "$dst exists and is a git repo, attempting update."
-            update_repo $dst $repo $branch
+            update_repo $dst $repo $resolved_ref
         else
             warning "$dst exists, but is not a git repo - skipping."
             return
@@ -150,11 +192,8 @@ clone_or_update() {
     else
         info "Attempting to clone $src into $dst."
         if ! git clone $branch_arg $git_depth $src $dst; then
-           warning "Cloning $branch failed, trying $branch-dev"
-           if ! git clone $branch_dev_arg $git_depth $src $dst; then
-                warning "Cloning $dst failed, skipping."
-                return
-           fi
+            warning "Cloning $dst failed, skipping."
+            return
         fi
     fi
 }
@@ -180,15 +219,15 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-clone_or_update turnkeylinux/buildtasks $BT_PATH $BRANCH
-clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
-clone_or_update turnkeylinux/common $FAB_PATH/common $BRANCH
+clone_or_update turnkeylinux/buildtasks $BT_PATH $BT_REFS
+clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles $TKLBAM_REFS
+clone_or_update turnkeylinux/common $FAB_PATH/common $COMMON_REFS
 for app in $APPS; do
-    clone_or_update turnkeylinux-apps/$app $FAB_PATH/products/$app
+    clone_or_update turnkeylinux-apps/$app $FAB_PATH/products/$app $APP_REFS
 done
 
 if [[ "${FAB_ARCH}" == "amd64" ]]; then
-    clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots $BRANCH
+    clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots $CDROOTS_REFS
 fi
 
 if [[ ! -d "$BT_PATH/config" ]]; then
