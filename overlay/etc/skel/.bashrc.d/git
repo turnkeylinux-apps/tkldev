@@ -1,0 +1,139 @@
+# uncomment these or use 'git config'
+#export GIT_AUTHOR_NAME="Your Name"
+#export GIT_AUTHOR_EMAIL="your@email.com"
+#export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
+#export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+
+if [[ -d /usr/lib/git-core ]]; then
+    export PATH=/usr/lib/git-core:$PATH
+else
+    echo "Bash completion for git disabled" >&2
+    return 1
+fi
+
+_git_bash_complete_=/usr/share/bash-completion/completions/git
+if [[ -f "$_git_bash_complete_" ]]; then
+    # shellcheck source=/usr/share/bash-completion/completions/git
+    source "$_git_bash_complete_"
+else
+    echo "Bash completion file for git not found - $_git_bash_complete_" >&2
+fi
+
+_complete_() {
+    # load completion/s
+    if ! [[ -f "$_git_bash_complete_" ]]; then
+        return
+    fi
+    local command="${1/_}"
+    shift
+    local aliases=("$@")
+    for alias in "${aliases[@]}"; do
+        __git_complete "$alias" "_git_$command"
+    done
+}
+
+git_branch() {
+    # default to show all branch info, but not for incompatable switches
+    local args=("$@")
+    local default_args=(--all --verbose)
+    local final_args=()
+    for arg in "${args[@]}"; do
+        if [[ "$arg" == "-d" ]] || [[ "$arg" == "--delete" ]] \
+            || [[ "$arg" == "-D" ]] \
+            || [[ "$arg" == "-m" ]] || [[ "$arg" == "--move" ]] \
+            || [[ "$arg" == "-M" ]] \
+            || [[ "$arg" == "-c" ]] || [[ "$arg" == "--copy" ]] \
+            || [[ "$arg" == "-C" ]] \
+            || [[ "$arg" == "-t" ]] || [[ "$arg" == "--track"* ]]; then
+                default_args=()
+        fi
+        final_args+=("$arg")
+    done
+    final_args=("${default_args[@]}" "${final_args[@]}")
+    /usr/lib/git-core/git-branch "${final_args[@]}"
+}
+
+g_alias_help() {
+    echo "git alias bashrc: ~/.bashrc.d/git"
+    echo
+    alias \
+        | sed "s|g_alias_help|show this help|" \
+        | sed -En "\|git|s|^alias ([a-z]+)='([a-z0-9_ -]+)'|  \1\t\2|p" \
+        | sed "s|git_branch|git-branch --all --verbose (except -c\|-d\|-m)|"
+}
+
+gp() {
+    cat 1>&2 <<EOF
+git alias 'gp' is ambiguous - try:
+
+git push:
+
+    gph $*
+
+git pull:
+
+    gpl $*
+EOF
+}
+
+# define aliases and enable alias bash completion
+alias gh="g_alias_help"
+
+alias ga="git-add"
+_complete_ _add ga
+
+alias gb="git_branch"  # see git_branch func above
+alias gbb="/usr/lib/git-core/git-branch"  # to use raw 'git-branch'
+_complete_ _branch gb
+
+alias gc="git-commit"
+alias gca="git-commit --all --verbose"
+alias gcam="git-commit --amend --verbose"
+_complete_ _commit gc gca gcam
+
+alias gch="git-checkout"
+_complete_ _checkout gch
+
+alias gd="git-diff"
+_complete_ _diff gd
+
+alias gf="git-fetch --verbose"
+alias gfa="git-fetch --verbose --all"
+_complete_ _fetch gf
+
+alias gg="git-grep"
+_complete_ _grep gg
+
+alias gl="git-log"
+alias gll="git-log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+alias glo="git-log --oneline"
+alias gln="git-log --name-only"
+_complete_ _log gl gll glo gln
+
+alias gm="git mv"
+_complete_ _mv gm
+
+alias gpl="git-pull"
+_complete_ _pull gpl
+
+alias gph="git-push"
+_complete_ _push gph
+
+alias gr="git-remote --verbose"
+alias gra="git-remote add"
+_complete_ _remote gr gra
+
+alias grb="git-rebase"
+alias gri="git-rebase --interactive"
+_complete_ _rebase grb gri
+
+alias gs="git-status"
+_complete_ _status gs
+
+alias gt="git-tag"
+alias gta="git-tag --add"
+alias gtm="git-tag -n5"  # show tags and 5 lines of message
+alias gts="git-tag --sign"
+_complete_ _tag gt gta gtm gts
+
+# vim:ft=bash
