@@ -16,21 +16,32 @@ git aliases
 
 All the TurnKey code is stored within Git version control and hosted on GitHub.
 Because developing and sharing TurnKey code requires lots of git usage, we
-provide a number of shorthand aliases for git preconfigured. To view them all:
+provide a number of preconfigured git command aliases. They are configured/set
+in `~/.bashrc.d/git`. There is also a useful git alias help function included
+(and an alias for that too):
 
 ```
-cat ~/.bashrc.d/git
+g_alias_help
+
+# or the alias :)
+
+gh
 ```
 
-They can be changed or new ones can be added by editing that file. To apply
-your changes either open a new shell, or manually load the file:
+Git aliases can be changed or new ones can be added by editing the local
+`~/.bashrc.d/git` file. To apply your changes either open a new shell, or
+manually load the file:
 
 ```
 source ~/.bashrc.d/git
 ```
 
-Note that reloading the file will only overwrite existing aliases and add new
-ones. Deleted ones will be retained until you open a new shell.
+If you add any that you think are particularly useful, please consider updating
+the TKLDev `git alias bashrc` file in the `TKLDev app buildcode` overlay and
+open a pull request on Github.
+
+Note that re-sourcing the git alias will only overwrite existing aliases and
+add new ones. Deleted ones will be retained until you open a new shell.
 
 If you want to disable all of the git aliases, make the script non-executable:
 
@@ -99,3 +110,6 @@ ssh-copy-id root@tkldev
 And then enter the root user password. The command will copy across your keys
 and exit. From then on key authentication will be the default, so no password
 required.
+
+.. _git alias bashrc: https://github.com/turnkeylinux-apps/tkldev/tree/master/overlay/etc/skel/.bashrc.d/git
+.. _TKLDev app buildcode: https://github.com/turnkeylinux-apps/tkldev/
