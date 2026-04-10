@@ -37,8 +37,8 @@ source ~/.bashrc.d/git
 ```
 
 If you add any that you think are particularly useful, please consider updating
-the TKLDev `git alias bashrc` file in the `TKLDev app buildcode` overlay and
-open a pull request on Github.
+the TKLDev [git alias bashrc](alias-src) file in the
+[TKLDev app buildcode](tkldev-code) overlay and open a pull request on Github.
 
 Note that re-sourcing the git alias will only overwrite existing aliases and
 add new ones. Deleted ones will be retained until you open a new shell.
@@ -111,5 +111,5 @@ And then enter the root user password. The command will copy across your keys
 and exit. From then on key authentication will be the default, so no password
 required.
 
-.. _git alias bashrc: https://github.com/turnkeylinux-apps/tkldev/tree/master/overlay/etc/skel/.bashrc.d/git
-.. _TKLDev app buildcode: https://github.com/turnkeylinux-apps/tkldev/
+[alias-src]: https://github.com/turnkeylinux-apps/tkldev/tree/master/overlay/etc/skel/.bashrc.d/git
+[tkldev-code]: https://github.com/turnkeylinux-apps/tkldev/
