@@ -1,6 +1,7 @@
 #include <turnkey/base>
 
 fab
+pool
 deck
 
 tklpatch                /* buildtasks optimized builds depends */
