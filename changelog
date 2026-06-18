@@ -1,3 +1,144 @@
+turnkey-tkldev-19.0 (1) turnkey; urgency=low
+
+  * Upgraded base distribution to Debian 13.x/Trixie.
+
+  * TurnKey build tool (fab):
+
+    - Bugfix:
+      - Fix removelist bug where non-file non-dirs (e.g. symlinks or
+        file-sockets) would not be removed.
+
+    - New contrib convenience scripts for improved app-dev flow:
+      - fab-investigate:
+        - Interactivly enter and investigate an appliance chroot (fab-chroot
+          with some extra setup and tear down).
+      - fab-rewind:
+        - Wind back build step/s.
+
+    - ARM64 support:
+      - Initial support for arm64 - incomplete, but now supports basic arm64
+        builds.
+
+    - Misc clean up and improvements in code and packaging. See fab release
+      notes for full details.
+
+  * Misc bootstrap updates and improvements.
+
+  * Chroot management (turnkey-chroot):
+
+    - Bugfix:
+      - Fix 'mnt_profile' mutation bug. Special thanks to Marcos:
+        https://github.com/marcos-mendez - https://popsolutions.co/
+
+    - Features/improvements:
+      - Mount /run (tmpfs) by default.
+      - Make chroot system mount mounting/unmounting more robust.
+
+    - Misc clean up and improvements in code and packaging. See
+      turnkey-chroot release notes for full details.
+
+  * Replace TurnKey custom Debian-Installer based 'di-live' with new custom
+    TurnKey installer built from scratch; 'tkl-installer'.
+
+  * Updated release signing keys & apt repo keys - now included as
+    'turnkey-keys' deb package.
+
+  * Replace legacy '.list' apt remote config files with Deb822 '.sources'
+    files.
+
+  * "Proper" IPv6 support. May still have some gaps and still requires cosmetic
+     work but fully functional.
+
+  * Improved fail2ban config:
+    - Increased default findtime (10 minutes) & bumped maxretry (3) to minimize
+      risk of user accidentally locking themself out.
+    - Removed redundant v18.x custom patches.
+
+  * Leverage 'iptables-persistent' package to manage firewall start/stop.
+
+  * Include 'zstd' by default to support smaller initramfs that unpacks faster.
+
+  * Replace 'ifupdown' with 'ifupdown-ng' (and 'ifupdown-ng-compat').
+
+  * Replace 'udhcpc' (IPv4 only) with 'dhcpcd-base' (dual stack ipv4/6). Also
+    include custom TurnKey config ('tkl-dhcpcd-ifupdown-glue') to ensure DHCP
+    config is in sync with interfaces file.
+
+  * General code cleanup including linting, formating and style updates. Still
+    WIP but solid start.
+
+  * Configuration console (confconsole):
+    - Bugfixes:
+      - Support for firewall config when setting a static IP. Particularly
+        affected OpenVPN (which ships with firewall enabled by default).
+        Closes #2037.
+      - Fix Let's Encrypt integration failing back-to-back runs. Closes #2121.
+    - Features:
+      - "Proper" support for IPv6:
+        - Show IPv6 info on "usage" page. Special thanks to Marcos:
+          https://github.com/marcos-mendez - https://popsolutions.co/
+    - Misc clean up and improvements in code and packaging. See Confconsole
+      release notes for full details.
+
+  * Firstboot Initialization (inithooks):
+    - Bugfixes:
+      - Ensure everyboot scripts only run once per boot.
+      - firstboot.d/15regen-sslcert:
+        - Only services which are already running need to be restarted as
+          restart is only to apply updated certs.
+      - firstboot.d/01ipconfig:
+        - Minor bugfix.
+    - Features/improvements and other changes of significance:
+      - Reimplement an 'inithooks.service' and refactor integration with
+        getty1.
+      - Delay start of inithooks/confconsole at boot time to reduce chance of
+        boot messages overwriting inithooks/confconsole.
+        - Developers - please note that hooks with a prefix less than '30' will
+          still run early, so should _always_ be non-interactive.
+      - TurnKey 'init-fence' (blocks web access at firstboot):
+        - Run by default on all builds pre firstboot initialization (previously
+          only enabled on "headless" builds).
+        - New pre-seed variable 'AUTO_RUN' to skip interactive config
+          (re-implements previous "headless" build functionality).
+        - Replace legacy init.d script with systemd
+          'turnkey-init-fence.service' (& script which is called by the
+          service).
+        - Add support for 'systemctl reload turnkey-init-fence.service' -
+          which restarts 'simplehttpd.py' (init-fence mini web server) but does
+          not disable the firewall rules.
+        - Support for custom init-fence content.
+        - Update dynamically generated SSH information for IPv6 address
+          display.
+        - Add IPv6 support to mini server.
+    - Ensure inithook 'SEC_UPDATES' pre-seed variable test is case insensitive;
+      eliminates risk of unintended behavior when pre-seeding.
+    - Misc clean up and improvements in code and packaging. See Inithooks
+      release notes for full details.
+
+  * Web management console (webmin):
+    - Upgraded Webmin to latest upstream.
+    - Refactored TurnKey Webmin packaging process to support easier updates;
+      with the intention of following upstream releases as closely as possible
+      (provided via TurnKey apt repo).
+    - Ensure that Webmin listens via IPv6 by default.
+
+  * Backup (tklbam):
+    - Bugfixes:
+      - Fix broken help pager (not sure how long that has been broken!?).
+      - Fix broken tar command (deprecated functionality removed in Debian
+        Trixie).
+    - Features/improvements:
+      - Migrate core program and direct dependency python2 runtime from
+        cpython2 (EOL) to Pypy (still supported - packaged by TurnKey).
+      - Migrate all other components to python3.
+        Note: remaining python2 TKLBAM code port to python3 is in progress but
+        no ETA yet...
+    - Misc clean up and improvements in code and packaging. See TKLBAM release
+      notes for full details.
+
+  * Misc code cleanup and improvements.
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Thu, 18 Jun 2026 16:21:24 +1000
+
 turnkey-tkldev-18.1 (1) turnkey; urgency=low
 
   * v18.1 rebuild - includes latest Debian & TurnKey packages.
