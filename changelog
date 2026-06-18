@@ -25,7 +25,7 @@ turnkey-tkldev-18.0 (1) turnkey; urgency=low
     - Refactor network interface code to ensure that it works as expected and
       supports more possible network config (e.g. hotplug interfaces & wifi).
     - Show error message rather than stacktrace when window resized to
-      incompatable resolution - closes  #1609.
+      incompatible resolution - closes  #1609.
       [ Stefan Davis <stefan@turnkeylinux.org> ]
     - Bugfix exception when quitting configuration of mail relay.
       [ Oleh Dmytrychenko <dmytrychenko.oleh@gmail.com> github: @NitrogenUA ]
@@ -79,7 +79,7 @@ turnkey-tkldev-18.0 (1) turnkey; urgency=low
   * TKLDev specific updates/tweaks below:
 
   * fab:
-    - Improve typing and implemnt fstrings.
+    - Improve typing and implement fstrings.
     - Improved code styling (mostly PEP8 compliant now).
     - Support debug logging via '-d|--debug' switch.
     [ Stefan Davis <stefan@turnkeylinux.org> & Jeremy Davis ]

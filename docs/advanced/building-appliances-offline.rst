@@ -1,5 +1,5 @@
-Building Applicances Offline
-============================
+Building Appliances Offline
+===========================
 
 It is possible to build TurnKey appliances offline; although you will
 need to at least initially be online to collect the required packages.

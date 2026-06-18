@@ -9,9 +9,9 @@ Install upstream software
 
         To do this you must:
 
-        #. Setup the repo's GPG key.
+        #. Setup the repos GPG key.
 
-            #. Find the third party repo's GPG key.
+            #. Find the third party repos GPG key.
 
             #. Check if GPG key is ASCII armored or not. Often ASCII armored keys are suffixed with
                 ``.asc`` however running ``file <key.gpg|asc>`` will give you a definitive result.
