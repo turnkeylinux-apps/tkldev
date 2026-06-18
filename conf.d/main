@@ -5,6 +5,10 @@ FAB_PATH=/turnkey/fab
 PROD_PATH=$FAB_PATH/products
 BUILDTASKS=/mnt
 
+# reduce squid default shutdown timeout (default 30 seconds)
+sed -i '\|# *shutdown_lifetime|s|#.*|shutdown_lifetime 10 seconds|' \
+    /etc/squid/squid.conf
+
 if [[ "$NO_PROXY" == "true" ]]; then
     cat >&2 <<EOF
 Warning - NO_PROXY=true - Squid & FAB_PROXY config set up will be skipped.
@@ -24,6 +28,8 @@ else
 [Service]
 LimitNOFILE=65535
 EOF
+    # reload systemd to apply tweaked squid service conf
+    systemctl daemon-reload
     # leverage firstboot script to configure TLS interception (DRY)
     /usr/lib/inithooks/firstboot.d/20regen-proxy-cert
     # use squid for future apt caching; but change the name
