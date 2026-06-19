@@ -99,7 +99,7 @@ tklbam-restore TESTBACKUPID
 
 tklbam-rollback
 
-    /root/test shoud be gone, as should user alon in /etc/passwd
+    /root/test should be gone, as should user alon in /etc/passwd
 
 from webmin
 '''''''''''
