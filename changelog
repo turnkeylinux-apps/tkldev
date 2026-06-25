@@ -2,6 +2,9 @@ turnkey-tkldev-19.0 (1) turnkey; urgency=low
 
   * Upgraded base distribution to Debian 13.x/Trixie.
 
+  * Update squid https proxy CA cert config so it generates a CA cert that is
+    valid against current requirements.
+
   * TurnKey build tool (fab):
 
     - Bugfix:
@@ -137,7 +140,8 @@ turnkey-tkldev-19.0 (1) turnkey; urgency=low
       notes for full details.
 
   * Misc code cleanup and improvements.
- -- Jeremy Davis <jeremy@turnkeylinux.org>  Thu, 18 Jun 2026 16:21:24 +1000
+
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Thu, 25 Jun 2026 12:42:24 +1000
 
 turnkey-tkldev-18.1 (1) turnkey; urgency=low
 
