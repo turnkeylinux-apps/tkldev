@@ -17,6 +17,7 @@ Options:
     -f|--force      If the ref to be updated is not already checked out,
                     rather than skip, it will be checked out (no updates if
                     repo dirty)*
+    -s|--strict     Fail rather than skip non-fatal steps
     -n|--full-clone Full clone (rather than default shallow clone)*
     -h|--help       Show this help and exit
 
@@ -43,20 +44,23 @@ alternate branch checked out, they will be skipped (unless -f|--force used).
 
 Env vars:
 
-    FAB_PATH    Fab PATH (default: $FAB_PATH)
-    FAB_ARCH    Fab architecture (default: $FAB_ARCH)
-    BT_PATH     Buildtasks PATH (default: $BT_PATH)
-    RELEASE     Release to target - e.g. debian/bookworm (default: $RELEASE)
-    ARCH        Arch to target (default: $ARCH)
-    BRANCH      Preferred series ref (default: $BRANCH)
-    BT_REFS     Candidate refs for turnkeylinux/buildtasks
-    TKLBAM_REFS Candidate refs for turnkeylinux/tklbam-profiles
-    COMMON_REFS Candidate refs for turnkeylinux/common
-    APP_REFS    Candidate refs for turnkeylinux-apps/APP
-    CDROOTS_REFS Candidate refs for turnkeylinux/cdroots
-    GIT_DEPTH   Depth to clone (default: $GIT_DEPTH) - setting to 'full' gives
-                same behavior as -n|--full-clone
-    DEBUG       Verbose output (useful for debugging)
+    FAB_PATH        Fab PATH (default: $FAB_PATH)
+    FAB_ARCH        Fab architecture (default: $FAB_ARCH)
+    BT_PATH         Buildtasks PATH (default: $BT_PATH)
+    RELEASE         Release to target - e.g. debian/bookworm (default: $RELEASE)
+    ARCH            Arch to target (default: $ARCH)
+    BRANCH          Preferred series ref (default: $BRANCH)
+    BT_REFS         Candidate refs for turnkeylinux/buildtasks
+    TKLBAM_REFS     Candidate refs for turnkeylinux/tklbam-profiles
+    COMMON_REFS     Candidate refs for turnkeylinux/common
+    APP_REFS        Candidate refs for turnkeylinux-apps/APP
+    CDROOTS_REFS    Candidate refs for turnkeylinux/cdroots
+    GIT_DEPTH       Depth to clone (default: $GIT_DEPTH) - setting to 'full'
+                    gives same behavior as -n|--full-clone
+    GIT_REMOTE_URL  Remote URL to clone/update from
+                    (default: 'https://github.com/turnkeylinux')
+    GIT_REMOTE_NAME Remote name (default: 'origin')
+    DEBUG           Verbose output (useful for debugging)
 
 EOF
     exit $exit_code
@@ -72,7 +76,7 @@ if [[ "${distro,,}" == "turnkey" ]] || [[ "${distro,,}" == "debian" ]]; then
    distro="debian"
 fi
 tkl_ver=$(turnkey-version -t)
-unset FORCE
+unset FORCE STRICT
 
 export RELEASE="${RELEASE:-${distro}/$(lsb_release -s -c)}"
 CODENAME="$(basename "$RELEASE")"
@@ -92,16 +96,25 @@ COMMON_REFS=${COMMON_REFS:-$BRANCH ${BRANCH}-dev master}
 APP_REFS=${APP_REFS:-$BRANCH ${BRANCH}-dev master}
 CDROOTS_REFS=${CDROOTS_REFS:-$BRANCH ${BRANCH}-dev master}
 
+GIT_REMOTE_URL="${GIT_REMOTE_URL:-https://github.com/turnkeylinux}"
+GIT_REMOTE_NAME="${GIT_REMOTE_NAME:-origin}"
+
+# remove trailing '/' if needed
+GIT_REMOTE_URL="${GIT_REMOTE_URL%/}"
+# Append '-apps' to git remote URL for apps if default org is 'turnkeylinux'
+APP_GIT_REMOTE_URL="$GIT_REMOTE_URL"
+if [[ "$GIT_REMOTE_URL" =~ [:/]turnkeylinux ]]; then
+    APP_GIT_REMOTE_URL="$GIT_REMOTE_URL-apps"
+fi
 
 resolve_ref() {
     local repo="$1"
     shift
-    local src="https://github.com/$repo"
     local ref
 
     for ref in "$@"; do
         [[ -n "$ref" ]] || continue
-        if git ls-remote --exit-code --heads "$src" "$ref" >/dev/null 2>&1; then
+        if git ls-remote --exit-code --heads "$repo" "$ref" >/dev/null 2>&1; then
             echo "$ref"
             return 0
         fi
@@ -114,18 +127,26 @@ resolve_ref() {
 update_repo() {
     dst=$1
     git_dir=$dst/.git
-    repo=$2
+    remote_url=$2
     branch=$3
     _git="git --git-dir=$git_dir --work-tree=$dst"
     remote="$($_git remote -v | grep -m1 "$repo" | cut -f1)"
     if [[ -n "$($_git status -s)" ]]; then
-        warning "$dst has uncommitted files, skipping."
-        return
+        if [[ -z "$STRICT" ]]; then
+            warning "$dst has uncommitted files, skipping."
+            return
+        else
+            fatal "$dst has uncommitted files"
+        fi
     fi
     current_branch=$($_git branch --show-current)
     if ! $_git fetch "$remote"; then
-        warning "($dst) Fetching remote: $remote failed, skipping."
-        return
+        if [[ -z "$STRICT" ]]; then
+            warning "($dst) Fetching remote: $remote failed, skipping."
+            return
+        else
+            fatal "($dst) Fetching remote: $remote failed"
+        fi
     fi
     if [[ -z "$branch" ]]; then
         branch="$current_branch"
@@ -146,50 +167,64 @@ update_repo() {
                     return
                 fi
             fi
-        else
+        elif [[ -z "$STRICT" ]]; then
             warning "($dst) current checked out branch is $current_branch"\
                     " (not $branch) so skipping"
             return
+        else
+            fatal "($dst) current checked out branch is $current_branch"\
+                " (not $branch)"
         fi
     fi
     if ! $_git pull "$remote" "$branch"; then
-        warning "($dst) Updating '$branch' failed, skipping."
-        return
+        if [[ -z "$STRICT" ]]; then
+            warning "($dst) Updating '$branch' failed, skipping."
+            return
+        else
+            fatal "($dst) Updating '$branch' failed"
+        fi
     fi
 }
 
 clone_or_update() {
-    repo=$1
-    src=https://github.com/$repo
-    dst=$2
+    local remote_url
+    remote_url="$GIT_REMOTE_URL"
+    if [[ $1 == _APP_ ]]; then
+        remote_url="$APP_GIT_REMOTE_URL"
+        shift
+    fi
+    local repo=$1
+    local src="$remote_url/$repo"
+    local dst=$2
     shift 2
     refs=("$@")
-    git_depth=""
-    branch_arg=""
-    resolved_ref=""
+    local git_depth
+    local branch_arg
+    local resolved_ref
     [[ "$GIT_DEPTH" == "full" ]] || git_depth="--depth $GIT_DEPTH"
     mkdir -p "$(dirname "$dst")"
 
-    if resolved_ref=$(resolve_ref "$repo" "${refs[@]}"); then
+    if resolved_ref=$(resolve_ref "$src" "${refs[@]}"); then
         info "Resolved $repo to ref: $resolved_ref"
         branch_arg="--branch $resolved_ref"
+    elif [[ -z "$STRICT" ]]; then
+        warning "Could not resolve preferred refs for $repo; falling back to"\
+            " repo default branch."
     else
-        warning "Could not resolve preferred refs for $repo; falling back to repo default branch."
+        fatal "Could not resolve preferred refs for $repo"
     fi
 
     if [[ -d "$dst" ]]; then
         if [[ -d "$dst/.git" ]]; then
             info "$dst exists and is a git repo, attempting update."
-            update_repo "$dst" "$repo" "$resolved_ref"
+            update_repo "$dst" "$src" "$resolved_ref"
         else
-            warning "$dst exists, but is not a git repo - skipping."
-            return
+            fatal "$dst exists, but is not a git repo."
         fi
     else
         info "Attempting to clone $src into $dst."
-        if ! git clone "$branch_arg" "$git_depth" "$src" "$dst"; then
-            warning "Cloning $dst failed, skipping."
-            return
+        if ! git clone "$branch_arg" "$git_depth" "$src.git" "$dst"; then
+            fatal "Cloning $dst failed."
         fi
     fi
 }
@@ -202,26 +237,27 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         -f|--force)
             FORCE=y
-            shift
             ;;
         -n|--full-clone)
             GIT_DEPTH='full'
-            shift
+            ;;
+        -s|--strict)
+            STRICT=true
             ;;
         *)
             APPS+=("$1")
-            shift
             ;;
     esac
+    shift
 done
 
 [[ -n "${APPS[*]}" ]] || APPS=(core)
 
-clone_or_update turnkeylinux/buildtasks "$BT_PATH" "$BT_REFS"
-clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles "$TKLBAM_REFS"
-clone_or_update turnkeylinux/common "$FAB_PATH/common" "$COMMON_REFS"
+clone_or_update buildtasks "$BT_PATH" "$BT_REFS"
+clone_or_update tklbam-profiles /turnkey/tklbam-profiles "$TKLBAM_REFS"
+clone_or_update common "$FAB_PATH/common" "$COMMON_REFS"
 for app in "${APPS[@]}"; do
-    clone_or_update "turnkeylinux-apps/$app" "$FAB_PATH/products/$app" "$APP_REFS"
+    clone_or_update _APP_ "$app" "$FAB_PATH/products/$app" "$APP_REFS"
 done
 
 if [[ "${FAB_ARCH}" == "amd64" ]]; then
