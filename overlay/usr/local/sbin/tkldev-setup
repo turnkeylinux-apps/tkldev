@@ -13,6 +13,7 @@ $(basename "$0"): [-h|--help] [APP] [... APP]
 Tool to initialize and maintain TKLDev
 
 Options:
+    APP [APP ...]   Appliance name/s - defaults if unset: 'core'
     -f|--force      If the ref to be updated is not already checked out,
                     rather than skip, it will be checked out (no updates if
                     repo dirty)*
@@ -81,7 +82,7 @@ export BRANCH="${tkl_ver::2}.x"
 IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
 FAB_PATH="${FAB_PATH:-/turnkey/fab}"
 BOOTSTRAP_NAME="bootstrap-${CODENAME}-${FAB_ARCH}"
-BOOTSTRAP_PATH="$FAB_PATH/bootstraps/${CODENAME}"
+BOOTSTRAP_PATH="$FAB_PATH/bootstraps/${CODENAME}-${FAB_ARCH}"
 BT_PATH="${BT_PATH:-/turnkey/buildtasks}"
 BT_VERIFY="$BT_PATH/bin/signature-verify"
 
