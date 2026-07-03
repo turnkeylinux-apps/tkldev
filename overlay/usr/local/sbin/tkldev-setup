@@ -1,18 +1,14 @@
 #!/bin/bash -e
 # setup/update system ready for building appliances
 
-fatal() { echo "FATAL [$(basename $0)]: $@" 1>&2; exit 1; }
-warning() { echo "WARNING [$(basename $0)]: $@"; }
-info() { echo "INFO [$(basename $0)]: $@"; }
+fatal() { echo "FATAL [$(basename "$0")]: $*" 1>&2; exit 1; }
+warning() { echo "WARNING [$(basename "$0")]: $*"; }
+info() { echo "INFO [$(basename "$0")]: $*"; }
 
 usage() {
     exit_code=0
-    if [[ $# -ge 1 ]]; then
-        echo "FATAL: $@"
-        exit_code=1
-    fi
     cat <<EOF
-$(basename $0): [-h|--help] [APP] [... APP]
+$(basename "$0"): [-h|--help] [APP] [... APP]
 
 Tool to initialize and maintain TKLDev
 
@@ -69,8 +65,6 @@ EOF
 [[ $(id -u) -eq 0 ]] || fatal "Root user required."
 
 GIT_DEPTH=${GIT_DEPTH:-1}
-APP="${@}"
-[[ -n "$APP" ]] || APP="core"
 
 distro="$(lsb_release -si)"
 if [[ "${distro,,}" == "turnkey" ]] || [[ "${distro,,}" == "debian" ]]; then
@@ -80,7 +74,8 @@ tkl_ver=$(turnkey-version -t)
 unset FORCE
 
 export RELEASE="${RELEASE:-${distro}/$(lsb_release -s -c)}"
-export CODENAME="$(basename $RELEASE)"
+CODENAME="$(basename "$RELEASE")"
+export CODENAME
 export FAB_ARCH="${FAB_ARCH:-$(dpkg --print-architecture)}"
 export BRANCH="${tkl_ver::2}.x"
 IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
@@ -127,7 +122,7 @@ update_repo() {
         return
     fi
     current_branch=$($_git branch --show-current)
-    if ! $_git fetch $remote; then
+    if ! $_git fetch "$remote"; then
         warning "($dst) Fetching remote: $remote failed, skipping."
         return
     fi
@@ -137,7 +132,7 @@ update_repo() {
     if [[ "$current_branch" != "$branch" ]]; then
         if [[ -n "$FORCE" ]]; then
             warning "Force used - attempting to checkout $branch"
-            if ! $_git checkout $branch && ! $_git checkout $branch-dev; then
+            if ! $_git checkout "$branch" && ! $_git checkout "$branch-dev"; then
                 warning "($dst) Checking out '$branch' failed, skipping."
                 return
             fi
@@ -145,7 +140,7 @@ update_repo() {
             if [[ "${current_branch::4}" == "$branch" ]]; then
                 warning "($dst) current checked out branch is $current_branch"\
                         " attempting to checkout $branch"
-                if ! $_git checkout $branch; then
+                if ! $_git checkout "$branch"; then
                     warning "($dst) checkout failed - skipping"
                     return
                 fi
@@ -156,7 +151,7 @@ update_repo() {
             return
         fi
     fi
-    if ! $_git pull $remote $branch; then
+    if ! $_git pull "$remote" "$branch"; then
         warning "($dst) Updating '$branch' failed, skipping."
         return
     fi
@@ -172,7 +167,7 @@ clone_or_update() {
     branch_arg=""
     resolved_ref=""
     [[ "$GIT_DEPTH" == "full" ]] || git_depth="--depth $GIT_DEPTH"
-    mkdir -p $(dirname $dst)
+    mkdir -p "$(dirname "$dst")"
 
     if resolved_ref=$(resolve_ref "$repo" "${refs[@]}"); then
         info "Resolved $repo to ref: $resolved_ref"
@@ -184,21 +179,21 @@ clone_or_update() {
     if [[ -d "$dst" ]]; then
         if [[ -d "$dst/.git" ]]; then
             info "$dst exists and is a git repo, attempting update."
-            update_repo $dst $repo $resolved_ref
+            update_repo "$dst" "$repo" "$resolved_ref"
         else
             warning "$dst exists, but is not a git repo - skipping."
             return
         fi
     else
         info "Attempting to clone $src into $dst."
-        if ! git clone $branch_arg $git_depth $src $dst; then
+        if ! git clone "$branch_arg" "$git_depth" "$src" "$dst"; then
             warning "Cloning $dst failed, skipping."
             return
         fi
     fi
 }
 
-APPS=''
+APPS=()
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -h|--help)
@@ -213,28 +208,31 @@ while [[ "$#" -gt 0 ]]; do
             shift
             ;;
         *)
-            APPS="$APPS $1"
+            APPS+=("$1")
             shift
             ;;
     esac
 done
 
-clone_or_update turnkeylinux/buildtasks $BT_PATH $BT_REFS
-clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles $TKLBAM_REFS
-clone_or_update turnkeylinux/common $FAB_PATH/common $COMMON_REFS
-for app in $APPS; do
-    clone_or_update turnkeylinux-apps/$app $FAB_PATH/products/$app $APP_REFS
+[[ -n "${APPS[*]}" ]] || APPS=(core)
+
+clone_or_update turnkeylinux/buildtasks "$BT_PATH" "$BT_REFS"
+clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles "$TKLBAM_REFS"
+clone_or_update turnkeylinux/common "$FAB_PATH/common" "$COMMON_REFS"
+for app in "${APPS[@]}"; do
+    clone_or_update "turnkeylinux-apps/$app" "$FAB_PATH/products/$app" "$APP_REFS"
 done
 
 if [[ "${FAB_ARCH}" == "amd64" ]]; then
-    clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots $CDROOTS_REFS
+    clone_or_update turnkeylinux/cdroots "$FAB_PATH/cdroots" "$CDROOTS_REFS"
 fi
 
 if [[ ! -d "$BT_PATH/config" ]]; then
     cp -r "$BT_PATH/config.example" "$BT_PATH/config"
 fi
 if [[ -f "$BT_PATH/config/common.cfg" ]]; then
-    . $BT_PATH/config/common.cfg
+    # shellcheck source=/turnkey/buildtasks/config.example/common.cfg
+    source "$BT_PATH/config/common.cfg"
 else
     fatal "$BT_PATH config not found, unable to determine GPG key ID (BT_GPGKEY)."
 fi
@@ -247,23 +245,23 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y fab
 if [[ -d "$BOOTSTRAP_PATH" ]]; then
     info "$BOOTSTRAP_PATH exists, skipping download."
 else
-    errmsg=''
     info "Downloading $BOOTSTRAP_NAME"
-    mkdir -p $(dirname $BOOTSTRAP_PATH)
-    cd $(dirname $BOOTSTRAP_PATH)
+    mkdir -p "$(dirname "$BOOTSTRAP_PATH")"
+    cd "$(dirname "$BOOTSTRAP_PATH")"
     bootstrap_file=$BOOTSTRAP_PATH
-    wget -nc -nv $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz \
+    wget -nc -nv "$IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz" \
         || fatal "Downloading $BOOTSTRAP_NAME failed."
-    wget -nc -nv $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash \
+    wget -nc -nv "$IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash" \
         || fatal "Downloading $BOOTSTRAP_NAME hash file failed."
     if [[ -f "$BT_VERIFY" ]]; then
-        bootstrap_file=$(dirname $BOOTSTRAP_PATH)/$BOOTSTRAP_NAME.tar.gz
-        BT_DEBUG=$DEBUG $BT_VERIFY --force-gpg $bootstrap_file $bootstrap_file.hash
+        bootstrap_file=$(dirname "$BOOTSTRAP_PATH)/$BOOTSTRAP_NAME.tar.gz")
+        BT_DEBUG=$DEBUG $BT_VERIFY \
+            --force-gpg "$bootstrap_file" "$bootstrap_file.hash"
     else
         fatal "$BT_VERIFY script not found, unable to verify downloaded files."
     fi
     info "Unpacking $BOOTSTRAP_NAME"
-    mkdir $BOOTSTRAP_PATH
-    tar -zxf $BOOTSTRAP_NAME.tar.gz -C $BOOTSTRAP_PATH
+    mkdir "$BOOTSTRAP_PATH"
+    tar -zxf "$BOOTSTRAP_NAME.tar.gz" -C "$BOOTSTRAP_PATH"
 fi
-info "$(basename $0) complete."
+info "$(basename "$0") complete."
