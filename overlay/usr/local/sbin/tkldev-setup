@@ -132,20 +132,22 @@ update_repo() {
     _git="git --git-dir=$git_dir --work-tree=$dst"
     remote="$($_git remote -v | grep -m1 "$repo" | cut -f1)"
     if [[ -n "$($_git status -s)" ]]; then
+        err_msg="$dst has uncommitted files"
         if [[ -z "$STRICT" ]]; then
-            warning "$dst has uncommitted files, skipping."
+            warning "$err_msg, skipping."
             return
         else
-            fatal "$dst has uncommitted files"
+            fatal "$err_msg"
         fi
     fi
     current_branch=$($_git branch --show-current)
     if ! $_git fetch "$remote"; then
+        err_msg="($dst) Fetching remote: $remote failed"
         if [[ -z "$STRICT" ]]; then
-            warning "($dst) Fetching remote: $remote failed, skipping."
+            warning "$err_msg, skipping."
             return
         else
-            fatal "($dst) Fetching remote: $remote failed"
+            fatal "$err_msg"
         fi
     fi
     if [[ -z "$branch" ]]; then
@@ -163,25 +165,32 @@ update_repo() {
                 warning "($dst) current checked out branch is $current_branch"\
                         " attempting to checkout $branch"
                 if ! $_git checkout "$branch"; then
-                    warning "($dst) checkout failed - skipping"
-                    return
+                    err_msg="($dst) checkout failed"
+                    if [[ -z "$STRICT" ]]; then
+                        warning "$err_msg - skipping"
+                        return
+                    else
+                        fatal "$err_msg"
+                    fi
                 fi
             fi
-        elif [[ -z "$STRICT" ]]; then
-            warning "($dst) current checked out branch is $current_branch"\
-                    " (not $branch) so skipping"
-            return
         else
-            fatal "($dst) current checked out branch is $current_branch"\
-                " (not $branch)"
+            err_msg="($dst) checked out branch is $current_branch (not $branch)"
+            if [[ -z "$STRICT" ]]; then
+                warning "$err_msg so skipping"
+                return
+            else
+                fatal "$err_msg"
+            fi
         fi
     fi
     if ! $_git pull "$remote" "$branch"; then
+        err_msg="($dst) Updating '$branch' failed"
         if [[ -z "$STRICT" ]]; then
-            warning "($dst) Updating '$branch' failed, skipping."
+            warning "$err_msg, skipping."
             return
         else
-            fatal "($dst) Updating '$branch' failed"
+            fatal "$err_msg"
         fi
     fi
 }
@@ -204,14 +213,14 @@ clone_or_update() {
     [[ "$GIT_DEPTH" == "full" ]] || git_depth="--depth $GIT_DEPTH"
     mkdir -p "$(dirname "$dst")"
 
+    err_msg="Could not resolve preferred refs for $repo"
     if resolved_ref=$(resolve_ref "$src" "${refs[@]}"); then
         info "Resolved $repo to ref: $resolved_ref"
         branch_arg="--branch $resolved_ref"
     elif [[ -z "$STRICT" ]]; then
-        warning "Could not resolve preferred refs for $repo; falling back to"\
-            " repo default branch."
+        warning "$err_msg; falling back to repo default branch."
     else
-        fatal "Could not resolve preferred refs for $repo"
+        fatal "$err_msg"
     fi
 
     if [[ -d "$dst" ]]; then
