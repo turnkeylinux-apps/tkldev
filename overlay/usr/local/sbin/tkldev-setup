@@ -90,11 +90,11 @@ BOOTSTRAP_PATH="$FAB_PATH/bootstraps/${CODENAME}-${FAB_ARCH}"
 BT_PATH="${BT_PATH:-/turnkey/buildtasks}"
 BT_VERIFY="$BT_PATH/bin/signature-verify"
 
-BT_REFS=${BT_REFS:-$BRANCH ${BRANCH}-dev master}
-TKLBAM_REFS=${TKLBAM_REFS:-$BRANCH ${BRANCH}-dev master}
-COMMON_REFS=${COMMON_REFS:-$BRANCH ${BRANCH}-dev master}
-APP_REFS=${APP_REFS:-$BRANCH ${BRANCH}-dev master}
-CDROOTS_REFS=${CDROOTS_REFS:-$BRANCH ${BRANCH}-dev master}
+read -ra BT_REFS <<< "${BT_REFS:-$BRANCH ${BRANCH}-dev master}"
+read -ra TKLBAM_REFS <<< "${TKLBAM_REFS:-$BRANCH ${BRANCH}-dev master}"
+read -ra COMMON_REFS <<< "${COMMON_REFS:-$BRANCH ${BRANCH}-dev master}"
+read -ra APP_REFS <<< "${APP_REFS:-$BRANCH ${BRANCH}-dev master}"
+read -ra CDROOTS_REFS <<< "${CDROOTS_REFS:-$BRANCH ${BRANCH}-dev master}"
 
 GIT_REMOTE_URL="${GIT_REMOTE_URL:-https://github.com/turnkeylinux}"
 GIT_REMOTE_NAME="${GIT_REMOTE_NAME:-origin}"
@@ -253,15 +253,15 @@ done
 
 [[ -n "${APPS[*]}" ]] || APPS=(core)
 
-clone_or_update buildtasks "$BT_PATH" "$BT_REFS"
-clone_or_update tklbam-profiles /turnkey/tklbam-profiles "$TKLBAM_REFS"
-clone_or_update common "$FAB_PATH/common" "$COMMON_REFS"
+clone_or_update buildtasks "$BT_PATH" "${BT_REFS[@]}"
+clone_or_update tklbam-profiles /turnkey/tklbam-profiles "${TKLBAM_REFS[@]}"
+clone_or_update common "$FAB_PATH/common" "${COMMON_REFS[@]}"
 for app in "${APPS[@]}"; do
-    clone_or_update _APP_ "$app" "$FAB_PATH/products/$app" "$APP_REFS"
+    clone_or_update _APP_ "$app" "$FAB_PATH/products/$app" "${APP_REFS[@]}"
 done
 
 if [[ "${FAB_ARCH}" == "amd64" ]]; then
-    clone_or_update turnkeylinux/cdroots "$FAB_PATH/cdroots" "$CDROOTS_REFS"
+    clone_or_update turnkeylinux/cdroots "$FAB_PATH/cdroots" "${CDROOTS_REFS[@]}"
 fi
 
 if [[ ! -d "$BT_PATH/config" ]]; then
