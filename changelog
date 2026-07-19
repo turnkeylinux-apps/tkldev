@@ -27,6 +27,10 @@ turnkey-tkldev-19.0 (1) turnkey; urgency=low
 
   * Misc bootstrap updates and improvements.
 
+  * Improvments to 'tkldev-setup' script which make it more useful for
+    updating git repos - not just initial set up (perhaps needs a name
+    change?).
+
   * Chroot management (turnkey-chroot):
 
     - Bugfix:
@@ -57,18 +61,18 @@ turnkey-tkldev-19.0 (1) turnkey; urgency=low
       risk of user accidentally locking themself out.
     - Removed redundant v18.x custom patches.
 
-  * Leverage 'iptables-persistent' package to manage firewall start/stop.
-
   * Include 'zstd' by default to support smaller initramfs that unpacks faster.
 
   * Replace 'ifupdown' with 'ifupdown-ng' (and 'ifupdown-ng-compat').
 
   * Replace 'udhcpc' (IPv4 only) with 'dhcpcd-base' (dual stack ipv4/6). Also
-    include custom TurnKey config ('tkl-dhcpcd-ifupdown-glue') to ensure DHCP
-    config is in sync with interfaces file.
+    include custom TurnKey config (if-pre-up & if-post-down scripts provided by
+    'tkl-dhcpcd-ifupdown-glue') to ensure DHCP config is in sync with
+    /etc/network/interfaces file.
 
-  * General code cleanup including linting, formating and style updates. Still
-    WIP but solid start.
+  * General code cleanup of TurnKey code; build code, build tools and TurnKey
+    custom tools & libraries. Updates include linting, formating and style
+    updates. Still WIP but solid start.
 
   * Configuration console (confconsole):
     - Bugfixes:
@@ -78,7 +82,10 @@ turnkey-tkldev-19.0 (1) turnkey; urgency=low
       - Fix Let's Encrypt integration failing back-to-back runs. Closes #2121.
     - Features:
       - "Proper" support for IPv6:
-        - Show IPv6 info on "usage" page. Special thanks to Marcos:
+        - Make ifutil.py module code "IPv6 aware", including reliable
+          management of /etc/network/interfaces with "inet6" stanza/s.
+        - Show IPv6 info on "usage" page - only shown if IPv6 configured.
+          Special thanks to Marcos:
           https://github.com/marcos-mendez - https://popsolutions.co/
     - Misc clean up and improvements in code and packaging. See Confconsole
       release notes for full details.
@@ -123,7 +130,14 @@ turnkey-tkldev-19.0 (1) turnkey; urgency=low
     - Refactored TurnKey Webmin packaging process to support easier updates;
       with the intention of following upstream releases as closely as possible
       (provided via TurnKey apt repo).
-    - Ensure that Webmin listens via IPv6 by default.
+    - Updated default Webmin config:
+      - Listen on IPv6 by default.
+      - Preconfigured IPv6 firewall matching IPv4 rules (but not enabled - as
+        per historical IPv4 default).
+      - Auto redirect http => https.
+      - Default 30 min user logout (can be overridden via login page "remember
+        me" checkbox or webmin "authentication" config).
+      - Updated logging paths and fixed log file rotation.
 
   * Backup (tklbam):
     - Bugfixes:
@@ -141,7 +155,7 @@ turnkey-tkldev-19.0 (1) turnkey; urgency=low
 
   * Misc code cleanup and improvements.
 
- -- Jeremy Davis <jeremy@turnkeylinux.org>  Thu, 25 Jun 2026 12:42:24 +1000
+ -- Jeremy Davis <jeremy@turnkeylinux.org>  Thu, 16 Jul 2026 17:35:02 +1000
 
 turnkey-tkldev-18.1 (1) turnkey; urgency=low
 
@@ -483,4 +497,3 @@ turnkey-tkldev-12.1 (1) turnkey; urgency=low
     appliances. Here we only describe changes specific to this appliance.
 
  -- Alon Swartz <alon@turnkeylinux.org>  Tue, 02 Jul 2013 18:56:00 +0300
-

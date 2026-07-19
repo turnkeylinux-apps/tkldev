@@ -1,25 +1,23 @@
 #!/bin/bash -e
 # setup/update system ready for building appliances
 
-fatal() { echo "FATAL [$(basename $0)]: $@" 1>&2; exit 1; }
-warning() { echo "WARNING [$(basename $0)]: $@"; }
-info() { echo "INFO [$(basename $0)]: $@"; }
+fatal() { echo "FATAL [$(basename "$0")]: $*" 1>&2; exit 1; }
+warning() { echo "WARNING [$(basename "$0")]: $*"; }
+info() { echo "INFO [$(basename "$0")]: $*"; }
 
 usage() {
     exit_code=0
-    if [[ $# -ge 1 ]]; then
-        echo "FATAL: $@"
-        exit_code=1
-    fi
     cat <<EOF
-$(basename $0): [-h|--help] [APP] [... APP]
+$(basename "$0"): [-h|--help] [APP] [... APP]
 
 Tool to initialize and maintain TKLDev
 
 Options:
+    APP [APP ...]   Appliance name/s - defaults if unset: 'core'
     -f|--force      If the ref to be updated is not already checked out,
                     rather than skip, it will be checked out (no updates if
                     repo dirty)*
+    -s|--strict     Fail rather than skip non-fatal steps
     -n|--full-clone Full clone (rather than default shallow clone)*
     -h|--help       Show this help and exit
 
@@ -46,20 +44,23 @@ alternate branch checked out, they will be skipped (unless -f|--force used).
 
 Env vars:
 
-    FAB_PATH    Fab PATH (default: $FAB_PATH)
-    FAB_ARCH    Fab architecture (default: $FAB_ARCH)
-    BT_PATH     Buildtasks PATH (default: $BT_PATH)
-    RELEASE     Release to target - e.g. debian/bookworm (default: $RELEASE)
-    ARCH        Arch to target (default: $ARCH)
-    BRANCH      Preferred series ref (default: $BRANCH)
-    BT_REFS     Candidate refs for turnkeylinux/buildtasks
-    TKLBAM_REFS Candidate refs for turnkeylinux/tklbam-profiles
-    COMMON_REFS Candidate refs for turnkeylinux/common
-    APP_REFS    Candidate refs for turnkeylinux-apps/APP
-    CDROOTS_REFS Candidate refs for turnkeylinux/cdroots
-    GIT_DEPTH   Depth to clone (default: $GIT_DEPTH) - setting to 'full' gives
-                same behavior as -n|--full-clone
-    DEBUG       Verbose output (useful for debugging)
+    FAB_PATH        Fab PATH (default: $FAB_PATH)
+    FAB_ARCH        Fab architecture (default: $FAB_ARCH)
+    BT_PATH         Buildtasks PATH (default: $BT_PATH)
+    RELEASE         Release to target - e.g. debian/bookworm (default: $RELEASE)
+    ARCH            Arch to target (default: $ARCH)
+    BRANCH          Preferred series ref (default: $BRANCH)
+    BT_REFS         Candidate refs for turnkeylinux/buildtasks
+    TKLBAM_REFS     Candidate refs for turnkeylinux/tklbam-profiles
+    COMMON_REFS     Candidate refs for turnkeylinux/common
+    APP_REFS        Candidate refs for turnkeylinux-apps/APP
+    CDROOTS_REFS    Candidate refs for turnkeylinux/cdroots
+    GIT_DEPTH       Depth to clone (default: $GIT_DEPTH) - setting to 'full'
+                    gives same behavior as -n|--full-clone
+    GIT_REMOTE_URL  Remote URL to clone/update from
+                    (default: 'https://github.com/turnkeylinux')
+    GIT_REMOTE_NAME Remote name (default: 'origin')
+    DEBUG           Verbose output (useful for debugging)
 
 EOF
     exit $exit_code
@@ -69,43 +70,51 @@ EOF
 [[ $(id -u) -eq 0 ]] || fatal "Root user required."
 
 GIT_DEPTH=${GIT_DEPTH:-1}
-APP="${@}"
-[[ -n "$APP" ]] || APP="core"
 
 distro="$(lsb_release -si)"
 if [[ "${distro,,}" == "turnkey" ]] || [[ "${distro,,}" == "debian" ]]; then
    distro="debian"
 fi
 tkl_ver=$(turnkey-version -t)
-unset FORCE
+unset FORCE STRICT
 
 export RELEASE="${RELEASE:-${distro}/$(lsb_release -s -c)}"
-export CODENAME="$(basename $RELEASE)"
+CODENAME="$(basename "$RELEASE")"
+export CODENAME
 export FAB_ARCH="${FAB_ARCH:-$(dpkg --print-architecture)}"
 export BRANCH="${tkl_ver::2}.x"
 IMAGES="http://mirror.turnkeylinux.org/turnkeylinux/images"
 FAB_PATH="${FAB_PATH:-/turnkey/fab}"
 BOOTSTRAP_NAME="bootstrap-${CODENAME}-${FAB_ARCH}"
-BOOTSTRAP_PATH="$FAB_PATH/bootstraps/${CODENAME}"
+BOOTSTRAP_PATH="$FAB_PATH/bootstraps/${CODENAME}-${FAB_ARCH}"
 BT_PATH="${BT_PATH:-/turnkey/buildtasks}"
 BT_VERIFY="$BT_PATH/bin/signature-verify"
 
-BT_REFS=${BT_REFS:-$BRANCH ${BRANCH}-dev master}
-TKLBAM_REFS=${TKLBAM_REFS:-$BRANCH ${BRANCH}-dev master}
-COMMON_REFS=${COMMON_REFS:-$BRANCH ${BRANCH}-dev master}
-APP_REFS=${APP_REFS:-$BRANCH ${BRANCH}-dev master}
-CDROOTS_REFS=${CDROOTS_REFS:-$BRANCH ${BRANCH}-dev master}
+read -ra BT_REFS <<< "${BT_REFS:-$BRANCH ${BRANCH}-dev master}"
+read -ra TKLBAM_REFS <<< "${TKLBAM_REFS:-$BRANCH ${BRANCH}-dev master}"
+read -ra COMMON_REFS <<< "${COMMON_REFS:-$BRANCH ${BRANCH}-dev master}"
+read -ra APP_REFS <<< "${APP_REFS:-$BRANCH ${BRANCH}-dev master}"
+read -ra CDROOTS_REFS <<< "${CDROOTS_REFS:-$BRANCH ${BRANCH}-dev master}"
 
+GIT_REMOTE_URL="${GIT_REMOTE_URL:-https://github.com/turnkeylinux}"
+GIT_REMOTE_NAME="${GIT_REMOTE_NAME:-origin}"
+
+# remove trailing '/' if needed
+GIT_REMOTE_URL="${GIT_REMOTE_URL%/}"
+# Append '-apps' to git remote URL for apps if default org is 'turnkeylinux'
+APP_GIT_REMOTE_URL="$GIT_REMOTE_URL"
+if [[ "$GIT_REMOTE_URL" =~ [:/]turnkeylinux ]]; then
+    APP_GIT_REMOTE_URL="$GIT_REMOTE_URL-apps"
+fi
 
 resolve_ref() {
     local repo="$1"
     shift
-    local src="https://github.com/$repo"
     local ref
 
     for ref in "$@"; do
         [[ -n "$ref" ]] || continue
-        if git ls-remote --exit-code --heads "$src" "$ref" >/dev/null 2>&1; then
+        if git ls-remote --exit-code --heads "$repo" "$ref" >/dev/null 2>&1; then
             echo "$ref"
             return 0
         fi
@@ -118,18 +127,28 @@ resolve_ref() {
 update_repo() {
     dst=$1
     git_dir=$dst/.git
-    repo=$2
+    remote_url=$2
     branch=$3
     _git="git --git-dir=$git_dir --work-tree=$dst"
     remote="$($_git remote -v | grep -m1 "$repo" | cut -f1)"
     if [[ -n "$($_git status -s)" ]]; then
-        warning "$dst has uncommitted files, skipping."
-        return
+        err_msg="$dst has uncommitted files"
+        if [[ -z "$STRICT" ]]; then
+            warning "$err_msg, skipping."
+            return
+        else
+            fatal "$err_msg"
+        fi
     fi
     current_branch=$($_git branch --show-current)
-    if ! $_git fetch $remote; then
-        warning "($dst) Fetching remote: $remote failed, skipping."
-        return
+    if ! $_git fetch "$remote"; then
+        err_msg="($dst) Fetching remote: $remote failed"
+        if [[ -z "$STRICT" ]]; then
+            warning "$err_msg, skipping."
+            return
+        else
+            fatal "$err_msg"
+        fi
     fi
     if [[ -z "$branch" ]]; then
         branch="$current_branch"
@@ -137,7 +156,7 @@ update_repo() {
     if [[ "$current_branch" != "$branch" ]]; then
         if [[ -n "$FORCE" ]]; then
             warning "Force used - attempting to checkout $branch"
-            if ! $_git checkout $branch && ! $_git checkout $branch-dev; then
+            if ! $_git checkout "$branch" && ! $_git checkout "$branch-dev"; then
                 warning "($dst) Checking out '$branch' failed, skipping."
                 return
             fi
@@ -145,60 +164,81 @@ update_repo() {
             if [[ "${current_branch::4}" == "$branch" ]]; then
                 warning "($dst) current checked out branch is $current_branch"\
                         " attempting to checkout $branch"
-                if ! $_git checkout $branch; then
-                    warning "($dst) checkout failed - skipping"
-                    return
+                if ! $_git checkout "$branch"; then
+                    err_msg="($dst) checkout failed"
+                    if [[ -z "$STRICT" ]]; then
+                        warning "$err_msg - skipping"
+                        return
+                    else
+                        fatal "$err_msg"
+                    fi
                 fi
             fi
         else
-            warning "($dst) current checked out branch is $current_branch"\
-                    " (not $branch) so skipping"
-            return
+            err_msg="($dst) checked out branch is $current_branch (not $branch)"
+            if [[ -z "$STRICT" ]]; then
+                warning "$err_msg so skipping"
+                return
+            else
+                fatal "$err_msg"
+            fi
         fi
     fi
-    if ! $_git pull $remote $branch; then
-        warning "($dst) Updating '$branch' failed, skipping."
-        return
+    if ! $_git pull "$remote" "$branch"; then
+        err_msg="($dst) Updating '$branch' failed"
+        if [[ -z "$STRICT" ]]; then
+            warning "$err_msg, skipping."
+            return
+        else
+            fatal "$err_msg"
+        fi
     fi
 }
 
 clone_or_update() {
-    repo=$1
-    src=https://github.com/$repo
-    dst=$2
+    local remote_url
+    remote_url="$GIT_REMOTE_URL"
+    if [[ $1 == _APP_ ]]; then
+        remote_url="$APP_GIT_REMOTE_URL"
+        shift
+    fi
+    local repo=$1
+    local src="$remote_url/$repo"
+    local dst=$2
     shift 2
     refs=("$@")
-    git_depth=""
-    branch_arg=""
-    resolved_ref=""
+    local git_depth
+    local branch_arg
+    local resolved_ref
     [[ "$GIT_DEPTH" == "full" ]] || git_depth="--depth $GIT_DEPTH"
-    mkdir -p $(dirname $dst)
+    mkdir -p "$(dirname "$dst")"
 
-    if resolved_ref=$(resolve_ref "$repo" "${refs[@]}"); then
+    err_msg="Could not resolve preferred refs for $repo"
+    if resolved_ref=$(resolve_ref "$src" "${refs[@]}"); then
         info "Resolved $repo to ref: $resolved_ref"
         branch_arg="--branch $resolved_ref"
+    elif [[ -z "$STRICT" ]]; then
+        warning "$err_msg; falling back to repo default branch."
     else
-        warning "Could not resolve preferred refs for $repo; falling back to repo default branch."
+        fatal "$err_msg"
     fi
 
     if [[ -d "$dst" ]]; then
         if [[ -d "$dst/.git" ]]; then
             info "$dst exists and is a git repo, attempting update."
-            update_repo $dst $repo $resolved_ref
+            update_repo "$dst" "$src" "$resolved_ref"
         else
-            warning "$dst exists, but is not a git repo - skipping."
-            return
+            fatal "$dst exists, but is not a git repo."
         fi
     else
         info "Attempting to clone $src into $dst."
-        if ! git clone $branch_arg $git_depth $src $dst; then
-            warning "Cloning $dst failed, skipping."
-            return
+        if ! git clone "$branch_arg" "$git_depth" "$src.git" "$dst"; then
+            fatal "Cloning $dst failed."
         fi
     fi
 }
 
-APPS=''
+APPS=()
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -h|--help)
@@ -206,35 +246,39 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         -f|--force)
             FORCE=y
-            shift
             ;;
         -n|--full-clone)
             GIT_DEPTH='full'
-            shift
+            ;;
+        -s|--strict)
+            STRICT=true
             ;;
         *)
-            APPS="$APPS $1"
-            shift
+            APPS+=("$1")
             ;;
     esac
+    shift
 done
 
-clone_or_update turnkeylinux/buildtasks $BT_PATH $BT_REFS
-clone_or_update turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles $TKLBAM_REFS
-clone_or_update turnkeylinux/common $FAB_PATH/common $COMMON_REFS
-for app in $APPS; do
-    clone_or_update turnkeylinux-apps/$app $FAB_PATH/products/$app $APP_REFS
+[[ -n "${APPS[*]}" ]] || APPS=(core)
+
+clone_or_update buildtasks "$BT_PATH" "${BT_REFS[@]}"
+clone_or_update tklbam-profiles /turnkey/tklbam-profiles "${TKLBAM_REFS[@]}"
+clone_or_update common "$FAB_PATH/common" "${COMMON_REFS[@]}"
+for app in "${APPS[@]}"; do
+    clone_or_update _APP_ "$app" "$FAB_PATH/products/$app" "${APP_REFS[@]}"
 done
 
 if [[ "${FAB_ARCH}" == "amd64" ]]; then
-    clone_or_update turnkeylinux/cdroots $FAB_PATH/cdroots $CDROOTS_REFS
+    clone_or_update turnkeylinux/cdroots "$FAB_PATH/cdroots" "${CDROOTS_REFS[@]}"
 fi
 
 if [[ ! -d "$BT_PATH/config" ]]; then
     cp -r "$BT_PATH/config.example" "$BT_PATH/config"
 fi
 if [[ -f "$BT_PATH/config/common.cfg" ]]; then
-    . $BT_PATH/config/common.cfg
+    # shellcheck source=/turnkey/buildtasks/config.example/common.cfg
+    source "$BT_PATH/config/common.cfg"
 else
     fatal "$BT_PATH config not found, unable to determine GPG key ID (BT_GPGKEY)."
 fi
@@ -247,23 +291,23 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y fab
 if [[ -d "$BOOTSTRAP_PATH" ]]; then
     info "$BOOTSTRAP_PATH exists, skipping download."
 else
-    errmsg=''
     info "Downloading $BOOTSTRAP_NAME"
-    mkdir -p $(dirname $BOOTSTRAP_PATH)
-    cd $(dirname $BOOTSTRAP_PATH)
+    mkdir -p "$(dirname "$BOOTSTRAP_PATH")"
+    cd "$(dirname "$BOOTSTRAP_PATH")"
     bootstrap_file=$BOOTSTRAP_PATH
-    wget -nc -nv $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz \
+    wget -nc -nv "$IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz" \
         || fatal "Downloading $BOOTSTRAP_NAME failed."
-    wget -nc -nv $IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash \
+    wget -nc -nv "$IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash" \
         || fatal "Downloading $BOOTSTRAP_NAME hash file failed."
     if [[ -f "$BT_VERIFY" ]]; then
-        bootstrap_file=$(dirname $BOOTSTRAP_PATH)/$BOOTSTRAP_NAME.tar.gz
-        BT_DEBUG=$DEBUG $BT_VERIFY --force-gpg $bootstrap_file $bootstrap_file.hash
+        bootstrap_file=$(dirname "$BOOTSTRAP_PATH)/$BOOTSTRAP_NAME.tar.gz")
+        BT_DEBUG=$DEBUG $BT_VERIFY \
+            --force-gpg "$bootstrap_file" "$bootstrap_file.hash"
     else
         fatal "$BT_VERIFY script not found, unable to verify downloaded files."
     fi
     info "Unpacking $BOOTSTRAP_NAME"
-    mkdir $BOOTSTRAP_PATH
-    tar -zxf $BOOTSTRAP_NAME.tar.gz -C $BOOTSTRAP_PATH
+    mkdir "$BOOTSTRAP_PATH"
+    tar -zxf "$BOOTSTRAP_NAME.tar.gz" -C "$BOOTSTRAP_PATH"
 fi
-info "$(basename $0) complete."
+info "$(basename "$0") complete."

@@ -1,0 +1,11 @@
+# GitHub authentication token environment variables.
+#
+# Some appliances derive latest version to install via GitHub API (using
+# gh_releases). To avoid possible unauthenticated API rate limiting uncomment
+# and set the 2 env var lines below.
+#
+# To generate a new GITHUB_USER_TOKEN, please browse to:
+# https://github.com/settings/tokens
+
+#export GITHUB_USER=your-github-username
+#export GITHUB_USER_TOKEN=your-github-user-token
