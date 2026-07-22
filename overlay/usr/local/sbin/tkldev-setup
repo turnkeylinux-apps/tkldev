@@ -107,6 +107,13 @@ if [[ "$GIT_REMOTE_URL" =~ [:/]turnkeylinux ]]; then
     APP_GIT_REMOTE_URL="$GIT_REMOTE_URL-apps"
 fi
 
+tkl_remote() {
+    local dir=$1
+    local git_remote
+    git_remote="$(git -C "$dir" remote --verbose)"
+    awk '/github.com[:/]turnkeylinux.*fetch/ {print $1; exit}' <<<"$git_remote"
+}
+
 resolve_ref() {
     local repo="$1"
     shift
@@ -125,13 +132,11 @@ resolve_ref() {
 
 
 update_repo() {
-    dst=$1
-    git_dir=$dst/.git
-    remote_url=$2
-    branch=$3
-    _git="git --git-dir=$git_dir --work-tree=$dst"
-    remote="$($_git remote -v | grep -m1 "$repo" | cut -f1)"
-    if [[ -n "$($_git status -s)" ]]; then
+    local dst=$1
+    local branch=$2
+    local remote
+    remote="$(tkl_remote "$dst")"
+    if [[ -n "$(git -C "$dst" status -s)" ]]; then
         err_msg="$dst has uncommitted files"
         if [[ -z "$STRICT" ]]; then
             warning "$err_msg, skipping."
@@ -140,8 +145,8 @@ update_repo() {
             fatal "$err_msg"
         fi
     fi
-    current_branch=$($_git branch --show-current)
-    if ! $_git fetch "$remote"; then
+    current_branch=$(git -C "$dst" branch --show-current)
+    if ! git -C "$dst" fetch "$remote"; then
         err_msg="($dst) Fetching remote: $remote failed"
         if [[ -z "$STRICT" ]]; then
             warning "$err_msg, skipping."
@@ -156,7 +161,8 @@ update_repo() {
     if [[ "$current_branch" != "$branch" ]]; then
         if [[ -n "$FORCE" ]]; then
             warning "Force used - attempting to checkout $branch"
-            if ! $_git checkout "$branch" && ! $_git checkout "$branch-dev"; then
+            if ! git -C "$dst" checkout "$branch" \
+                    && ! git -C "$dst" checkout "$branch-dev"; then
                 warning "($dst) Checking out '$branch' failed, skipping."
                 return
             fi
@@ -164,7 +170,7 @@ update_repo() {
             if [[ "${current_branch::4}" == "$branch" ]]; then
                 warning "($dst) current checked out branch is $current_branch"\
                         " attempting to checkout $branch"
-                if ! $_git checkout "$branch"; then
+                if ! git -C "$dst" checkout "$branch"; then
                     err_msg="($dst) checkout failed"
                     if [[ -z "$STRICT" ]]; then
                         warning "$err_msg - skipping"
@@ -184,7 +190,7 @@ update_repo() {
             fi
         fi
     fi
-    if ! $_git pull "$remote" "$branch"; then
+    if ! git -C "$dst" pull "$remote" "$branch"; then
         err_msg="($dst) Updating '$branch' failed"
         if [[ -z "$STRICT" ]]; then
             warning "$err_msg, skipping."
