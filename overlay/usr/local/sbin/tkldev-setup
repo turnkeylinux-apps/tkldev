@@ -304,15 +304,15 @@ else
     info "Downloading $BOOTSTRAP_NAME"
     mkdir -p "$(dirname "$BOOTSTRAP_PATH")"
     cd "$(dirname "$BOOTSTRAP_PATH")"
-    bootstrap_file=$BOOTSTRAP_PATH
-    wget -nc -nv "$IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz" \
-        || fail "$BOOTSTRAP_NAME"
-    wget -nc -nv "$IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash" \
-        || fail "$BOOTSTRAP_NAME.hash"
+    bootstrap_tar="$BOOTSTRAP_NAME.tar.gz"
+    wget -nc -nv "$IMAGES/bootstrap/$bootstrap_tar" \
+        || fail "$bootstrap_tar"
+    wget -nc -nv "$IMAGES/bootstrap/$bootstrap_tar.hash" \
+        || fail "$bootstrap_tar.hash"
     if [[ -f "$BT_VERIFY" ]]; then
-        bootstrap_file=$(dirname "$BOOTSTRAP_PATH)/$BOOTSTRAP_NAME.tar.gz")
+        bootstrap_tar_path=$(dirname "$BOOTSTRAP_PATH)/$bootstrap_tar")
         BT_DEBUG=$DEBUG $BT_VERIFY \
-            --force-gpg "$bootstrap_file" "$bootstrap_file.hash"
+            --force-gpg "$bootstrap_tar_path" "$bootstrap_tar_path.hash"
     else
         fatal "$BT_VERIFY script not found, unable to verify downloaded files."
     fi
