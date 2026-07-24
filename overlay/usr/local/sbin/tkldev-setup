@@ -62,7 +62,10 @@ EOF
     exit $exit_code
 }
 
-[[ -z "$DEBUG" ]] || set -x
+# check for BT_DEBUG as well as bt scripts call tkldev-setup
+if [[ -n "$DEBUG" ]] || [[ -n "$BT_DEBUG" ]]; then
+    set -x
+fi
 [[ $(id -u) -eq 0 ]] || fatal "Root user required."
 
 GIT_DEPTH=${GIT_DEPTH:-1}
@@ -214,7 +217,7 @@ clone_or_update() {
     local resolved_ref
     [[ "$GIT_DEPTH" == "full" ]] || git_depth="--depth $GIT_DEPTH"
     mkdir -p "$(dirname "$dst")"
-
+    info "Processing $repo"
     err_msg="Could not resolve preferred refs for $repo"
     if resolved_ref=$(resolve_ref "$src" "${refs[@]}"); then
         info "Resolved $repo to ref: $resolved_ref"
