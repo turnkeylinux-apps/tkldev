@@ -21,9 +21,11 @@ Options:
                     branch checked out; dirty repos still skipped
     -n|--full-clone Full clone (rather than default shallow clone)*
     -s|--strict     Fail rather than skip non-fatal steps
+    -t|--transition Transition build - no fail on missing bootstrap download**
     -h|--help       Show this help and exit
 
 *   - only applies to git repos listed below
+**  - '--transition' overrides '--strict' if bootstrap not downloadable
 
 Unless '--strict', repos with uncommitted files ('dirty') &/or alternate
 branches will be skipped. Default git repos, branches and local paths are:
@@ -70,7 +72,7 @@ if [[ "${distro,,}" == "turnkey" ]] || [[ "${distro,,}" == "debian" ]]; then
    distro="debian"
 fi
 tkl_ver=$(turnkey-version -t)
-unset FORCE STRICT
+unset FORCE STRICT TRANSITION
 
 export RELEASE="${RELEASE:-${distro}/$(lsb_release -s -c)}"
 CODENAME="$(basename "$RELEASE")"
@@ -253,6 +255,9 @@ while [[ "$#" -gt 0 ]]; do
         -s|--strict)
             STRICT=true
             ;;
+        -t|--transition)
+            TRANSITION=true
+            ;;
         *)
             APPS+=("$1")
             ;;
@@ -291,14 +296,19 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y fab
 if [[ -d "$BOOTSTRAP_PATH" ]]; then
     info "$BOOTSTRAP_PATH exists, skipping download."
 else
+    if [[ -n $TRANSITION ]]; then
+        fail() { warning "Failed download: $* - skipping due to transition"; }
+    else
+        fail() { fatal "Failed download: $*"; }
+    fi
     info "Downloading $BOOTSTRAP_NAME"
     mkdir -p "$(dirname "$BOOTSTRAP_PATH")"
     cd "$(dirname "$BOOTSTRAP_PATH")"
     bootstrap_file=$BOOTSTRAP_PATH
     wget -nc -nv "$IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz" \
-        || fatal "Downloading $BOOTSTRAP_NAME failed."
+        || fail "$BOOTSTRAP_NAME"
     wget -nc -nv "$IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash" \
-        || fatal "Downloading $BOOTSTRAP_NAME hash file failed."
+        || fail "$BOOTSTRAP_NAME.hash"
     if [[ -f "$BT_VERIFY" ]]; then
         bootstrap_file=$(dirname "$BOOTSTRAP_PATH)/$BOOTSTRAP_NAME.tar.gz")
         BT_DEBUG=$DEBUG $BT_VERIFY \
