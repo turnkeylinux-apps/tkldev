@@ -10,37 +10,31 @@ usage() {
     cat <<EOF
 $(basename "$0"): [-h|--help] [APP] [... APP]
 
-Tool to initialize and maintain TKLDev
+Tool to initialize and maintain TKLDev.
+
+Relevant git repos are downloaded/updated (see below), bootstrap is downloaded
+if needed and the latest 'fab' package will be installed when relevant.
 
 Options:
     APP [APP ...]   Appliance name/s - defaults if unset: 'core'
-    -f|--force      If the ref to be updated is not already checked out,
-                    rather than skip, it will be checked out (no updates if
-                    repo dirty)*
-    -s|--strict     Fail rather than skip non-fatal steps
+    -f|--force      Attempt checkout of default branch (see below) if alternate
+                    branch checked out; dirty repos still skipped
     -n|--full-clone Full clone (rather than default shallow clone)*
+    -s|--strict     Fail rather than skip non-fatal steps
     -h|--help       Show this help and exit
 
-*- only applies to git repos listed below
+*   - only applies to git repos listed below
 
-The default action is to download the bootstrap (if it doesn't already exist)
-and clone (or update) the following repos (to the corresponding paths):
+Unless '--strict', repos with uncommitted files ('dirty') &/or alternate
+branches will be skipped. Default git repos, branches and local paths are:
 
-    turnkeylinux/buildtasks $BT_PATH
-    turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
-    turnkeylinux/common $FAB_PATH/common
-    turnkeylinux-apps/APP $FAB_PATH/products/APP
-    turnkeylinux/cdroots $FAB_PATH/cdroots (amd64 only)
-
-Git refs are resolved per-repo. By default tkldev-setup prefers the current
-TurnKey series ref (e.g. 19.x), then <series>-dev, then master. This allows
-older TKLDev releases to avoid tracking a moving default branch while still
-remaining compatible with repos that have not yet grown stable series branches.
-
-The 'fab' apt package will be updated when possible (to the latest available).
-
-If the repos are dirty (uncommited files) they are skipped, if they have an
-alternate branch checked out, they will be skipped (unless -f|--force used).
+remote repo                     branch      local path
+------------------------------------------------------
+turnkeylinux/buildtasks         <ver>.x     $BT_PATH
+turnkeylinux/tklbam-profiles    master      /turnkey/tklbam-profiles
+turnkeylinux/cdroots            <ver>.x     $FAB_PATH/cdroots (amd64 only)
+turnkeylinux/common             <ver>.x     $FAB_PATH/common
+turnkeylinux-apps/APP           master      $FAB_PATH/products/APP
 
 Env vars:
 
