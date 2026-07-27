@@ -297,6 +297,9 @@ info "Installing newer fab version (if available)"
 DEBIAN_FRONTEND=noninteractive apt-get install -y fab
 
 if [[ -d "$BOOTSTRAP_PATH" ]]; then
+    if [[ ! -f "$BOOTSTRAP_PATH/bin/bash" ]]; then
+        fatal "$BOOTSTRAP_PATH exists, but does not appear to be a bootstrap"
+    fi
     info "$BOOTSTRAP_PATH exists, skipping download."
 else
     if [[ -n $TRANSITION ]]; then
