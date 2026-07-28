@@ -279,7 +279,7 @@ for app in "${APPS[@]}"; do
 done
 
 if [[ "${FAB_ARCH}" == "amd64" ]]; then
-    clone_or_update turnkeylinux/cdroots "$FAB_PATH/cdroots" "${CDROOTS_REFS[@]}"
+    clone_or_update cdroots "$FAB_PATH/cdroots" "${CDROOTS_REFS[@]}"
 fi
 
 if [[ ! -d "$BT_PATH/config" ]]; then
