@@ -10,37 +10,33 @@ usage() {
     cat <<EOF
 $(basename "$0"): [-h|--help] [APP] [... APP]
 
-Tool to initialize and maintain TKLDev
+Tool to initialize and maintain TKLDev.
+
+Relevant git repos are downloaded/updated (see below), bootstrap is downloaded
+if needed and the latest 'fab' package will be installed when relevant.
 
 Options:
     APP [APP ...]   Appliance name/s - defaults if unset: 'core'
-    -f|--force      If the ref to be updated is not already checked out,
-                    rather than skip, it will be checked out (no updates if
-                    repo dirty)*
-    -s|--strict     Fail rather than skip non-fatal steps
+    -f|--force      Attempt checkout of default branch (see below) if alternate
+                    branch checked out; dirty repos still skipped
     -n|--full-clone Full clone (rather than default shallow clone)*
+    -s|--strict     Fail rather than skip non-fatal steps
+    -t|--transition Transition build - no fail on missing bootstrap download**
     -h|--help       Show this help and exit
 
-*- only applies to git repos listed below
+*   - only applies to git repos listed below
+**  - '--transition' overrides '--strict' if bootstrap not downloadable
 
-The default action is to download the bootstrap (if it doesn't already exist)
-and clone (or update) the following repos (to the corresponding paths):
+Unless '--strict', repos with uncommitted files ('dirty') &/or alternate
+branches will be skipped. Default git repos, branches and local paths are:
 
-    turnkeylinux/buildtasks $BT_PATH
-    turnkeylinux/tklbam-profiles /turnkey/tklbam-profiles
-    turnkeylinux/common $FAB_PATH/common
-    turnkeylinux-apps/APP $FAB_PATH/products/APP
-    turnkeylinux/cdroots $FAB_PATH/cdroots (amd64 only)
-
-Git refs are resolved per-repo. By default tkldev-setup prefers the current
-TurnKey series ref (e.g. 19.x), then <series>-dev, then master. This allows
-older TKLDev releases to avoid tracking a moving default branch while still
-remaining compatible with repos that have not yet grown stable series branches.
-
-The 'fab' apt package will be updated when possible (to the latest available).
-
-If the repos are dirty (uncommited files) they are skipped, if they have an
-alternate branch checked out, they will be skipped (unless -f|--force used).
+remote repo                     branch      local path
+------------------------------------------------------
+turnkeylinux/buildtasks         <ver>.x     $BT_PATH
+turnkeylinux/tklbam-profiles    master      /turnkey/tklbam-profiles
+turnkeylinux/cdroots            <ver>.x     $FAB_PATH/cdroots (amd64 only)
+turnkeylinux/common             <ver>.x     $FAB_PATH/common
+turnkeylinux-apps/APP           master      $FAB_PATH/products/APP
 
 Env vars:
 
@@ -66,7 +62,10 @@ EOF
     exit $exit_code
 }
 
-[[ -z "$DEBUG" ]] || set -x
+# check for BT_DEBUG as well as bt scripts call tkldev-setup
+if [[ -n "$DEBUG" ]] || [[ -n "$BT_DEBUG" ]]; then
+    set -x
+fi
 [[ $(id -u) -eq 0 ]] || fatal "Root user required."
 
 GIT_DEPTH=${GIT_DEPTH:-1}
@@ -76,7 +75,7 @@ if [[ "${distro,,}" == "turnkey" ]] || [[ "${distro,,}" == "debian" ]]; then
    distro="debian"
 fi
 tkl_ver=$(turnkey-version -t)
-unset FORCE STRICT
+unset FORCE STRICT TRANSITION
 
 export RELEASE="${RELEASE:-${distro}/$(lsb_release -s -c)}"
 CODENAME="$(basename "$RELEASE")"
@@ -107,6 +106,13 @@ if [[ "$GIT_REMOTE_URL" =~ [:/]turnkeylinux ]]; then
     APP_GIT_REMOTE_URL="$GIT_REMOTE_URL-apps"
 fi
 
+tkl_remote() {
+    local dir=$1
+    local git_remote
+    git_remote="$(git -C "$dir" remote --verbose)"
+    awk '/github.com[:/]turnkeylinux.*fetch/ {print $1; exit}' <<<"$git_remote"
+}
+
 resolve_ref() {
     local repo="$1"
     shift
@@ -125,13 +131,11 @@ resolve_ref() {
 
 
 update_repo() {
-    dst=$1
-    git_dir=$dst/.git
-    remote_url=$2
-    branch=$3
-    _git="git --git-dir=$git_dir --work-tree=$dst"
-    remote="$($_git remote -v | grep -m1 "$repo" | cut -f1)"
-    if [[ -n "$($_git status -s)" ]]; then
+    local dst=$1
+    local branch=$2
+    local remote
+    remote="$(tkl_remote "$dst")"
+    if [[ -n "$(git -C "$dst" status -s)" ]]; then
         err_msg="$dst has uncommitted files"
         if [[ -z "$STRICT" ]]; then
             warning "$err_msg, skipping."
@@ -140,8 +144,8 @@ update_repo() {
             fatal "$err_msg"
         fi
     fi
-    current_branch=$($_git branch --show-current)
-    if ! $_git fetch "$remote"; then
+    current_branch=$(git -C "$dst" branch --show-current)
+    if ! git -C "$dst" fetch "$remote"; then
         err_msg="($dst) Fetching remote: $remote failed"
         if [[ -z "$STRICT" ]]; then
             warning "$err_msg, skipping."
@@ -156,7 +160,8 @@ update_repo() {
     if [[ "$current_branch" != "$branch" ]]; then
         if [[ -n "$FORCE" ]]; then
             warning "Force used - attempting to checkout $branch"
-            if ! $_git checkout "$branch" && ! $_git checkout "$branch-dev"; then
+            if ! git -C "$dst" checkout "$branch" \
+                    && ! git -C "$dst" checkout "$branch-dev"; then
                 warning "($dst) Checking out '$branch' failed, skipping."
                 return
             fi
@@ -164,7 +169,7 @@ update_repo() {
             if [[ "${current_branch::4}" == "$branch" ]]; then
                 warning "($dst) current checked out branch is $current_branch"\
                         " attempting to checkout $branch"
-                if ! $_git checkout "$branch"; then
+                if ! git -C "$dst" checkout "$branch"; then
                     err_msg="($dst) checkout failed"
                     if [[ -z "$STRICT" ]]; then
                         warning "$err_msg - skipping"
@@ -184,7 +189,7 @@ update_repo() {
             fi
         fi
     fi
-    if ! $_git pull "$remote" "$branch"; then
+    if ! git -C "$dst" pull "$remote" "$branch"; then
         err_msg="($dst) Updating '$branch' failed"
         if [[ -z "$STRICT" ]]; then
             warning "$err_msg, skipping."
@@ -212,7 +217,7 @@ clone_or_update() {
     local resolved_ref
     [[ "$GIT_DEPTH" == "full" ]] || git_depth="--depth $GIT_DEPTH"
     mkdir -p "$(dirname "$dst")"
-
+    info "Processing $repo"
     err_msg="Could not resolve preferred refs for $repo"
     if resolved_ref=$(resolve_ref "$src" "${refs[@]}"); then
         info "Resolved $repo to ref: $resolved_ref"
@@ -253,6 +258,9 @@ while [[ "$#" -gt 0 ]]; do
         -s|--strict)
             STRICT=true
             ;;
+        -t|--transition)
+            TRANSITION=true
+            ;;
         *)
             APPS+=("$1")
             ;;
@@ -289,20 +297,28 @@ info "Installing newer fab version (if available)"
 DEBIAN_FRONTEND=noninteractive apt-get install -y fab
 
 if [[ -d "$BOOTSTRAP_PATH" ]]; then
+    if [[ ! -f "$BOOTSTRAP_PATH/bin/bash" ]]; then
+        fatal "$BOOTSTRAP_PATH exists, but does not appear to be a bootstrap"
+    fi
     info "$BOOTSTRAP_PATH exists, skipping download."
 else
+    if [[ -n $TRANSITION ]]; then
+        fail() { warning "Failed download: $* - skipping due to transition"; }
+    else
+        fail() { fatal "Failed download: $*"; }
+    fi
     info "Downloading $BOOTSTRAP_NAME"
     mkdir -p "$(dirname "$BOOTSTRAP_PATH")"
     cd "$(dirname "$BOOTSTRAP_PATH")"
-    bootstrap_file=$BOOTSTRAP_PATH
-    wget -nc -nv "$IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz" \
-        || fatal "Downloading $BOOTSTRAP_NAME failed."
-    wget -nc -nv "$IMAGES/bootstrap/$BOOTSTRAP_NAME.tar.gz.hash" \
-        || fatal "Downloading $BOOTSTRAP_NAME hash file failed."
+    bootstrap_tar="$BOOTSTRAP_NAME.tar.gz"
+    wget -nc -nv "$IMAGES/bootstrap/$bootstrap_tar" \
+        || fail "$bootstrap_tar"
+    wget -nc -nv "$IMAGES/bootstrap/$bootstrap_tar.hash" \
+        || fail "$bootstrap_tar.hash"
     if [[ -f "$BT_VERIFY" ]]; then
-        bootstrap_file=$(dirname "$BOOTSTRAP_PATH)/$BOOTSTRAP_NAME.tar.gz")
+        bootstrap_tar_path=$(dirname "$BOOTSTRAP_PATH)/$bootstrap_tar")
         BT_DEBUG=$DEBUG $BT_VERIFY \
-            --force-gpg "$bootstrap_file" "$bootstrap_file.hash"
+            --force-gpg "$bootstrap_tar_path" "$bootstrap_tar_path.hash"
     else
         fatal "$BT_VERIFY script not found, unable to verify downloaded files."
     fi
