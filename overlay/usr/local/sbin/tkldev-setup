@@ -212,16 +212,16 @@ clone_or_update() {
     local dst=$2
     shift 2
     refs=("$@")
-    local git_depth
-    local branch_arg
+    local git_depth=()
+    local branch_arg=()
     local resolved_ref
-    [[ "$GIT_DEPTH" == "full" ]] || git_depth="--depth $GIT_DEPTH"
+    [[ "$GIT_DEPTH" == "full" ]] || git_depth=(--depth "$GIT_DEPTH")
     mkdir -p "$(dirname "$dst")"
     info "Processing $repo"
     err_msg="Could not resolve preferred refs for $repo"
     if resolved_ref=$(resolve_ref "$src" "${refs[@]}"); then
         info "Resolved $repo to ref: $resolved_ref"
-        branch_arg="--branch $resolved_ref"
+        branch_arg=(--branch "$resolved_ref")
     elif [[ -z "$STRICT" ]]; then
         warning "$err_msg; falling back to repo default branch."
     else
@@ -237,7 +237,8 @@ clone_or_update() {
         fi
     else
         info "Attempting to clone $src into $dst."
-        if ! git clone "$branch_arg" "$git_depth" "$src.git" "$dst"; then
+        git_cmd=(git clone "${branch_arg[@]}" "${git_depth[@]}")
+        if ! "${git_cmd[@]}" "$src.git" "$dst"; then
             fatal "Cloning $dst failed."
         fi
     fi
@@ -278,7 +279,7 @@ for app in "${APPS[@]}"; do
 done
 
 if [[ "${FAB_ARCH}" == "amd64" ]]; then
-    clone_or_update turnkeylinux/cdroots "$FAB_PATH/cdroots" "${CDROOTS_REFS[@]}"
+    clone_or_update cdroots "$FAB_PATH/cdroots" "${CDROOTS_REFS[@]}"
 fi
 
 if [[ ! -d "$BT_PATH/config" ]]; then
