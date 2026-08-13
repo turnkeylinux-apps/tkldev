@@ -317,7 +317,7 @@ else
     wget -nc -nv "$IMAGES/bootstrap/$bootstrap_tar.hash" \
         || fail "$bootstrap_tar.hash"
     if [[ -f "$BT_VERIFY" ]]; then
-        bootstrap_tar_path=$(dirname "$BOOTSTRAP_PATH)/$bootstrap_tar")
+        bootstrap_tar_path=$(dirname "$BOOTSTRAP_PATH/$bootstrap_tar")
         BT_DEBUG=$DEBUG $BT_VERIFY \
             --force-gpg "$bootstrap_tar_path" "$bootstrap_tar_path.hash"
     else
